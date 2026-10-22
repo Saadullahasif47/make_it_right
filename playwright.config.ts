@@ -1,4 +1,11 @@
+import { existsSync } from "node:fs";
+
 import { defineConfig, devices } from "@playwright/test";
+
+// Developers keep the local stack's variables in .env.local; CI exports them directly.
+if (process.env.SUPABASE_SECRET_KEY === undefined && existsSync(".env.local")) {
+  process.loadEnvFile(".env.local");
+}
 
 /**
  * E2E runs against a production build (`pnpm build` first) by default. Set
@@ -13,7 +20,9 @@ export default defineConfig({
   fullyParallel: true,
   forbidOnly: isCI,
   retries: isCI ? 1 : 0,
-  workers: isCI ? 2 : undefined,
+  // Each worker drives a browser against Docker Supabase and one Next server; keep it modest.
+  workers: isCI ? 2 : 3,
+  expect: { timeout: 10_000 },
   reporter: isCI ? [["github"], ["html", { open: "never" }]] : [["list"]],
   use: {
     baseURL: externalBaseUrl ?? `http://localhost:${port}`,
@@ -31,6 +40,8 @@ export default defineConfig({
           url: `http://localhost:${port}/api/health`,
           reuseExistingServer: !isCI,
           timeout: 120_000,
+          // Links in emails must point at this test server.
+          env: { APP_BASE_URL: `http://localhost:${port}` },
         }
       : undefined,
 });

@@ -21,7 +21,20 @@ export default defineConfig({
         test: {
           name: "unit",
           environment: "node",
-          include: ["tests/unit/**/*.test.ts", "tests/integration/**/*.test.ts"],
+          include: ["tests/unit/**/*.test.ts"],
+        },
+      },
+      {
+        // Needs the local Supabase stack (`pnpm db:start`); run with `pnpm test:integration`.
+        extends: true,
+        test: {
+          name: "integration",
+          environment: "node",
+          include: ["tests/integration/**/*.test.ts"],
+          setupFiles: ["./tests/integration/support/load-env.ts"],
+          testTimeout: 30_000,
+          hookTimeout: 60_000,
+          fileParallelism: false,
         },
       },
       {

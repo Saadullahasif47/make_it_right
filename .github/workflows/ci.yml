@@ -20,7 +20,7 @@ jobs:
   verify:
     name: Lint, typecheck, test, build, e2e
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
 
     steps:
       - name: Check out
@@ -54,6 +54,27 @@ jobs:
 
       - name: Audit production dependencies
         run: pnpm audit --prod --audit-level high
+
+      # Everything below runs against a throwaway local Supabase stack in Docker: migrations,
+      # seed, RLS and auth are exercised for real, and no cloud credentials are needed.
+      - name: Start local Supabase
+        run: pnpm db:start
+
+      - name: Generated database types match the migrations
+        run: |
+          pnpm db:types
+          git diff --exit-code -- src/lib/supabase/database.types.ts
+
+      - name: Database security tests (pgTAP)
+        run: pnpm db:test
+
+      - name: Export local stack environment
+        run: node scripts/local-supabase-env.mts >> "$GITHUB_ENV"
+        env:
+          APP_PORT: "3100"
+
+      - name: Integration tests (Auth and Data API)
+        run: pnpm test:integration
 
       - name: Build
         run: pnpm build

@@ -23,7 +23,13 @@ export function LogoMark({ className }: { readonly className?: string }) {
   );
 }
 
-export function Logo({ className }: { readonly className?: string }) {
+interface LogoProps {
+  readonly className?: string;
+  /** For dark brand surfaces (the ink band). */
+  readonly inverse?: boolean;
+}
+
+export function Logo({ className, inverse = false }: LogoProps) {
   return (
     <Link
       href="/"
@@ -31,8 +37,13 @@ export function Logo({ className }: { readonly className?: string }) {
       className={cn("group inline-flex items-center gap-2.5", className)}
     >
       <LogoMark className="transition-transform duration-300 ease-(--ease-out-soft) group-hover:scale-105 group-hover:-rotate-6" />
-      <span className="text-lg font-extrabold tracking-tight text-ink">
-        MakeIt<span className="text-brand">Right</span>
+      <span
+        className={cn(
+          "text-lg font-extrabold tracking-tight",
+          inverse ? "text-band-fg" : "text-ink",
+        )}
+      >
+        MakeIt<span className={inverse ? "text-brand-on-band" : "text-brand"}>Right</span>
       </span>
     </Link>
   );
