@@ -38,6 +38,10 @@ refers to this project.
 9. **CI** runs one job: lint, typecheck, format, unit tests, `pnpm audit` (high or above fails),
    build, then Playwright on desktop and mobile Chromium. Actions are pinned to commit SHAs and
    the workflow token is read-only.
+10. **Deployment settings are versioned.** `vercel.json` pins `"framework": "nextjs"`. When the
+    project was imported, `main` held no app yet, so Vercel auto-detected a static "Other" site
+    and the first preview failed with `STATIC_BUILD_NO_OUT_DIR`. A committed setting cannot drift
+    the way a dashboard default can.
 
 ## UI direction
 
