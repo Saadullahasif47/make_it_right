@@ -77,6 +77,9 @@ exist to prevent.
 
 ## Cloud verification
 
-- [ ] Migrations and seed applied to `makeitright-staging`
+- [x] Migrations and seed applied to `makeitright-staging` with `supabase db push --include-seed`.
+      `supabase migration list --linked` shows local `20261022115901` = remote `20261022115901`.
+- [x] Five fictional demo accounts seeded on the cloud project by `scripts/seed-demo-accounts.mts`.
+      The secret key was rotated afterwards because it had been typed on a command line.
 - [ ] Vercel preview: three demo roles sign in; wrong-role and signed-out access denied
 - [ ] Login checked from an incognito window and a phone
