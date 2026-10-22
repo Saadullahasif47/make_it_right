@@ -34,6 +34,7 @@
   --band: #0b1f2a;
   --band-fg: #ffffff;
   --band-muted: #a8bcc0;
+  --brand-on-band: #4fcdbb;
 
   --focus: #0b7a6e;
   --shadow-color: 200 40% 12%;
@@ -98,6 +99,7 @@
   --color-band: var(--band);
   --color-band-fg: var(--band-fg);
   --color-band-muted: var(--band-muted);
+  --color-brand-on-band: var(--brand-on-band);
   --color-focus: var(--focus);
 
   --font-sans: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;

@@ -53,8 +53,14 @@ const eslintConfig = defineConfig([
 
   // The configuration module and tooling configs are the only places allowed to touch process.env.
   {
-    files: ["src/lib/config/**", "*.config.{ts,mts}", "tests/e2e/**"],
+    files: ["src/lib/config/**", "*.config.{ts,mts}", "tests/e2e/**", "tests/integration/**"],
     rules: { "no-restricted-properties": "off" },
+  },
+
+  // Command-line scripts own their environment and talk to the terminal.
+  {
+    files: ["scripts/**"],
+    rules: { "no-restricted-properties": "off", "no-console": "off" },
   },
 
   // The logger is the single sanctioned console sink.
@@ -71,6 +77,8 @@ const eslintConfig = defineConfig([
     "playwright-report/**",
     "test-results/**",
     "next-env.d.ts",
+    "src/lib/supabase/database.types.ts",
+    "supabase/.temp/**",
   ]),
 ]);
 

@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+  <body
+    style="
+      margin: 0;
+      padding: 24px;
+      background: #f5f7f6;
+      font-family: system-ui, sans-serif;
+      color: #0b1f2a;
+    "
+  >
+    <table
+      role="presentation"
+      width="100%"
+      style="
+        max-width: 480px;
+        margin: 0 auto;
+        background: #ffffff;
+        border: 1px solid #dce5e2;
+        border-radius: 16px;
+      "
+    >
+      <tr>
+        <td style="padding: 32px">
+          <p style="margin: 0 0 4px; font-weight: 800; font-size: 18px">
+            MakeIt<span style="color: #0b7a6e">Right</span>
+          </p>
+          <h1 style="margin: 24px 0 8px; font-size: 22px">Confirm your email</h1>
+          <p style="margin: 0 0 24px; color: #475a63; line-height: 1.5">
+            Confirm this address to finish creating your MakeItRight account. The link expires in
+            one hour.
+          </p>
+          <a
+            href="{{ .RedirectTo }}?token_hash={{ .TokenHash }}&type=email"
+            style="
+              display: inline-block;
+              background: #0b7a6e;
+              color: #ffffff;
+              text-decoration: none;
+              font-weight: 600;
+              padding: 12px 20px;
+              border-radius: 12px;
+            "
+            >Confirm email</a
+          >
+          <p style="margin: 24px 0 0; color: #5b6c74; font-size: 13px; line-height: 1.5">
+            If you did not create an account, you can ignore this email. Coursework prototype: not
+            an official university channel.
+          </p>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>

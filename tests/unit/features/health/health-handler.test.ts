@@ -1,9 +1,11 @@
 import { describe, expect, it, vi } from "vitest";
 
 import { createHealthHandler } from "@/features/health/health-handler";
-import { ConfigError, parseServerConfig, type ServerConfig } from "@/lib/config/server-config";
+import { ConfigError, type ServerConfig } from "@/lib/config/server-config";
 import { createLogger } from "@/lib/logging/logger";
 import { createRequestId } from "@/lib/logging/request-id";
+
+import { configWith } from "../../../support/env";
 
 function silentLogger() {
   const sink = vi.fn<(level: string, line: string) => void>();
@@ -17,7 +19,7 @@ function request(headers: Record<string, string> = {}): Request {
 describe("health handler", () => {
   it("returns ok with the local version outside Vercel", async () => {
     const { logger } = silentLogger();
-    const handle = createHealthHandler({ loadConfig: () => parseServerConfig({}), logger });
+    const handle = createHealthHandler({ loadConfig: () => configWith(), logger });
 
     const response = handle(request());
 
@@ -32,7 +34,7 @@ describe("health handler", () => {
 
   it("reports the short commit SHA and environment of a Vercel deployment", async () => {
     const { logger } = silentLogger();
-    const config: ServerConfig = parseServerConfig({
+    const config: ServerConfig = configWith({
       VERCEL_ENV: "preview",
       VERCEL_GIT_COMMIT_SHA: "abcdef0123456789abcdef0123456789abcdef01",
     });
@@ -47,7 +49,7 @@ describe("health handler", () => {
 
   it("never exposes secrets, even when they are configured", async () => {
     const { logger } = silentLogger();
-    const config = parseServerConfig({ GEMINI_API_KEY: "gem-secret-key", AI_ENABLED: "true" });
+    const config = configWith({ GEMINI_API_KEY: "gem-secret-key", AI_ENABLED: "true" });
     const handle = createHealthHandler({ loadConfig: () => config, logger });
 
     const text = await handle(request()).text();
@@ -57,7 +59,7 @@ describe("health handler", () => {
 
   it("echoes a valid inbound request ID", () => {
     const { logger } = silentLogger();
-    const handle = createHealthHandler({ loadConfig: () => parseServerConfig({}), logger });
+    const handle = createHealthHandler({ loadConfig: () => configWith(), logger });
     const id = createRequestId();
 
     expect(handle(request({ "x-request-id": id })).headers.get("x-request-id")).toBe(id);
