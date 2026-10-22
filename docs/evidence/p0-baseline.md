@@ -70,6 +70,8 @@ rules are active and not silently skipped.
 
 ## Remaining to close the gate
 
-- [ ] GitHub Actions run green on the Phase 0 pull request (link the run here).
+- [x] GitHub Actions run green on the Phase 0 pull request:
+      [run 39666341234](https://github.com/Saadullahasif47/make_it_right/actions/runs/39666341234)
+      on `ec4d56a` (every step passed, 34/34 E2E on ubuntu-latest, 2 min 22 s).
 - [ ] Vercel preview URL loads; `/api/health` returns `{"status":"ok"}` from a second device.
 - [ ] E2E suite passes against the preview (`PLAYWRIGHT_BASE_URL=<preview> pnpm test:e2e`).
