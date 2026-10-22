@@ -1,0 +1,241 @@
+@import "tailwindcss";
+
+/*
+ * MakeItRight design tokens.
+ * Palette: deep ink (trust, legibility) + pine teal (resolution, "fixed") + amber (attention,
+ * used sparingly). Every text/background pair below meets WCAG AA (>= 4.5:1).
+ * Components use the semantic names only, so dark mode is a token swap, not a rewrite.
+ */
+:root {
+  --canvas: #f5f7f6;
+  --surface: #ffffff;
+  --surface-muted: #eef3f1;
+  --ink: #0b1f2a;
+  --ink-muted: #475a63;
+  --ink-subtle: #5b6c74;
+  --line: #dce5e2;
+  --line-strong: #c3d1cd;
+
+  --brand: #0b7a6e;
+  --brand-hover: #086257;
+  --brand-fg: #ffffff;
+  --brand-soft: #e2f3ef;
+  --brand-strong: #075e54;
+
+  --accent: #f2a516;
+  --accent-soft: #fef3d9;
+  --accent-ink: #8a4b00;
+
+  --danger: #b42318;
+  --danger-soft: #fdecea;
+  --success: #157f4f;
+  --success-soft: #e3f5ec;
+
+  --band: #0b1f2a;
+  --band-fg: #ffffff;
+  --band-muted: #a8bcc0;
+
+  --focus: #0b7a6e;
+  --shadow-color: 200 40% 12%;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --canvas: #081316;
+    --surface: #0e1c20;
+    --surface-muted: #13262b;
+    --ink: #e6efed;
+    --ink-muted: #9fb3b0;
+    --ink-subtle: #8aa19d;
+    --line: #1f343a;
+    --line-strong: #2b464d;
+
+    --brand: #2db7a5;
+    --brand-hover: #4fcdbb;
+    --brand-fg: #04211d;
+    --brand-soft: #0f3833;
+    --brand-strong: #4fcdbb;
+
+    --accent: #f5b940;
+    --accent-soft: #3a2a0c;
+    --accent-ink: #f5c86a;
+
+    --danger: #f97066;
+    --danger-soft: #3b1513;
+    --success: #47cd89;
+    --success-soft: #0f3221;
+
+    --band: #0d2a2b;
+    --band-fg: #e6efed;
+    --band-muted: #9fb3b0;
+
+    --focus: #4fcdbb;
+    --shadow-color: 200 60% 2%;
+  }
+}
+
+@theme inline {
+  --color-canvas: var(--canvas);
+  --color-surface: var(--surface);
+  --color-surface-muted: var(--surface-muted);
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
+  --color-ink-subtle: var(--ink-subtle);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-brand: var(--brand);
+  --color-brand-hover: var(--brand-hover);
+  --color-brand-fg: var(--brand-fg);
+  --color-brand-soft: var(--brand-soft);
+  --color-brand-strong: var(--brand-strong);
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-ink: var(--accent-ink);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-band: var(--band);
+  --color-band-fg: var(--band-fg);
+  --color-band-muted: var(--band-muted);
+  --color-focus: var(--focus);
+
+  --font-sans: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, monospace;
+
+  --shadow-soft:
+    0 1px 2px hsl(var(--shadow-color) / 0.06), 0 2px 8px hsl(var(--shadow-color) / 0.05);
+  --shadow-lift:
+    0 2px 4px hsl(var(--shadow-color) / 0.06), 0 12px 32px -8px hsl(var(--shadow-color) / 0.18);
+
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+
+  --animate-fade-up: fade-up 0.7s var(--ease-out-soft) both;
+  --animate-step-in: step-in 0.5s var(--ease-out-soft) both;
+  --animate-pulse-ring: pulse-ring 2s var(--ease-out-soft) infinite;
+  --animate-float: float 6s ease-in-out infinite;
+}
+
+/* Keyframes live outside @theme so custom component classes can always reference them. */
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes step-in {
+  from {
+    opacity: 0;
+    transform: translateX(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes pulse-ring {
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in oklab, var(--brand) 45%, transparent);
+  }
+  70%,
+  100% {
+    box-shadow: 0 0 0 10px color-mix(in oklab, var(--brand) 0%, transparent);
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes sheen {
+  from {
+    transform: translateX(-120%) skewX(-20deg);
+  }
+  to {
+    transform: translateX(220%) skewX(-20deg);
+  }
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    color-scheme: light dark;
+  }
+
+  body {
+    background-color: var(--color-canvas);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background-color: color-mix(in oklab, var(--brand) 25%, transparent);
+  }
+
+  /* One consistent, clearly visible keyboard focus style across the app. */
+  :focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 3px;
+    border-radius: 6px;
+  }
+
+  [id] {
+    scroll-margin-top: 6rem;
+  }
+}
+
+@layer components {
+  /* A light sweep across primary buttons on hover; purely decorative. */
+  .btn-sheen {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+  }
+
+  .btn-sheen::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    width: 40%;
+    background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.28), transparent);
+    transform: translateX(-120%) skewX(-20deg);
+    pointer-events: none;
+  }
+
+  .btn-sheen:hover::after {
+    animation: sheen 0.9s var(--ease-out-soft);
+  }
+
+  .bg-grid {
+    background-image:
+      linear-gradient(to right, var(--color-line) 1px, transparent 1px),
+      linear-gradient(to bottom, var(--color-line) 1px, transparent 1px);
+    background-size: 44px 44px;
+    mask-image: radial-gradient(ellipse 70% 60% at 50% 30%, black 30%, transparent 75%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
