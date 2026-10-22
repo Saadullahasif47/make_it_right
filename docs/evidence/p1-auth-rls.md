@@ -5,18 +5,18 @@ rejected by the database.
 
 ## Task checklist (plan §15)
 
-| ID    | Task                                                         | Status  | Evidence                                                                                 |
-| ----- | ------------------------------------------------------------ | ------- | ---------------------------------------------------------------------------------------- |
-| P1.01 | Supabase project; region, quotas; keys in Vercel preview env | Pending | `makeitright-staging` (`ijmikxhkyrensmsnmvmb`) created; Vercel env vars set by the owner |
-| P1.02 | Supabase CLI; first migration and seed                       | Done    | `supabase/config.toml`, `migrations/20261022115901_identity_and_access.sql`, `seed.sql`  |
-| P1.03 | departments/profiles; student-default trigger; demo seed     | Done    | `private.handle_new_user`, `scripts/seed-demo-accounts.mts`                              |
-| P1.04 | SSR cookie clients and server session verification           | Done    | `lib/supabase/server.ts`, `proxy-session.ts`, `features/auth/session.ts`                 |
-| P1.05 | Login/logout, callback redirects, reject signed-out access   | Done    | `(auth)` pages, `auth/confirm/route.ts`, `proxy.ts`; E2E `auth.spec.ts`                  |
-| P1.06 | Role-aware navigation after server role checks               | Done    | `ROLE_NAVIGATION`, `(app)/layout.tsx`, `requirePageAccess`                               |
-| P1.07 | RLS for profiles and departments; direct-client denial tests | Done    | pgTAP `002_identity_access`, `tests/integration/identity-api.test.ts`                    |
-| P1.08 | Fictional student/staff/admin accounts; no self-promotion    | Done    | Seed script; 8 self-promotion attempts rejected across the pgTAP and API suites          |
-| P1.09 | Auth and redirect E2E incl. expired session and wrong role   | Done    | `auth.spec.ts`: tampered cookie, cleared cookies, wrong-role 403, open-redirect          |
-| P1.10 | Preview deploy; login from incognito and mobile              | Pending | After the cloud setup below                                                              |
+| ID    | Task                                                         | Status | Evidence                                                                                                      |
+| ----- | ------------------------------------------------------------ | ------ | ------------------------------------------------------------------------------------------------------------- |
+| P1.01 | Supabase project; region, quotas; keys in Vercel preview env | Done   | `makeitright-staging` (`ijmikxhkyrensmsnmvmb`), Free plan; publishable URL/key on Vercel Production + Preview |
+| P1.02 | Supabase CLI; first migration and seed                       | Done   | `supabase/config.toml`, `migrations/20261022115901_identity_and_access.sql`, `seed.sql`                       |
+| P1.03 | departments/profiles; student-default trigger; demo seed     | Done   | `private.handle_new_user`, `scripts/seed-demo-accounts.mts`                                                   |
+| P1.04 | SSR cookie clients and server session verification           | Done   | `lib/supabase/server.ts`, `proxy-session.ts`, `features/auth/session.ts`                                      |
+| P1.05 | Login/logout, callback redirects, reject signed-out access   | Done   | `(auth)` pages, `auth/confirm/route.ts`, `proxy.ts`; E2E `auth.spec.ts`                                       |
+| P1.06 | Role-aware navigation after server role checks               | Done   | `ROLE_NAVIGATION`, `(app)/layout.tsx`, `requirePageAccess`                                                    |
+| P1.07 | RLS for profiles and departments; direct-client denial tests | Done   | pgTAP `002_identity_access`, `tests/integration/identity-api.test.ts`                                         |
+| P1.08 | Fictional student/staff/admin accounts; no self-promotion    | Done   | Seed script; 8 self-promotion attempts rejected across the pgTAP and API suites                               |
+| P1.09 | Auth and redirect E2E incl. expired session and wrong role   | Done   | `auth.spec.ts`: tampered cookie, cleared cookies, wrong-role 403, open-redirect                               |
+| P1.10 | Preview deploy; login from incognito and mobile              | Done   | Cloud verification below; owner sign-in checks on incognito and phone                                         |
 
 ## Local verification (2026-10-22, Docker Supabase CLI 2.121, Postgres 17)
 
@@ -80,6 +80,18 @@ exist to prevent.
 - [x] Migrations and seed applied to `makeitright-staging` with `supabase db push --include-seed`.
       `supabase migration list --linked` shows local `20261022115901` = remote `20261022115901`.
 - [x] Five fictional demo accounts seeded on the cloud project by `scripts/seed-demo-accounts.mts`.
-      The secret key was rotated afterwards because it had been typed on a command line.
-- [ ] Vercel preview: three demo roles sign in; wrong-role and signed-out access denied
-- [ ] Login checked from an incognito window and a phone
+      The secret key was rotated afterwards (old key deleted), because it had been typed on a
+      command line. Future scripts will read secrets from a prompt, not the command line.
+- [x] Vercel preview <https://makeitright-git-phase-p1-auth-rls-takeasy1.vercel.app> on `d38a210`:
+      `/api/health` returns `{"status":"ok","version":"d38a210","environment":"preview"}`. Signed-out
+      requests to `/student/complaints`, `/department`, `/admin` and `/account/password` get
+      **307 → `/login?next=…`**, and the public E2E suite passes **34/34** against the live preview.
+- [x] Owner sign-in checks on the preview, in an incognito window and on a phone:
+  - each role (student, electrical staff, admin) lands on its own dashboard
+  - a student opening `/admin` gets the 403 view
+  - sign-out works, and a wrong password shows the generic message
+  - the admin overview shows the seeded counts
+- [x] Supabase Auth configured by the owner: site URL, redirect allow-list, email confirmation,
+      and the 10-character letters-and-digits password policy.
+
+**Gate P1: passed.**
