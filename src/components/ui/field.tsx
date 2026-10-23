@@ -73,3 +73,35 @@ export function TextField({ name, label, hint, error, className, ...props }: Tex
     </FieldShell>
   );
 }
+
+type TextAreaFieldProps = Omit<ComponentProps<"textarea">, "id" | "name"> & {
+  readonly name: string;
+  readonly label: string;
+  readonly hint?: string | undefined;
+  readonly error?: string | undefined;
+  readonly labelAside?: ReactNode;
+};
+
+export function TextAreaField({
+  name,
+  label,
+  hint,
+  error,
+  labelAside,
+  className,
+  ...props
+}: TextAreaFieldProps) {
+  const id = `field-${name}`;
+  return (
+    <FieldShell id={id} label={label} hint={hint} error={error} labelAside={labelAside}>
+      <textarea
+        id={id}
+        name={name}
+        aria-invalid={error === undefined ? undefined : true}
+        aria-describedby={fieldDescriptionIds(id, hint, error)}
+        className={cn(inputClassName, "h-auto min-h-36 resize-y py-3 leading-relaxed", className)}
+        {...props}
+      />
+    </FieldShell>
+  );
+}

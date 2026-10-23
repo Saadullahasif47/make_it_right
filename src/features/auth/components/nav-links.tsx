@@ -7,13 +7,28 @@ import { cn } from "@/lib/utils/cn";
 
 import type { NavItem } from "../navigation";
 
+function matches(pathname: string, href: string): boolean {
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
+
+/** The most specific matching item is current, so nested routes never highlight two tabs. */
+export function activeHref(pathname: string, items: readonly NavItem[]): string | undefined {
+  return items
+    .filter((item) => matches(pathname, item.href))
+    .reduce<string | undefined>(
+      (best, item) => (best === undefined || item.href.length > best.length ? item.href : best),
+      undefined,
+    );
+}
+
 export function NavLinks({ items }: { readonly items: readonly NavItem[] }) {
   const pathname = usePathname();
+  const current = activeHref(pathname, items);
 
   return (
     <ul className="flex items-center gap-1 overflow-x-auto">
       {items.map((item) => {
-        const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
+        const active = item.href === current;
         return (
           <li key={item.href}>
             <Link

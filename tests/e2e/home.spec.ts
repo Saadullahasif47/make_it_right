@@ -16,7 +16,7 @@ test.describe("public landing page", () => {
     await expect(page.getByRole("note", { name: "Prototype notice" })).toBeVisible();
     await expect(
       page.getByRole("banner").getByRole("link", { name: /report an issue/i }),
-    ).toHaveAttribute("href", "/login");
+    ).toHaveAttribute("href", "/student/complaints/new");
     expect(consoleErrors).toEqual([]);
   });
 
@@ -96,7 +96,7 @@ test.describe("public landing page", () => {
       .getByRole("link", { name: /report an issue/i })
       .click();
 
-    await expect(page).toHaveURL(/\/login$/);
+    await expect(page).toHaveURL(/\/login\?next=%2Fstudent%2Fcomplaints%2Fnew$/);
     await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
   });
 

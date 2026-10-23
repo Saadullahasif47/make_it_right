@@ -48,9 +48,21 @@ test.describe("protected areas when signed out", () => {
 
 test.describe("each role signs in to its own area", () => {
   const cases = [
-    { name: "student", home: /\/student\/complaints$/, nav: "My complaints", label: "Student" },
-    { name: "staff", home: /\/department$/, nav: "Department queue", label: "Department staff" },
-    { name: "admin", home: /\/admin$/, nav: "Overview", label: "Administrator" },
+    {
+      name: "student",
+      home: /\/student\/complaints$/,
+      nav: "My complaints",
+      links: 2,
+      label: "Student",
+    },
+    {
+      name: "staff",
+      home: /\/department$/,
+      nav: "Department queue",
+      links: 1,
+      label: "Department staff",
+    },
+    { name: "admin", home: /\/admin$/, nav: "Overview", links: 1, label: "Administrator" },
   ] as const;
 
   for (const role of cases) {
@@ -65,7 +77,8 @@ test.describe("each role signs in to its own area", () => {
         "aria-current",
         "page",
       );
-      await expect(workspace.getByRole("link")).toHaveCount(1);
+      await expect(workspace.getByRole("link")).toHaveCount(role.links);
+      await expect(workspace.locator('[aria-current="page"]')).toHaveCount(1);
       await expect(page.getByRole("banner").getByText(role.label, { exact: true })).toBeVisible();
     });
   }

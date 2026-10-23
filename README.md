@@ -69,6 +69,18 @@ To run the E2E suite against a deployed preview instead of a local build:
 PLAYWRIGHT_BASE_URL=https://<preview>.vercel.app pnpm test:e2e
 ```
 
+## HTTP API
+
+All endpoints use the signed-in session cookie, answer JSON with `Cache-Control: no-store` and an
+`x-request-id`, and report errors as `{ "error": { "code", "message", "requestId", "fields"? } }`.
+
+| Method and path            | Who                | Result                                                      |
+| -------------------------- | ------------------ | ----------------------------------------------------------- |
+| `POST /api/complaints`     | Student            | 201 created / 200 replayed; needs an `Idempotency-Key` UUID |
+| `GET /api/complaints`      | Any signed-in user | Visible tickets, `?limit` (≤ 50), `?cursor`, `?status`      |
+| `GET /api/complaints/[id]` | Viewer of ticket   | Ticket with timeline; 404 if missing or not visible         |
+| `GET /api/health`          | Anyone             | `{ status, version, environment }`                          |
+
 ## Project layout
 
 ```

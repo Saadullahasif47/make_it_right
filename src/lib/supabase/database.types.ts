@@ -5,7 +5,33 @@ export type Database = {
   
   "public": {
           Tables: {
-            "departments": {
+            "complaints": {
+                  Row: {
+                    "assigned_department_id": string | null,"building": string,"category": Database["public"]['Enums']["complaint_category"],"created_at": string,"created_by": string,"description": string,"id": string,"priority": Database["public"]['Enums']["ticket_priority"],"reference_no": number,"room": string | null,"status": Database["public"]['Enums']["ticket_state"],"title": string,"updated_at": string,"version": number
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "assigned_department_id"?: string | null,"building": string,"category"?: Database["public"]['Enums']["complaint_category"],"created_at"?: string,"created_by": string,"description": string,"id"?: string,"priority"?: Database["public"]['Enums']["ticket_priority"],"reference_no"?: never,"room"?: string | null,"status"?: Database["public"]['Enums']["ticket_state"],"title": string,"updated_at"?: string,"version"?: number
+                  }
+                  Update: {
+                    "assigned_department_id"?: string | null,"building"?: string,"category"?: Database["public"]['Enums']["complaint_category"],"created_at"?: string,"created_by"?: string,"description"?: string,"id"?: string,"priority"?: Database["public"]['Enums']["ticket_priority"],"reference_no"?: never,"room"?: string | null,"status"?: Database["public"]['Enums']["ticket_state"],"title"?: string,"updated_at"?: string,"version"?: number
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "complaints_assigned_department_id_fkey"
+      columns: ["assigned_department_id"]
+isOneToOne: false
+      referencedRelation: "departments"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "complaints_created_by_fkey"
+      columns: ["created_by"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"departments": {
                   Row: {
                     "code": string,"created_at": string,"id": string,"is_active": boolean,"name": string
                   }
@@ -39,16 +65,95 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"submission_keys": {
+                  Row: {
+                    "actor_id": string,"complaint_id": string,"created_at": string,"idempotency_key": string,"request_hash": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "actor_id": string,"complaint_id": string,"created_at"?: string,"idempotency_key": string,"request_hash": string
+                  }
+                  Update: {
+                    "actor_id"?: string,"complaint_id"?: string,"created_at"?: string,"idempotency_key"?: string,"request_hash"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "submission_keys_actor_id_fkey"
+      columns: ["actor_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "submission_keys_complaint_id_fkey"
+      columns: ["complaint_id"]
+isOneToOne: false
+      referencedRelation: "complaints"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"ticket_events": {
+                  Row: {
+                    "actor_id": string | null,"actor_kind": Database["public"]['Enums']["ticket_actor_kind"],"complaint_id": string,"created_at": string,"event_type": Database["public"]['Enums']["ticket_event_type"],"id": number,"new_status": Database["public"]['Enums']["ticket_state"] | null,"note": string | null,"previous_status": Database["public"]['Enums']["ticket_state"] | null
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "actor_id"?: string | null,"actor_kind": Database["public"]['Enums']["ticket_actor_kind"],"complaint_id": string,"created_at"?: string,"event_type": Database["public"]['Enums']["ticket_event_type"],"id"?: never,"new_status"?: Database["public"]['Enums']["ticket_state"] | null,"note"?: string | null,"previous_status"?: Database["public"]['Enums']["ticket_state"] | null
+                  }
+                  Update: {
+                    "actor_id"?: string | null,"actor_kind"?: Database["public"]['Enums']["ticket_actor_kind"],"complaint_id"?: string,"created_at"?: string,"event_type"?: Database["public"]['Enums']["ticket_event_type"],"id"?: never,"new_status"?: Database["public"]['Enums']["ticket_state"] | null,"note"?: string | null,"previous_status"?: Database["public"]['Enums']["ticket_state"] | null
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "ticket_events_actor_id_fkey"
+      columns: ["actor_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "ticket_events_complaint_id_fkey"
+      columns: ["complaint_id"]
+isOneToOne: false
+      referencedRelation: "complaints"
+      referencedColumns: ["id"]
+    }
+                  ]
                 }
           }
           Views: {
             [_ in never]: never
           }
           Functions: {
-            [_ in never]: never
+            "create_ticket":
+{ Args: { "p_building": string,"p_description": string,"p_idempotency_key": string,"p_room": string,"p_title": string }; Returns: {
+              "created": boolean,"id": string,"reference_no": number,"status": Database["public"]['Enums']["ticket_state"]
+            }[]
+                           },
+"list_complaints":
+{ Args: { "p_cursor_created_at"?: string,"p_cursor_id"?: string,"p_limit"?: number,"p_statuses"?: (Database["public"]['Enums']["ticket_state"])[] }; Returns: {
+              "assigned_department_id": string | null,
+"building": string,
+"category": Database["public"]['Enums']["complaint_category"],
+"created_at": string,
+"created_by": string,
+"description": string,
+"id": string,
+"priority": Database["public"]['Enums']["ticket_priority"],
+"reference_no": number,
+"room": string | null,
+"status": Database["public"]['Enums']["ticket_state"],
+"title": string,
+"updated_at": string,
+"version": number
+            }[]
+                          SetofOptions: {
+        from: "*"
+        to: "complaints"
+        isOneToOne: false
+        isSetofReturn: true
+      } }
           }
           Enums: {
-            "app_role": "student"|"department"|"admin"
+            "app_role": "student"|"department"|"admin","complaint_category": "unclassified"|"electrical"|"it_equipment"|"plumbing"|"furniture"|"sanitation"|"other","ticket_actor_kind": "user"|"agent"|"rule"|"system","ticket_event_type": "created","ticket_priority": "unassessed"|"low"|"medium"|"high","ticket_state": "submitted"|"triaging"|"needs_review"|"assigned"|"in_progress"|"resolved"|"reopened"|"closed"
           }
           CompositeTypes: {
             [_ in never]: never
@@ -164,7 +269,7 @@ export type CompositeTypes<
 export const Constants = {
   "public": {
           Enums: {
-            "app_role": ["student", "department", "admin"]
+            "app_role": ["student", "department", "admin"],"complaint_category": ["unclassified", "electrical", "it_equipment", "plumbing", "furniture", "sanitation", "other"],"ticket_actor_kind": ["user", "agent", "rule", "system"],"ticket_event_type": ["created"],"ticket_priority": ["unassessed", "low", "medium", "high"],"ticket_state": ["submitted", "triaging", "needs_review", "assigned", "in_progress", "resolved", "reopened", "closed"]
           }
         }
 } as const
