@@ -5,18 +5,18 @@ cannot see student B.
 
 ## Task checklist (plan §15)
 
-| ID    | Task                                                                  | Status  | Evidence                                                                        |
-| ----- | --------------------------------------------------------------------- | ------- | ------------------------------------------------------------------------------- |
-| P2.01 | complaints, ticket_events, submission_keys with FK/checks and indexes | Done    | `migrations/20261023122610_complaints_and_ticket_events.sql`                    |
-| P2.02 | RLS read policies for student, department, admin                      | Done    | `complaints_select_scoped`, `ticket_events_select_with_complaint`; pgTAP 003    |
-| P2.03 | `create_ticket` RPC: server-derived owner, idempotency, CREATED event | Done    | pgTAP 003 (creation, idempotency, rate limit)                                   |
-| P2.04 | Zod complaint input; accessible form with validation                  | Done    | `features/complaints/schemas.ts`, `complaint-form.tsx`; E2E field errors, axe   |
-| P2.05 | `POST /api/complaints` through the authenticated RPC, no AI yet       | Done    | `features/complaints/api.ts`; unit `api.test.ts`; E2E API contract              |
-| P2.06 | Scoped list and detail with keyset pagination and events              | Done    | `list_complaints()`; list/detail pages; E2E 25-ticket pagination and filters    |
-| P2.07 | Duplicate idempotency key → one complaint                             | Done    | 10 simultaneous identical calls → 1 ticket; E2E triple replay of the form POST  |
-| P2.08 | Concurrent creation and two-student read isolation                    | Done    | 20 parallel → 20 unique refs; 30 parallel → exactly 20 (limit); isolation tests |
-| P2.09 | SQL tests for unauthorized updates and injected role/status fields    | Done    | pgTAP 003 direct-write denials; API rejects injected fields; smuggled RPC args  |
-| P2.10 | Preview deploy; submitted ticket persists after refresh               | Pending | After the cloud migration                                                       |
+| ID    | Task                                                                  | Status | Evidence                                                                        |
+| ----- | --------------------------------------------------------------------- | ------ | ------------------------------------------------------------------------------- |
+| P2.01 | complaints, ticket_events, submission_keys with FK/checks and indexes | Done   | `migrations/20261023122610_complaints_and_ticket_events.sql`                    |
+| P2.02 | RLS read policies for student, department, admin                      | Done   | `complaints_select_scoped`, `ticket_events_select_with_complaint`; pgTAP 003    |
+| P2.03 | `create_ticket` RPC: server-derived owner, idempotency, CREATED event | Done   | pgTAP 003 (creation, idempotency, rate limit)                                   |
+| P2.04 | Zod complaint input; accessible form with validation                  | Done   | `features/complaints/schemas.ts`, `complaint-form.tsx`; E2E field errors, axe   |
+| P2.05 | `POST /api/complaints` through the authenticated RPC, no AI yet       | Done   | `features/complaints/api.ts`; unit `api.test.ts`; E2E API contract              |
+| P2.06 | Scoped list and detail with keyset pagination and events              | Done   | `list_complaints()`; list/detail pages; E2E 25-ticket pagination and filters    |
+| P2.07 | Duplicate idempotency key → one complaint                             | Done   | 10 simultaneous identical calls → 1 ticket; E2E triple replay of the form POST  |
+| P2.08 | Concurrent creation and two-student read isolation                    | Done   | 20 parallel → 20 unique refs; 30 parallel → exactly 20 (limit); isolation tests |
+| P2.09 | SQL tests for unauthorized updates and injected role/status fields    | Done   | pgTAP 003 direct-write denials; API rejects injected fields; smuggled RPC args  |
+| P2.10 | Preview deploy; submitted ticket persists after refresh               | Done   | Cloud verification below                                                        |
 
 ## Local verification (2026-10-23)
 
@@ -69,6 +69,18 @@ against the mutant and passes against the real code.
 
 ## Cloud verification
 
-- [ ] Migration `20261023122610` applied to `makeitright-staging`
-- [ ] Preview: a demo student submits a report; it persists after refresh and appears in the list
-- [ ] Preview: a second demo student cannot open the first student's ticket
+- [x] Migration `20261023122610` applied to `makeitright-staging` with `supabase db push`.
+      `supabase migration list --linked` shows local = remote for `20261022115901` and
+      `20261023122610`.
+- [x] Preview <https://makeitright-git-phase-p2-complaints-takeasy1.vercel.app> on `8f4ae39`:
+      `/api/health` is ok. Signed-out `/student/complaints` and `/student/complaints/new` get
+      **307 → `/login?next=…`**. Anonymous `POST` and `GET /api/complaints` get **401**, and a
+      cross-site `POST` gets **403**.
+- [x] Owner check on the preview: Demo Student One submitted a fictional report, saved as
+      **MIR-1001**, the first ticket on the cloud database.
+  - The report shows its "Report submitted" event and local-time timestamps.
+  - It persists after a refresh and appears in My complaints with the Submitted badge.
+- [x] Owner check: Demo Student Two sees an empty list, and opening MIR-1001's URL shows the
+      "This page does not exist" view.
+
+**Gate P2: passed.**
