@@ -40,13 +40,13 @@ describe("landing page", () => {
     }
   });
 
-  it("sends every report call-to-action to sign-in", () => {
+  it("sends every report call-to-action to the report form (sign-in happens on the way)", () => {
     render(<HomePage />);
 
     const ctas = screen.getAllByRole("link", { name: /report an issue/i });
     expect(ctas.length).toBeGreaterThan(0);
     for (const cta of ctas) {
-      expect(cta).toHaveAttribute("href", "/login");
+      expect(cta).toHaveAttribute("href", "/student/complaints/new");
     }
   });
 

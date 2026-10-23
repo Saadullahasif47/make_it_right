@@ -3,7 +3,7 @@
 begin;
 create extension if not exists pgtap with schema extensions;
 
-select plan(10);
+select plan(11);
 
 select is(
   (select array_agg(c.relname order by c.relname)
@@ -31,13 +31,20 @@ select is(
 );
 
 select is(
-  (select array_agg(p.proname::text)
+  (select array_agg(p.proname::text order by p.proname)
      from pg_proc as p join pg_namespace as n on n.oid = p.pronamespace
-    where n.nspname = 'public'
-      and (has_function_privilege('anon', p.oid, 'execute')
-           or has_function_privilege('authenticated', p.oid, 'execute'))),
+    where n.nspname = 'public' and has_function_privilege('anon', p.oid, 'execute')),
   null,
-  'no public function is executable by anon or authenticated unless explicitly granted'
+  'no public function is executable by anon'
+);
+
+-- Every RPC a signed-in user can call is listed here on purpose. Adding one is a reviewed change.
+select is(
+  (select array_agg(p.proname::text order by p.proname)
+     from pg_proc as p join pg_namespace as n on n.oid = p.pronamespace
+    where n.nspname = 'public' and has_function_privilege('authenticated', p.oid, 'execute')),
+  array['create_ticket', 'list_complaints'],
+  'signed-in users can execute exactly the allow-listed public functions'
 );
 
 select is(

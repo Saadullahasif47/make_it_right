@@ -93,7 +93,7 @@ export function Hero() {
             className="mt-9 flex animate-fade-up flex-col items-center justify-center gap-3 sm:flex-row lg:justify-start"
             style={stagger(3)}
           >
-            <ButtonLink href="/login" size="lg" className="w-full sm:w-auto">
+            <ButtonLink href="/student/complaints/new" size="lg" className="w-full sm:w-auto">
               Report an issue
               <ArrowRight aria-hidden="true" className={buttonIconSlide} />
             </ButtonLink>
@@ -373,7 +373,7 @@ export function FinalCallToAction() {
           <p className="max-w-lg text-pretty text-ink-muted">
             Sign in and report it in under a minute. You can follow every step from your dashboard.
           </p>
-          <ButtonLink href="/login" size="lg">
+          <ButtonLink href="/student/complaints/new" size="lg">
             Report an issue
             <ArrowRight aria-hidden="true" className={buttonIconSlide} />
           </ButtonLink>

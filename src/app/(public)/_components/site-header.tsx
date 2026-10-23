@@ -35,7 +35,7 @@ export function SiteHeader() {
           <ButtonLink href="/login" variant="ghost" size="sm" className="hidden sm:inline-flex">
             Sign in
           </ButtonLink>
-          <ButtonLink href="/login" size="sm">
+          <ButtonLink href="/student/complaints/new" size="sm">
             Report an issue
             <ArrowRight aria-hidden="true" className={buttonIconSlide} />
           </ButtonLink>

@@ -10,7 +10,10 @@ export interface NavItem {
  * role check on the server. Items are added in the phase that builds the page.
  */
 export const ROLE_NAVIGATION: Readonly<Record<AppRole, readonly NavItem[]>> = {
-  student: [{ href: "/student/complaints", label: "My complaints" }],
+  student: [
+    { href: "/student/complaints", label: "My complaints" },
+    { href: "/student/complaints/new", label: "Report an issue" },
+  ],
   department: [{ href: "/department", label: "Department queue" }],
   admin: [{ href: "/admin", label: "Overview" }],
 };

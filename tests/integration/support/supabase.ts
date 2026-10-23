@@ -89,7 +89,19 @@ export async function createTestUser(role: Role, departmentCode?: string): Promi
   return { id: data.user.id, email, password, client };
 }
 
+/**
+ * Removes test users. Their complaints go first: the database deliberately refuses to delete a
+ * profile that still owns tickets (complaints.created_by is ON DELETE RESTRICT).
+ */
 export async function deleteUsers(ids: readonly string[]): Promise<void> {
+  if (ids.length === 0) return;
   const admin = adminClient();
+  const { error } = await admin
+    .from("complaints")
+    .delete()
+    .in("created_by", [...ids]);
+  if (error !== null) {
+    throw new Error(`complaint cleanup failed: ${error.message}`);
+  }
   await Promise.all(ids.map((id) => admin.auth.admin.deleteUser(id)));
 }
