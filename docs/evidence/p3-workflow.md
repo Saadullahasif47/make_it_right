@@ -5,18 +5,18 @@ an immutable audit trail.
 
 ## Task checklist (plan §15)
 
-| ID    | Task                                                                | Status      | Evidence                                                                             |
-| ----- | ------------------------------------------------------------------- | ----------- | ------------------------------------------------------------------------------------ |
-| P3.01 | Legal transition table and pure domain validator                    | Done        | `private.ticket_transitions`; `workflow.ts`; integration drift guard against the DB  |
-| P3.02 | `transition_ticket` RPC with expected version and atomic event log  | Done        | `migrations/20261023140440_ticket_workflow.sql`; pgTAP 004                           |
-| P3.03 | `routing_rules` and safe manual admin assignment                    | Done        | `assign_ticket()`; seeded default rules; pgTAP 004 (admin-only, inactive department) |
-| P3.04 | Department dashboard filtered to `assigned_department_id`           | Done        | `/department`; active/all filters, oldest/priority/newest sort; E2E isolation        |
-| P3.05 | Acknowledge, start work, resolve and add-remark controls            | Done        | `workflow-panel.tsx`; E2E Gate P3 lifecycle                                          |
-| P3.06 | Student confirmation, or dispute and reopen                         | Done        | Reporter "Is it fixed?" panel; reopen requires a reason; E2E lifecycle               |
-| P3.07 | Admin manual review list and reassign action                        | Done        | `/admin/review`, `/admin/complaints/[id]`; integration stale-reassignment test       |
-| P3.08 | Two clients edit one ticket: second gets a conflict, no lost update | Done        | Integration: concurrent transitions → exactly one `MR412`; E2E two-tab conflict      |
-| P3.09 | Cross-role E2E tests and immutable audit tests                      | Done        | `tests/e2e/workflow.spec.ts`; pgTAP 004 append-only and role-snapshot assertions     |
-| P3.10 | Deploy and demonstrate the manual lifecycle with AI disabled        | In progress | Cloud verification below                                                             |
+| ID    | Task                                                                | Status | Evidence                                                                             |
+| ----- | ------------------------------------------------------------------- | ------ | ------------------------------------------------------------------------------------ |
+| P3.01 | Legal transition table and pure domain validator                    | Done   | `private.ticket_transitions`; `workflow.ts`; integration drift guard against the DB  |
+| P3.02 | `transition_ticket` RPC with expected version and atomic event log  | Done   | `migrations/20261023140440_ticket_workflow.sql`; pgTAP 004                           |
+| P3.03 | `routing_rules` and safe manual admin assignment                    | Done   | `assign_ticket()`; seeded default rules; pgTAP 004 (admin-only, inactive department) |
+| P3.04 | Department dashboard filtered to `assigned_department_id`           | Done   | `/department`; active/all filters, oldest/priority/newest sort; E2E isolation        |
+| P3.05 | Acknowledge, start work, resolve and add-remark controls            | Done   | `workflow-panel.tsx`; E2E Gate P3 lifecycle                                          |
+| P3.06 | Student confirmation, or dispute and reopen                         | Done   | Reporter "Is it fixed?" panel; reopen requires a reason; E2E lifecycle               |
+| P3.07 | Admin manual review list and reassign action                        | Done   | `/admin/review`, `/admin/complaints/[id]`; integration stale-reassignment test       |
+| P3.08 | Two clients edit one ticket: second gets a conflict, no lost update | Done   | Integration: concurrent transitions → exactly one `MR412`; E2E two-tab conflict      |
+| P3.09 | Cross-role E2E tests and immutable audit tests                      | Done   | `tests/e2e/workflow.spec.ts`; pgTAP 004 append-only and role-snapshot assertions     |
+| P3.10 | Deploy and demonstrate the manual lifecycle with AI disabled        | Done   | Cloud verification below                                                             |
 
 ## Local verification (2026-10-23)
 
@@ -87,7 +87,8 @@ Both faults were reverted with `supabase db reset` and the suites re-run green.
       `/api/health` is ok. Signed-out `/department`, `/department/{id}`, `/admin/review` and
       `/admin/complaints/{id}` get **307 → `/login?next=…`**. Anonymous `PATCH …/status` and
       `POST …/review` get **401**, and a cross-site `PATCH` gets **403**.
-- [ ] Owner check on the preview: one fictional ticket goes report → assign → acknowledge →
-      start → resolve → close with the demo accounts, and the timeline shows each role.
+- [x] Owner check on the preview with the demo accounts: one fictional ticket went report →
+      assign → acknowledge → start work → resolve → close, with AI disabled, and the timeline
+      labels each step by role (Reporter, Administrator, Department staff).
 
-**Gate P3: in progress.**
+**Gate P3: passed.**
