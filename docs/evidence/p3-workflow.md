@@ -70,14 +70,23 @@ Both faults were reverted with `supabase db reset` and the suites re-run green.
    build confirmed it; the runbook now has a troubleshooting note.
 4. **Test-side:** the expected rule order now follows enum order, two weak pgTAP assertions were
    strengthened, and an E2E expectation was corrected (notes stay available after resolve).
+5. **Seed not applied on staging.** `db push --include-seed` reported "Updating seed hash" and
+   left `routing_rules` empty, because the CLI does not re-run a seed that changed after its
+   first run. Caught by a post-push row count. The idempotent seed was applied with
+   `supabase db query --linked -f supabase/seed.sql`; the runbook and ADR 0004 now say so.
 
 ## Cloud verification
 
-- [ ] Migration `20261023140440` applied to `makeitright-staging` with
-      `supabase db push --include-seed` (routing rules live in the seed).
-- [ ] `supabase migration list --linked` shows local = remote for all three migrations.
-- [ ] Preview `/api/health` ok; signed-out `/department` and `/admin/review` redirect to login;
-      anonymous `PATCH /api/complaints/{id}/status` gets 401.
+- [x] Migration `20261023140440` applied to `makeitright-staging` with `supabase db push`; the
+      changed seed applied with `supabase db query --linked -f supabase/seed.sql` (defect 5).
+- [x] `supabase migration list --linked` shows local = remote for all three migrations.
+- [x] Staging row checks: 10 transition rules, 6 routing rules (each category to its
+      department), 6 active departments, append-only trigger enabled (`O`), 0 events without
+      an actor role after the backfill.
+- [x] Preview <https://makeitright-git-phase-p3-workflow-takeasy1.vercel.app> on `3346e01`:
+      `/api/health` is ok. Signed-out `/department`, `/department/{id}`, `/admin/review` and
+      `/admin/complaints/{id}` get **307 → `/login?next=…`**. Anonymous `PATCH …/status` and
+      `POST …/review` get **401**, and a cross-site `PATCH` gets **403**.
 - [ ] Owner check on the preview: one fictional ticket goes report → assign → acknowledge →
       start → resolve → close with the demo accounts, and the timeline shows each role.
 

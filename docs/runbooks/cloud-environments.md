@@ -25,6 +25,15 @@ pnpm exec supabase db push --include-seed                  # migrations + refere
 
 The owner types the database password; it is never stored in the repository.
 
+**A changed seed is not re-run.** `--include-seed` executes `supabase/seed.sql` only the first
+time. After that, if the file changes, the CLI just records the new hash ("Updating seed hash")
+and skips the inserts. The seed is idempotent, so apply a changed seed explicitly and check it:
+
+```bash
+pnpm exec supabase db query --linked -f supabase/seed.sql
+pnpm exec supabase db query --linked "select count(*) from public.routing_rules"   # expect 6
+```
+
 ## Auth settings (dashboard → Authentication)
 
 - **URL Configuration**

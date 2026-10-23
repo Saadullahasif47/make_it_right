@@ -84,5 +84,7 @@ Gate P3 requires the full resolution flow to work **without any AI provider**.
 
 - Managing routing rules and department availability from the UI is Phase 5
   (`/admin/departments`). Role management stays a privileged seed operation.
-- The cloud push for this migration must include the seed (`--include-seed`), because the
-  routing rules live there. The seed is idempotent.
+- The routing rules live in the seed, so a cloud database needs the seed applied after this
+  migration. `--include-seed` does not re-run a seed that changed since its first run (it only
+  updates the stored hash), so the changed seed is applied with `supabase db query --linked -f`.
+  The seed is idempotent. See the cloud-environments runbook.
