@@ -43,7 +43,8 @@ select is(
   (select array_agg(p.proname::text order by p.proname)
      from pg_proc as p join pg_namespace as n on n.oid = p.pronamespace
     where n.nspname = 'public' and has_function_privilege('authenticated', p.oid, 'execute')),
-  array['create_ticket', 'list_complaints'],
+  array['acknowledge_ticket', 'add_ticket_note', 'assign_ticket', 'create_ticket', 'list_complaints',
+        'ticket_transition_rules', 'transition_ticket'],
   'signed-in users can execute exactly the allow-listed public functions'
 );
 

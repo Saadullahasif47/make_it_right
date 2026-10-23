@@ -1,5 +1,6 @@
 import "server-only";
 
+import type { AppRole } from "@/features/auth/roles";
 import type { SessionUser } from "@/features/auth/session";
 import { apiErrorResponse, apiJsonResponse } from "@/lib/http/api-error";
 import type { Logger } from "@/lib/logging/logger";
@@ -12,6 +13,7 @@ import { getComplaint, listComplaints } from "./repository";
 import { complaintIdSchema, pageSizeSchema } from "./schemas";
 import { submitComplaint } from "./service";
 import { STATUS_FILTERS, isStatusFilter } from "./statuses";
+import { assign, changeStatus, type WorkflowResult } from "./workflow-service";
 
 export const MAX_BODY_BYTES = 16 * 1024;
 export const IDEMPOTENCY_KEY_HEADER = "idempotency-key";
@@ -38,43 +40,83 @@ function isJson(request: Request): boolean {
   return /^application\/json\s*(;|$)/i.test(request.headers.get("content-type") ?? "");
 }
 
+type GuardedRequest =
+  | {
+      readonly ok: true;
+      readonly requestId: string;
+      readonly logger: Logger;
+      readonly actor: SessionUser;
+      readonly body: unknown;
+    }
+  | { readonly ok: false; readonly response: Response };
+
 export function createComplaintsApi(deps: ComplaintsApiDependencies) {
+  /**
+   * The checks every mutating endpoint shares, in order: refuse cross-site calls, require JSON
+   * (blocks HTML-form CSRF), cap the size, authenticate (and optionally restrict the role)
+   * before reading the body, then parse it.
+   */
+  async function guardedJson(
+    request: Request,
+    route: string,
+    allowedRoles?: readonly AppRole[],
+  ): Promise<GuardedRequest> {
+    const requestId = resolveRequestId(request.headers);
+    const fail = (response: Response): GuardedRequest => ({ ok: false, response });
+
+    if (isCrossSiteRequest(request)) {
+      return fail(apiErrorResponse("FORBIDDEN", requestId));
+    }
+    if (!isJson(request)) {
+      return fail(apiErrorResponse("UNSUPPORTED_MEDIA_TYPE", requestId));
+    }
+    if (Number(request.headers.get("content-length") ?? 0) > MAX_BODY_BYTES) {
+      return fail(apiErrorResponse("PAYLOAD_TOO_LARGE", requestId));
+    }
+
+    const actor = await deps.getActor();
+    if (actor === null) {
+      return fail(apiErrorResponse("UNAUTHENTICATED", requestId));
+    }
+    if (allowedRoles !== undefined && !allowedRoles.includes(actor.role)) {
+      return fail(apiErrorResponse("FORBIDDEN", requestId));
+    }
+
+    const text = await request.text();
+    if (Buffer.byteLength(text, "utf8") > MAX_BODY_BYTES) {
+      return fail(apiErrorResponse("PAYLOAD_TOO_LARGE", requestId));
+    }
+    let body: unknown;
+    try {
+      body = JSON.parse(text);
+    } catch {
+      return fail(
+        apiErrorResponse("VALIDATION_FAILED", requestId, { form: "The body must be valid JSON." }),
+      );
+    }
+    return {
+      ok: true,
+      requestId,
+      logger: deps.getLogger().child({ requestId, route }),
+      actor,
+      body,
+    };
+  }
+
+  function workflowResponse<T>(result: WorkflowResult<T>, requestId: string): Response {
+    return result.ok
+      ? apiJsonResponse(result.value, requestId)
+      : apiErrorResponse(result.code, requestId, result.fields);
+  }
+
   return {
     /** POST /api/complaints: idempotent ticket creation for students (plan §11). */
     async create(request: Request): Promise<Response> {
-      const requestId = resolveRequestId(request.headers);
-      const logger = deps.getLogger().child({ requestId, route: "POST /api/complaints" });
-
-      if (isCrossSiteRequest(request)) {
-        return apiErrorResponse("FORBIDDEN", requestId);
+      const guarded = await guardedJson(request, "POST /api/complaints", ["student"]);
+      if (!guarded.ok) {
+        return guarded.response;
       }
-      if (!isJson(request)) {
-        return apiErrorResponse("UNSUPPORTED_MEDIA_TYPE", requestId);
-      }
-      if (Number(request.headers.get("content-length") ?? 0) > MAX_BODY_BYTES) {
-        return apiErrorResponse("PAYLOAD_TOO_LARGE", requestId);
-      }
-
-      const actor = await deps.getActor();
-      if (actor === null) {
-        return apiErrorResponse("UNAUTHENTICATED", requestId);
-      }
-      if (actor.role !== "student") {
-        return apiErrorResponse("FORBIDDEN", requestId);
-      }
-
-      const text = await request.text();
-      if (Buffer.byteLength(text, "utf8") > MAX_BODY_BYTES) {
-        return apiErrorResponse("PAYLOAD_TOO_LARGE", requestId);
-      }
-      let body: unknown;
-      try {
-        body = JSON.parse(text);
-      } catch {
-        return apiErrorResponse("VALIDATION_FAILED", requestId, {
-          form: "The body must be valid JSON.",
-        });
-      }
+      const { requestId, logger, body } = guarded;
 
       const result = await submitComplaint(
         { client: await deps.getClient(), logger },
@@ -159,6 +201,34 @@ export function createComplaintsApi(deps: ComplaintsApiDependencies) {
           requestId,
         );
       }
+    },
+
+    /** PATCH /api/complaints/[id]/status: start work, resolve, close, reopen (plan §11). */
+    async changeStatus(request: Request, ticketId: string): Promise<Response> {
+      const guarded = await guardedJson(request, "PATCH /api/complaints/[id]/status");
+      if (!guarded.ok) {
+        return guarded.response;
+      }
+      const result = await changeStatus(
+        { client: await deps.getClient(), logger: guarded.logger },
+        ticketId,
+        guarded.body,
+      );
+      return workflowResponse(result, guarded.requestId);
+    },
+
+    /** POST /api/complaints/[id]/review: admin classification and (re)assignment. */
+    async review(request: Request, ticketId: string): Promise<Response> {
+      const guarded = await guardedJson(request, "POST /api/complaints/[id]/review", ["admin"]);
+      if (!guarded.ok) {
+        return guarded.response;
+      }
+      const result = await assign(
+        { client: await deps.getClient(), logger: guarded.logger },
+        ticketId,
+        guarded.body,
+      );
+      return workflowResponse(result, guarded.requestId);
     },
   };
 }

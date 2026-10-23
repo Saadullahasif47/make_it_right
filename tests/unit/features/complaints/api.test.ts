@@ -11,6 +11,10 @@ vi.mock("@/features/complaints/repository", () => ({
   createTicket: vi.fn(),
   listComplaints: vi.fn(),
   getComplaint: vi.fn(),
+  transitionTicket: vi.fn(),
+  acknowledgeTicket: vi.fn(),
+  addTicketNote: vi.fn(),
+  assignTicket: vi.fn(),
 }));
 
 const ORIGIN = "https://makeitright.test";
@@ -60,6 +64,8 @@ beforeEach(() => {
   vi.mocked(repository.createTicket).mockReset();
   vi.mocked(repository.listComplaints).mockReset();
   vi.mocked(repository.getComplaint).mockReset();
+  vi.mocked(repository.transitionTicket).mockReset();
+  vi.mocked(repository.assignTicket).mockReset();
 });
 
 describe("cross-site protection", () => {
@@ -268,5 +274,125 @@ describe("GET /api/complaints/[id]", () => {
   it("requires a signed-in user", async () => {
     actor = null;
     expect((await detail("c0000000-0000-4000-8000-000000000001")).status).toBe(401);
+  });
+});
+
+describe("PATCH /api/complaints/[id]/status", () => {
+  const TICKET = "c0000000-0000-4000-8000-000000000001";
+  const patch = (body: unknown, headers: Record<string, string> = {}) =>
+    api.changeStatus(
+      new Request(`${ORIGIN}/api/complaints/${TICKET}/status`, {
+        method: "PATCH",
+        headers: { "content-type": "application/json", ...headers },
+        body: JSON.stringify(body),
+      }),
+      TICKET,
+    );
+
+  it("applies a valid change and returns the new version", async () => {
+    vi.mocked(repository.transitionTicket).mockResolvedValue({
+      id: TICKET,
+      status: "in_progress",
+      version: 4,
+    });
+    const response = await patch({ target: "in_progress", expectedVersion: 3 });
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual({ id: TICKET, status: "in_progress", version: 4 });
+    expect(vi.mocked(repository.transitionTicket)).toHaveBeenCalledWith(fakeClient, TICKET, {
+      target: "in_progress",
+      expectedVersion: 3,
+    });
+  });
+
+  it.each([
+    ["STALE_VERSION", 409],
+    ["INVALID_TRANSITION", 409],
+    ["FORBIDDEN", 403],
+    ["NOT_FOUND", 404],
+  ] as const)("maps %s to %s", async (code, status) => {
+    vi.mocked(repository.transitionTicket).mockRejectedValue(new ComplaintError(code));
+    const response = await patch({ target: "in_progress", expectedVersion: 3 });
+    expect(response.status).toBe(status);
+    expect((await errorOf(response)).code).toBe(code);
+  });
+
+  it("requires a note before resolving, without calling the database", async () => {
+    const response = await patch({ target: "resolved", expectedVersion: 3 });
+    expect(response.status).toBe(400);
+    expect((await errorOf(response)).fields).toHaveProperty("note");
+    expect(vi.mocked(repository.transitionTicket)).not.toHaveBeenCalled();
+  });
+
+  it("treats a malformed ticket id as not found", async () => {
+    const response = await api.changeStatus(
+      new Request(`${ORIGIN}/api/complaints/x/status`, {
+        method: "PATCH",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({ target: "in_progress", expectedVersion: 1 }),
+      }),
+      "x",
+    );
+    expect(response.status).toBe(404);
+  });
+
+  it("shares the create endpoint's guards", async () => {
+    expect(
+      (
+        await patch(
+          { target: "in_progress", expectedVersion: 1 },
+          { origin: "https://evil.example" },
+        )
+      ).status,
+    ).toBe(403);
+    actor = null;
+    expect((await patch({ target: "in_progress", expectedVersion: 1 })).status).toBe(401);
+  });
+});
+
+describe("POST /api/complaints/[id]/review", () => {
+  const TICKET = "c0000000-0000-4000-8000-000000000001";
+  const body = {
+    departmentId: "d0000000-0000-4000-8000-000000000001",
+    category: "electrical",
+    priority: "high",
+    expectedVersion: 1,
+  };
+  const review = (payload: unknown) =>
+    api.review(
+      new Request(`${ORIGIN}/api/complaints/${TICKET}/review`, {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify(payload),
+      }),
+      TICKET,
+    );
+
+  it("is for administrators only, refused before the body is used", async () => {
+    expect((await review(body)).status).toBe(403);
+    actor = {
+      ...student,
+      role: "department",
+      departmentId: "d0000000-0000-4000-8000-000000000001",
+    };
+    expect((await review(body)).status).toBe(403);
+    expect(vi.mocked(repository.assignTicket)).not.toHaveBeenCalled();
+  });
+
+  it("assigns for an admin", async () => {
+    actor = { ...student, role: "admin" };
+    vi.mocked(repository.assignTicket).mockResolvedValue({
+      id: TICKET,
+      status: "assigned",
+      version: 2,
+    });
+    const response = await review(body);
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual({ id: TICKET, status: "assigned", version: 2 });
+  });
+
+  it("rejects an assignment without a real classification", async () => {
+    actor = { ...student, role: "admin" };
+    const response = await review({ ...body, category: "unclassified" });
+    expect(response.status).toBe(400);
   });
 });

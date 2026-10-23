@@ -28,7 +28,7 @@
 
   --danger: #b42318;
   --danger-soft: #fdecea;
-  --success: #157f4f;
+  --success: #13744a; /* 5.1:1 on success-soft, 5.8:1 on white */
   --success-soft: #e3f5ec;
 
   --band: #0b1f2a;

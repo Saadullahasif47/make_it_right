@@ -8,7 +8,7 @@ exit gate is demonstrated and the evidence is linked here.
 | P0 Repo & CI              | VERIFIED    | [p0-baseline.md](evidence/p0-baseline.md)     |
 | P1 Auth & RLS             | VERIFIED    | [p1-auth-rls.md](evidence/p1-auth-rls.md)     |
 | P2 Complaint persistence  | VERIFIED    | [p2-complaints.md](evidence/p2-complaints.md) |
-| P3 Department workflow    | NOT STARTED |                                               |
+| P3 Department workflow    | IN PROGRESS | [p3-workflow.md](evidence/p3-workflow.md)     |
 | P4 Gemini agent           | NOT STARTED |                                               |
 | P5 Dashboard & operations | NOT STARTED |                                               |
 | P6 QA / resilience        | NOT STARTED |                                               |

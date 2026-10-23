@@ -3,6 +3,10 @@ import type { ApiErrorCode } from "@/lib/http/api-error";
 export type ComplaintFailureCode = Extract<
   ApiErrorCode,
   | "UNAUTHENTICATED"
+  | "FORBIDDEN"
+  | "NOT_FOUND"
+  | "STALE_VERSION"
+  | "INVALID_TRANSITION"
   | "RATE_LIMITED"
   | "IDEMPOTENCY_CONFLICT"
   | "VALIDATION_FAILED"
@@ -29,11 +33,20 @@ export function complaintErrorFromDatabase(error: { readonly code?: string }): C
   switch (error.code) {
     case "42501":
       return new ComplaintError("UNAUTHENTICATED", { cause: error });
+    case "MR403":
+      return new ComplaintError("FORBIDDEN", { cause: error });
+    case "MR404":
+      return new ComplaintError("NOT_FOUND", { cause: error });
+    case "MR412":
+      return new ComplaintError("STALE_VERSION", { cause: error });
+    case "MR422":
+      return new ComplaintError("INVALID_TRANSITION", { cause: error });
     case "MR429":
       return new ComplaintError("RATE_LIMITED", { cause: error });
     case "MR409":
       return new ComplaintError("IDEMPOTENCY_CONFLICT", { cause: error });
     case "23514":
+    case "22023":
     case "22004":
     case "22P02":
       return new ComplaintError("VALIDATION_FAILED", { cause: error });
