@@ -372,7 +372,13 @@ test.describe("accessibility of complaint pages", () => {
     const student = await newStudent();
     await signInAs(page, student);
 
-    const scan = async () => {
+    /**
+     * Scans only once the page has finished rendering: its own title and main heading are in
+     * place. Scanning the instant the URL changes measured a half-rendered page on slow CI.
+     */
+    const scanWhenReady = async (title: RegExp, heading: string | RegExp) => {
+      await expect(page).toHaveTitle(title);
+      await expect(page.getByRole("heading", { level: 1, name: heading })).toBeVisible();
       const results = await new AxeBuilder({ page })
         .withTags(["wcag2a", "wcag2aa", "wcag21aa"])
         .analyze();
@@ -381,14 +387,14 @@ test.describe("accessibility of complaint pages", () => {
       );
     };
 
-    await scan(); // empty list
+    await scanWhenReady(/^My complaints · MakeItRight$/, /here are your reports/); // empty list
     await page.goto("/student/complaints/new");
-    await scan();
+    await scanWhenReady(/^Report an issue · MakeItRight$/, "Report an issue");
     await fillReport(page, "Accessibility check report");
     await page.getByRole("button", { name: "Submit report" }).click();
     await expect(page).toHaveURL(/notice=created$/);
-    await scan();
+    await scanWhenReady(/^Complaint · MakeItRight$/, "Accessibility check report");
     await page.goto("/student/complaints");
-    await scan();
+    await scanWhenReady(/^My complaints · MakeItRight$/, /here are your reports/);
   });
 });
