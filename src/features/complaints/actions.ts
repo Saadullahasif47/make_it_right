@@ -9,7 +9,7 @@ import { createRequestId } from "@/lib/logging/request-id";
 import type { FieldErrors } from "@/lib/http/api-error";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
-import type { ComplaintFailureCode } from "./errors";
+import { FAILURE_MESSAGES } from "./messages";
 import { submitComplaint } from "./service";
 
 const COMPLAINT_FIELDS = ["title", "description", "building", "room"] as const;
@@ -26,17 +26,6 @@ function formFieldErrors(fields: FieldErrors | undefined): Partial<Record<Compla
   }
   return result;
 }
-
-const FAILURE_MESSAGES: Readonly<Record<ComplaintFailureCode, string>> = {
-  VALIDATION_FAILED: "Some details need fixing before we can save your report.",
-  UNAUTHENTICATED: "Your session has ended. Sign in again to submit your report.",
-  RATE_LIMITED:
-    "You have submitted several reports in a short time. Please wait a few minutes and try again.",
-  IDEMPOTENCY_CONFLICT:
-    "This form was already used for a different report. Reload the page to start a new one.",
-  SERVICE_UNAVAILABLE:
-    "We could not save your report right now. Nothing was lost: please try again in a moment.",
-};
 
 /**
  * Web-form entry point to the same use case as POST /api/complaints. The idempotency key is

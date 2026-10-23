@@ -10,6 +10,11 @@ export const API_ERRORS = {
   FORBIDDEN: { status: 403, message: "You do not have permission to do that." },
   NOT_FOUND: { status: 404, message: "We could not find what you were looking for." },
   STALE_VERSION: { status: 409, message: "This ticket changed. Refresh and try again." },
+  INVALID_TRANSITION: {
+    status: 409,
+    message:
+      "This ticket cannot make that change in its current status. Refresh to see where it is now.",
+  },
   IDEMPOTENCY_CONFLICT: {
     status: 409,
     message:

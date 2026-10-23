@@ -17,7 +17,7 @@ export interface SubmitDependencies {
   readonly logger: Logger;
 }
 
-function firstIssuePerField(
+export function firstIssuePerField(
   issues: readonly { path: PropertyKey[]; message: string }[],
 ): FieldErrors {
   const fields: Record<string, string> = {};

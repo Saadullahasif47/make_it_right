@@ -54,5 +54,7 @@ script is idempotent, and re-running it resets their roles and password.
   `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`. Use the publishable key there.
 - **`supabase` commands fail to parse `.env.local`**: the file was saved with a byte-order mark.
   Regenerate it with `pnpm db:env --force`.
+- **A style change does not appear in `pnpm build` / `pnpm start`**: the incremental build cache
+  can keep a stale stylesheet. Delete `.next` and build again. CI always builds from scratch.
 - **Account-creating E2E tests are skipped**: they only run against a local stack, with
   `SUPABASE_SECRET_KEY` set and `PLAYWRIGHT_BASE_URL` unset.

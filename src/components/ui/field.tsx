@@ -52,14 +52,24 @@ export function FieldShell({ id, label, hint, error, labelAside, children }: Fie
 }
 
 type TextFieldProps = Omit<ComponentProps<"input">, "id" | "name"> & {
+  /** Must be unique on the page; defaults to `field-<name>`, which suits one-form pages. */
+  readonly id?: string;
   readonly name: string;
   readonly label: string;
   readonly hint?: string | undefined;
   readonly error?: string | undefined;
 };
 
-export function TextField({ name, label, hint, error, className, ...props }: TextFieldProps) {
-  const id = `field-${name}`;
+export function TextField({
+  id: idProp,
+  name,
+  label,
+  hint,
+  error,
+  className,
+  ...props
+}: TextFieldProps) {
+  const id = idProp ?? `field-${name}`;
   return (
     <FieldShell id={id} label={label} hint={hint} error={error}>
       <input
@@ -75,6 +85,8 @@ export function TextField({ name, label, hint, error, className, ...props }: Tex
 }
 
 type TextAreaFieldProps = Omit<ComponentProps<"textarea">, "id" | "name"> & {
+  /** Must be unique on the page; pass one whenever a page holds several forms. */
+  readonly id?: string;
   readonly name: string;
   readonly label: string;
   readonly hint?: string | undefined;
@@ -83,6 +95,7 @@ type TextAreaFieldProps = Omit<ComponentProps<"textarea">, "id" | "name"> & {
 };
 
 export function TextAreaField({
+  id: idProp,
   name,
   label,
   hint,
@@ -91,7 +104,7 @@ export function TextAreaField({
   className,
   ...props
 }: TextAreaFieldProps) {
-  const id = `field-${name}`;
+  const id = idProp ?? `field-${name}`;
   return (
     <FieldShell id={id} label={label} hint={hint} error={error} labelAside={labelAside}>
       <textarea

@@ -1,5 +1,9 @@
 import { z } from "zod";
 
+import { COMPLAINT_CATEGORIES } from "./categories";
+import { TICKET_STATES } from "./statuses";
+import { NOTE_LIMITS, NOTE_REQUIRED_FOR } from "./workflow";
+
 /**
  * Field limits for a complaint. The same numbers are enforced by check constraints in
  * supabase/migrations (a unit test keeps the two in sync), so Zod gives friendly messages and
@@ -60,3 +64,62 @@ export const pageSizeSchema = z.coerce
   .min(1)
   .max(PAGE_SIZE.max)
   .default(PAGE_SIZE.default);
+
+// ---------------------------------------------------------------------------------------------
+// Workflow inputs (Phase 3). The database re-validates every one of these rules.
+// ---------------------------------------------------------------------------------------------
+
+/** Form posts carry the version as text; JSON carries a number. Both must be a positive integer. */
+const expectedVersion = z.coerce
+  .number({ error: "This page is out of date. Refresh and try again." })
+  .int()
+  .positive();
+
+const optionalNote = z
+  .string()
+  .trim()
+  .max(NOTE_LIMITS.max, `Notes can be at most ${NOTE_LIMITS.max} characters.`)
+  .regex(/^(?:[^\p{Cc}]|[\n\r\t])*$/u, "Remove unsupported characters.")
+  .transform((value) => (value === "" ? undefined : value))
+  .optional();
+
+export const transitionInputSchema = z
+  .strictObject({
+    target: z.enum(TICKET_STATES),
+    expectedVersion,
+    note: optionalNote,
+  })
+  .superRefine((value, context) => {
+    if (NOTE_REQUIRED_FOR.includes(value.target) && (value.note?.length ?? 0) < NOTE_LIMITS.min) {
+      context.addIssue({
+        code: "custom",
+        path: ["note"],
+        message:
+          value.target === "resolved"
+            ? "Describe what was done to fix it (at least 5 characters)."
+            : "Tell the department what is still wrong (at least 5 characters).",
+      });
+    }
+  });
+
+export const assignInputSchema = z.strictObject({
+  departmentId: z.uuid("Choose a department."),
+  category: z.enum(COMPLAINT_CATEGORIES, "Choose a category."),
+  priority: z.enum(["low", "medium", "high"], "Choose a priority."),
+  expectedVersion,
+  note: optionalNote,
+});
+
+export const noteInputSchema = z.strictObject({
+  note: z
+    .string()
+    .trim()
+    .min(NOTE_LIMITS.min, `Write at least ${NOTE_LIMITS.min} characters.`)
+    .max(NOTE_LIMITS.max, `Notes can be at most ${NOTE_LIMITS.max} characters.`)
+    .regex(/^(?:[^\p{Cc}]|[\n\r\t])*$/u, "Remove unsupported characters."),
+});
+
+export const acknowledgeInputSchema = z.strictObject({ expectedVersion });
+
+export type TransitionInput = z.infer<typeof transitionInputSchema>;
+export type AssignInput = z.infer<typeof assignInputSchema>;

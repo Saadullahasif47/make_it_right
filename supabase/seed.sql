@@ -11,3 +11,17 @@ values
   ('sanitation', 'Sanitation and Cleaning'),
   ('facilities', 'Facilities Office')
 on conflict (code) do nothing;
+
+-- Default routing: which department handles each category (plan §9, routing_rules).
+insert into public.routing_rules (category, department_id)
+select rule.category::public.complaint_category, d.id
+  from (values
+    ('electrical', 'electrical'),
+    ('it_equipment', 'it_services'),
+    ('plumbing', 'plumbing'),
+    ('furniture', 'furniture'),
+    ('sanitation', 'sanitation'),
+    ('other', 'facilities')
+  ) as rule (category, department_code)
+  join public.departments as d on d.code = rule.department_code
+on conflict (category) do nothing;
