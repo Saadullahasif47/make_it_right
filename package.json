@@ -18,6 +18,7 @@
     "test:watch": "vitest --project unit --project dom",
     "test:e2e": "playwright test",
     "test:integration": "vitest run --project integration",
+    "eval:agent": "vitest run --project eval",
     "db:start": "supabase start -x vector,logflare,supavisor,imgproxy,postgres-meta,studio,realtime,storage-api,edge-runtime",
     "db:stop": "supabase stop",
     "db:reset": "supabase db reset",
@@ -28,6 +29,7 @@
     "check": "pnpm lint && pnpm typecheck && pnpm format:check && pnpm test && pnpm build"
   },
   "dependencies": {
+    "@google/genai": "2.29.1",
     "@supabase/ssr": "^0.12.7",
     "@supabase/supabase-js": "^2.118.0",
     "clsx": "^2.1.1",

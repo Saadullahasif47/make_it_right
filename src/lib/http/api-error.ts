@@ -20,9 +20,21 @@ export const API_ERRORS = {
     message:
       "This submission was already used for a different report. Reload the form and try again.",
   },
+  AI_DISABLED: {
+    status: 409,
+    message: "AI routing is switched off. Route this ticket manually.",
+  },
+  AI_IN_PROGRESS: {
+    status: 409,
+    message: "An AI attempt is already running for this ticket. Refresh in a moment.",
+  },
   PAYLOAD_TOO_LARGE: { status: 413, message: "The request is too large." },
   UNSUPPORTED_MEDIA_TYPE: { status: 415, message: "Send the request as JSON." },
   RATE_LIMITED: { status: 429, message: "Too many requests. Please wait a moment and try again." },
+  AI_RETRY_LIMIT: {
+    status: 429,
+    message: "The AI retry limit has been reached. Route this ticket manually, or try again later.",
+  },
   INTERNAL_ERROR: { status: 500, message: "Something went wrong on our side. Please try again." },
   SERVICE_UNAVAILABLE: {
     status: 503,

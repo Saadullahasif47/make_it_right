@@ -21,4 +21,6 @@ export const WORKFLOW_NOTICES: Readonly<Record<string, string>> = {
   reopened: "Reopened. The department has been asked to take another look.",
   note: "Note added to the timeline.",
   assigned: "Ticket assigned. The department will see it in their queue.",
+  "ai-routed": "The AI assistant routed this ticket. Its reason is on the timeline.",
+  "ai-review": "The AI attempt finished without a route, so this ticket still needs you.",
 };

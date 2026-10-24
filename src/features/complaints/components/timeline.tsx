@@ -6,6 +6,8 @@ import {
   MessageSquareText,
   RotateCcw,
   Route,
+  Sparkles,
+  UserRoundSearch,
   Wrench,
   type LucideIcon,
 } from "lucide-react";
@@ -43,6 +45,8 @@ interface Presentation {
   readonly icon: LucideIcon;
   readonly title: string;
   readonly tone: "brand" | "success" | "warning" | "neutral";
+  /** A fixed, plain-language explanation; never provider or failure details (plan §8). */
+  readonly explanation?: string;
 }
 
 function present(event: TimelineEvent): Presentation {
@@ -54,6 +58,15 @@ function present(event: TimelineEvent): Presentation {
         icon: Route,
         title: event.departmentName === null ? "Assigned" : `Assigned to ${event.departmentName}`,
         tone: "brand",
+      };
+    case "triage_started":
+      return { icon: Sparkles, title: "AI routing started", tone: "neutral" };
+    case "review_requested":
+      return {
+        icon: UserRoundSearch,
+        title: "Sent to an administrator",
+        tone: "neutral",
+        explanation: "This report could not be routed automatically, so a person will route it.",
       };
     case "acknowledged":
       return { icon: Eye, title: "Acknowledged by the department", tone: "neutral" };
@@ -111,7 +124,7 @@ export function Timeline({ events }: { readonly events: readonly TimelineEvent[]
   return (
     <ol aria-label="Ticket history" className="relative space-y-6">
       {events.map((event, index) => {
-        const { icon: Icon, title, tone } = present(event);
+        const { icon: Icon, title, tone, explanation } = present(event);
         const actor = actorLabel(event);
         const details = classification(event);
         const isLast = index === events.length - 1;
@@ -142,6 +155,9 @@ export function Timeline({ events }: { readonly events: readonly TimelineEvent[]
                 <LocalTime value={event.createdAt} />
               </p>
               {details === null ? null : <p className="mt-1 text-sm text-ink-muted">{details}</p>}
+              {explanation === undefined ? null : (
+                <p className="mt-1 text-sm text-ink-muted">{explanation}</p>
+              )}
               {event.note === null ? null : (
                 <p className="mt-2 rounded-xl bg-surface-muted px-3 py-2 text-sm whitespace-pre-wrap text-ink">
                   {event.note}
