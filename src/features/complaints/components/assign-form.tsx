@@ -24,6 +24,12 @@ interface AssignFormProps {
     readonly priority: string;
     readonly departmentId: string | null;
   };
+  /** The AI's suggestion from a run that ended in review, used to pre-fill an unrouted ticket. */
+  readonly suggestion?: {
+    readonly category: string | null;
+    readonly priority: string | null;
+    readonly departmentId: string | null;
+  };
 }
 
 const PRIORITIES = [
@@ -67,6 +73,7 @@ export function AssignForm({
   departments,
   routingRules,
   current,
+  suggestion,
 }: AssignFormProps) {
   const [state, formAction] = useActionState<FormState<WorkflowField>, FormData>(
     assignAction,
@@ -75,10 +82,18 @@ export function AssignForm({
   const ruleFor = (category: string) =>
     routingRules.find((rule) => rule.category === category && rule.enabled)?.departmentId;
 
+  const unrouted = current.category === "unclassified";
+  const suggestedDepartment = departments.some((d) => d.id === suggestion?.departmentId)
+    ? suggestion?.departmentId
+    : undefined;
   const [category, setCategory] = useState(
-    current.category === "unclassified" ? "" : current.category,
+    unrouted ? (suggestion?.category ?? "") : current.category,
   );
-  const [departmentId, setDepartmentId] = useState(current.departmentId ?? ruleFor(category) ?? "");
+  const [departmentId, setDepartmentId] = useState(
+    current.departmentId ?? (unrouted ? suggestedDepartment : undefined) ?? ruleFor(category) ?? "",
+  );
+  const initialPriority =
+    current.priority === "unassessed" ? (suggestion?.priority ?? "") : current.priority;
   const [departmentTouched, setDepartmentTouched] = useState(current.departmentId !== null);
 
   return (
@@ -88,8 +103,10 @@ export function AssignForm({
     >
       <h2 className="text-lg font-bold text-ink">Route this ticket</h2>
       <p className="text-sm text-ink-muted">
-        Classify the report and choose the department that should fix it. With AI switched off, this
-        is how every ticket reaches a department.
+        Classify the report and choose the department that should fix it.
+        {suggestion === undefined
+          ? " With AI switched off, this is how every ticket reaches a department."
+          : " The form starts from the AI assistant's suggestion; check it before assigning."}
       </p>
       <form action={formAction} noValidate className="space-y-4">
         <input type="hidden" name="ticketId" value={ticketId} />
@@ -144,7 +161,7 @@ export function AssignForm({
         <Select
           name="priority"
           label="Priority"
-          defaultValue={current.priority === "unassessed" ? "" : current.priority}
+          defaultValue={initialPriority === "unassessed" ? "" : initialPriority}
           error={state.fieldErrors?.priority}
         >
           <option value="" disabled>

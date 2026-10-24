@@ -51,9 +51,39 @@ const eslintConfig = defineConfig([
     },
   },
 
+  // The service-role client bypasses RLS. Only the agent's privileged adapter may use it
+  // (plan §9; ADR 0005), and the Gemini SDK stays behind the agent's model interface.
+  {
+    files: ["src/**/*.{ts,tsx}"],
+    ignores: ["src/features/agent/**", "src/lib/supabase/privileged.ts"],
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          paths: [
+            {
+              name: "@/lib/supabase/privileged",
+              message: "The service-role client is reserved for src/features/agent (ADR 0005).",
+            },
+            {
+              name: "@google/genai",
+              message: "Call the model through src/features/agent only.",
+            },
+          ],
+        },
+      ],
+    },
+  },
+
   // The configuration module and tooling configs are the only places allowed to touch process.env.
   {
-    files: ["src/lib/config/**", "*.config.{ts,mts}", "tests/e2e/**", "tests/integration/**"],
+    files: [
+      "src/lib/config/**",
+      "*.config.{ts,mts}",
+      "tests/e2e/**",
+      "tests/integration/**",
+      "tests/eval/**",
+    ],
     rules: { "no-restricted-properties": "off" },
   },
 
