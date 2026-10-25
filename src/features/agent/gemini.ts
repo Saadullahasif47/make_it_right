@@ -58,7 +58,9 @@ export function createGeminiModelClient(options: GeminiOptions): ModelClient {
     },
     automaticFunctionCalling: { disable: true },
     maxOutputTokens: OUTPUT_TOKEN_BUDGET,
-    thinkingConfig: { thinkingLevel: ThinkingLevel.LOW },
+    // Classification needs no extended reasoning; measured on the real model, MINIMAL answered
+    // in about half the time of LOW with the same tool call (docs/evidence/p4-agent.md).
+    thinkingConfig: { thinkingLevel: ThinkingLevel.MINIMAL },
   };
 
   return {

@@ -103,7 +103,9 @@ const server = createServer((req, res) => {
 
     const body = await readJson(req);
     const contents = body.contents ?? [];
-    const report = contents[0]?.parts?.[0]?.text ?? "";
+    const message = contents[0]?.parts?.[0]?.text ?? "";
+    // Only the report itself: the message also lists the approved departments.
+    const report = /<report>([\s\S]*)<\/report>/.exec(message)?.[1] ?? message;
     const turn = contents.filter((content) => content.role === "model").length + 1;
     const category = classify(report);
 

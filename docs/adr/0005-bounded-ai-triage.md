@@ -75,14 +75,23 @@ ticket stored, and invalid tool actions never modify the database.
      names, enum arguments and verdicts. It never stores prompts or report text. Logs follow the
      same rule.
    - Reporters see only a plain explanation, never provider details.
-10. **Honest labelling.** Agent events are shown as "AI assistant", and the prompt is versioned
-    (`triage-v1`) on every run. With `AI_ENABLED=false` nothing is attempted, and tickets wait for
-    manual routing exactly as in Phase 3. A deterministic fallback, if one is added later, must be
+10. **Honest labelling.** Agent events are shown as "AI assistant", and the prompt version is
+    stored on every run. With `AI_ENABLED=false` nothing is attempted, and tickets wait for manual
+    routing exactly as in Phase 3. A deterministic fallback, if one is added later, must be
     labelled rule-based routing (plan §8).
+11. **Prompt evolution was measured, not guessed.** Every version ran on the real model. Changes
+    were tuned on the 90 dev reports only; the 30 held-out reports were scored for v1 and v3 (once
+    each), never used for tuning.
+    - `triage-v1`: lookup, then propose (two calls). Held-out p95 latency was 16.8 s, above the
+      10 s deadline.
+    - `triage-v2`: the user message lists each category's approved department (names and ids
+      only, allowed by plan §8), so the model decides in one call. The lookup tools remain.
+    - `triage-v3`: sharper furniture vs other definitions after the dev run confused the two.
+    - Thinking level `MINIMAL`: measured faster than `LOW`, with the same tool call.
 
 ### Testing without a live provider
 
-11. **Three levels of stand-in.**
+12. **Three levels of stand-in.**
     - A provider-neutral `ModelClient` interface is implemented by the Gemini adapter and, in
       tests, by scripted models.
     - Unit tests drive the real adapter through an injected `fetch`, checking the exact REST
@@ -90,9 +99,9 @@ ticket stored, and invalid tool actions never modify the database.
     - E2E runs a second production server against a local stateless Gemini stub
       (`GEMINI_BASE_URL`). The config refuses that variable on any deployment and accepts only
       loopback addresses.
-12. **Live evaluation is opt-in.** `pnpm eval:agent` evaluates 120 labelled synthetic reports.
+13. **Live evaluation is opt-in.** `pnpm eval:agent` evaluates 120 labelled synthetic reports.
     The 30 held-out ones are the default, and the free-tier quota is respected. The report is
-    written to `docs/evidence/p4-agent-eval-<split>.md`.
+    written to `docs/evidence/p4-agent-eval-<prompt version>-<split>.md`.
 
 ## Consequences
 

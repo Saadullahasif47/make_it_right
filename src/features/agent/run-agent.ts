@@ -29,7 +29,9 @@ export interface AgentResult {
 export async function runAgent(input: AgentInput): Promise<AgentResult> {
   const safety = screenForSafety(`${input.report.title}\n${input.report.description}`);
   const trace: ToolTraceEntry[] = [];
-  const conversation = input.model.startConversation(buildReportMessage(input.report));
+  const conversation = input.model.startConversation(
+    buildReportMessage(input.report, input.snapshot),
+  );
   const done = (decision: AgentDecision, exchanges: number): AgentResult => ({
     decision,
     trace,

@@ -7,7 +7,7 @@
  *   EVAL_LIMIT=3 pnpm eval:agent         # a smoke test of key, model and tool calling
  *
  * Reads GEMINI_API_KEY / GEMINI_MODEL from .env.local. Writes the report to
- * docs/evidence/p4-agent-eval-<split>.md (dataset ids only, never report text). Waits for the
+ * docs/evidence/p4-agent-eval-<prompt version>-<split>.md (dataset ids only, never report text). Waits for the
  * free-tier rate limit are excluded from latency, which measures provider calls only.
  */
 import { mkdirSync, writeFileSync } from "node:fs";
@@ -180,5 +180,5 @@ ${tags.join("\n")}
 ${rows.join("\n")}
 `;
   mkdirSync("docs/evidence", { recursive: true });
-  writeFileSync(`docs/evidence/p4-agent-eval-${split}.md`, report);
+  writeFileSync(`docs/evidence/p4-agent-eval-${PROMPT_VERSION}-${split}.md`, report);
 }

@@ -12,6 +12,7 @@ import { ApiError } from "@google/genai";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import type { ModelTurn } from "@/features/agent/model";
+import { PROMPT_VERSION } from "@/features/agent/prompt";
 import { retryTriage } from "@/features/agent/retry";
 import { createAgentStore } from "@/features/agent/store";
 import { triageTicket, type TriageDependencies, type TriageRequest } from "@/features/agent/triage";
@@ -172,7 +173,7 @@ describe("a normal complaint routes to its approved department (Gate P4)", () =>
         outcome: "routed",
         failure_code: null,
         trigger: "submission",
-        prompt_version: "triage-v1",
+        prompt_version: PROMPT_VERSION,
         tool_calls: [
           { step: 1, tool: "find_category_route", verdict: "ok", category: "electrical" },
           {

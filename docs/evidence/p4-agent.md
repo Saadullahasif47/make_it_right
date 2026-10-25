@@ -5,26 +5,26 @@ ticket stored, and invalid tool actions never modify the database.
 
 ## Task checklist (plan §15)
 
-| ID    | Task                                                                        | Status      | Evidence                                                                           |
-| ----- | --------------------------------------------------------------------------- | ----------- | ---------------------------------------------------------------------------------- |
-| P4.01 | Gemini key; verify tool calling and the free-tier model with fictional data | Pending key | Model `gemini-3.1-flash-lite` (stable, function calling); live smoke below         |
-| P4.02 | Versioned prompt, six categories, strict tool declarations                  | Done        | `features/agent/prompt.ts` (`triage-v1`); declaration/validator drift test         |
-| P4.03 | Adapter, timeout, max-step guard, result schema, failure codes              | Done        | `gemini.ts`, `run-agent.ts`, `failures.ts`; adapter tested through real REST shape |
-| P4.04 | Read-only `list_departments` / `find_category_route`                        | Done        | `tools.ts`; answers from one routing snapshot per attempt                          |
-| P4.05 | Validated `propose_assignment` and server routing policy                    | Done        | `policy.ts` + `agent_finish_run` re-check; pgTAP 005, integration                  |
-| P4.06 | `agent_runs` metadata; inputs and keys redacted from logs                   | Done        | Migration `20261023184646`; trace of enums/ids only; log assertions                |
-| P4.07 | Best-effort AI after the ticket transaction                                 | Done        | `submitComplaint` + `triageTicket`; only for newly created tickets                 |
-| P4.08 | Review on timeout/429/invalid; stale recovery; bounded retries              | Done        | Stable codes; "AI stalled" marker; 3 per ticket, 10 per admin per 10 min (SQL)     |
-| P4.09 | Labelled synthetic dataset and evaluation                                   | Pending key | 120 reports (`tests/eval/fixtures`), harness and metrics done; live run below      |
-| P4.10 | Malicious instructions, fabricated departments, invalid priority, outage    | Done        | Unit, integration and E2E cases listed below                                       |
-| P4.11 | A successful and a rejected tool call in a recorded test                    | Done        | E2E `P4.11` + [screenshot](p4-tool-calls.png); trace asserted in the database      |
+| ID    | Task                                                                        | Status | Evidence                                                                           |
+| ----- | --------------------------------------------------------------------------- | ------ | ---------------------------------------------------------------------------------- |
+| P4.01 | Gemini key; verify tool calling and the free-tier model with fictional data | Done   | `gemini-3.1-flash-lite` answered with tool calls on the owner's free-tier key      |
+| P4.02 | Versioned prompt, six categories, strict tool declarations                  | Done   | `features/agent/prompt.ts` (`triage-v3`); declaration/validator drift test         |
+| P4.03 | Adapter, timeout, max-step guard, result schema, failure codes              | Done   | `gemini.ts`, `run-agent.ts`, `failures.ts`; adapter tested through real REST shape |
+| P4.04 | Read-only `list_departments` / `find_category_route`                        | Done   | `tools.ts`; answers from one routing snapshot per attempt                          |
+| P4.05 | Validated `propose_assignment` and server routing policy                    | Done   | `policy.ts` + `agent_finish_run` re-check; pgTAP 005, integration                  |
+| P4.06 | `agent_runs` metadata; inputs and keys redacted from logs                   | Done   | Migration `20261023184646`; trace of enums/ids only; log assertions                |
+| P4.07 | Best-effort AI after the ticket transaction                                 | Done   | `submitComplaint` + `triageTicket`; only for newly created tickets                 |
+| P4.08 | Review on timeout/429/invalid; stale recovery; bounded retries              | Done   | Stable codes; "AI stalled" marker; 3 per ticket, 10 per admin per 10 min (SQL)     |
+| P4.09 | Labelled synthetic dataset and evaluation                                   | Done   | 120 reports; live results below and in `p4-agent-eval-*.md`                        |
+| P4.10 | Malicious instructions, fabricated departments, invalid priority, outage    | Done   | Unit, integration and E2E cases listed below                                       |
+| P4.11 | A successful and a rejected tool call in a recorded test                    | Done   | E2E `P4.11` + [screenshot](p4-tool-calls.png); trace asserted in the database      |
 
 ## Local verification (2026-10-24)
 
 | Suite                         | Result                                                             |
 | ----------------------------- | ------------------------------------------------------------------ |
 | lint / typecheck / format     | Pass                                                               |
-| Unit + component (Vitest)     | **360 / 360** (85 new: agent, adapter, policy, evaluation metrics) |
+| Unit + component (Vitest)     | **361 / 361** (86 new: agent, adapter, policy, evaluation metrics) |
 | pgTAP (`pnpm db:test`)        | **178 / 178** (49 new agent assertions)                            |
 | API integration (Auth + REST) | **73 / 73** (19 new, real store and SQL with scripted models)      |
 | E2E (Playwright)              | **142 / 142** (16 new, AI server + local Gemini stub), axe clean   |
@@ -84,13 +84,42 @@ Each fault was reverted (`supabase db reset`, files restored) and the suites re-
    animations. It now uses reduced motion, as the other specs do. The real colours pass.
 2. **Redaction label order.** An 8-digit student id was labelled `[phone]`. Ids are now matched
    first.
-3. **Optional decision fields.** The generated RPC types marked them required, so the review
+3. **A latent flaky test from P2.** "Never writes complaint text to the logs" checked that the
+   room value `214` never appeared in any log line. It failed by chance when a random request id
+   contained `214`. It now matches distinctive values as text and every field by its key.
+4. **Optional decision fields.** The generated RPC types marked them required, so the review
    path could not omit them. The SQL parameters now have defaults instead of a cast.
 
-## Live model (pending the owner's Gemini key)
+## Live model evaluation (P4.01, P4.09)
 
-- [ ] P4.01 smoke: `EVAL_LIMIT=3 pnpm eval:agent` calls `gemini-3.1-flash-lite` with tool calling.
-- [ ] P4.09 evaluation of the 30 held-out reports: report in `p4-agent-eval-eval.md`.
+Run on the owner's free-tier key with `gemini-3.1-flash-lite` on 2026-10-25, using fictional
+reports only. Latency counts provider calls only (free-tier throttling excluded). Tuning used only
+the 90 dev reports. The 30 held-out reports were scored once for v1 and once for the final v3.
+
+| Run                                | Macro-F1  | Routed correctly | Must-review caught | Unauthorised | p50 / p95 latency |
+| ---------------------------------- | --------- | ---------------- | ------------------ | ------------ | ----------------- |
+| v1, held-out 30 (two calls)        | 0.880     | 20 / 22          | 3 / 3              | 0            | 5.6 s / 16.8 s    |
+| v2, dev 90 (routes in the message) | 0.892     | 73 / 80          | 6 / 6              | 0            | 1.2 s / 10.2 s    |
+| v3, dev 90 (category definitions)  | 0.936     | 76 / 79          | 6 / 6              | 0            | 2.3 s / 18.9 s    |
+| **v3, held-out 30 (final)**        | **0.981** | **25 / 25**      | **3 / 3**          | **0**        | **1.1 s / 4.1 s** |
+
+- **Why v2:** v1 needed two model calls per report, and 11 of the 30 held-out reports exceeded
+  the 10 s deadline. v2 lists each category's approved department in the message (names and ids
+  only), so one call decides. Thinking level `MINIMAL` was measured faster than `LOW`.
+- **Why v3:** the v2 dev run sent building-fabric reports (floor tiles, signs, ceiling tiles, a
+  gate) to Furniture. v3 defines furniture as fittings inside rooms and other as the building
+  and outdoor areas.
+- **Final held-out run:**
+  - Every automatic route was to the labelled category, and every safety or non-maintenance
+    report reached a human.
+  - The 2 mismatches were reports the model rated high priority, which the policy deliberately
+    sends to review.
+  - Human-review rate was 16.7%. There were 0 rejected tool calls and 0 unauthorised state changes.
+- **Honest caveats:**
+  - Free-tier latency varies. Two dev calls stalled until the deadline (recorded as `TIMEOUT`, and
+    the tickets went to review).
+  - 30 held-out reports is a small sample, and the labels are the author's.
+  - The figures are measured on synthetic data, not calibrated probabilities (BR-09).
 
 ## Cloud verification
 

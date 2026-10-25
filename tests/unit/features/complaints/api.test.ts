@@ -210,8 +210,13 @@ describe("POST /api/complaints", () => {
 
     const logs = logLines.join("\n");
     expect(logLines.length).toBeGreaterThan(0);
-    for (const value of Object.values(VALID)) {
+    // Short values such as the room "214" can occur by chance inside a random request id, so
+    // distinctive values are matched as text and every complaint field by its key.
+    for (const value of [VALID.title, VALID.description, VALID.building]) {
       expect(logs).not.toContain(value);
+    }
+    for (const field of Object.keys(VALID)) {
+      expect(logs).not.toContain(`"${field}"`);
     }
   });
 });
