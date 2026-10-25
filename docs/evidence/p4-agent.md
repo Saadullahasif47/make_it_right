@@ -94,10 +94,15 @@ Each fault was reverted (`supabase db reset`, files restored) and the suites re-
 
 ## Cloud verification
 
-- [ ] Migration `20261023184646` applied to `makeitright-staging` with `supabase db push`.
-- [ ] Vercel Preview has `AI_ENABLED`, `GEMINI_MODEL`, `GEMINI_API_KEY` and `SUPABASE_SECRET_KEY`.
-      The two keys are Sensitive.
-- [ ] Preview: signed-out `POST …/retry-ai` gets 401. A demo student's fictional report is
-      routed by the AI, and a review case appears in the admin queue with its run details.
+- [x] Migration `20261023184646` applied to `makeitright-staging` with `supabase db push`.
+      `supabase migration list --linked` shows local = remote for all four migrations.
+- [x] Staging checks: `authenticated` and `anon` cannot execute the agent functions, while
+      `service_role` can. RLS is on for `agent_runs`, and all 6 routing rules are enabled.
+- [x] Owner added `AI_ENABLED`, `GEMINI_MODEL`, `GEMINI_API_KEY` and `SUPABASE_SECRET_KEY` to
+      Vercel. The preview config parses (`/api/health` ok on `93b0bbf`).
+- [x] Preview probes: signed-out `/admin/review` and `/student/complaints/new` get 307 to login.
+      Anonymous `POST …/retry-ai` gets **401**, and a cross-site request gets **403**.
+- [ ] Owner check on the preview: a demo student's fictional report is routed by the AI, and a
+      review case appears in the admin queue with its run details.
 
 **Gate P4: in progress.**
