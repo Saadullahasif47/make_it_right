@@ -210,9 +210,81 @@ describe("POST /api/complaints", () => {
 
     const logs = logLines.join("\n");
     expect(logLines.length).toBeGreaterThan(0);
-    for (const value of Object.values(VALID)) {
+    // Short values such as the room "214" can occur by chance inside a random request id, so
+    // distinctive values are matched as text and every complaint field by its key.
+    for (const value of [VALID.title, VALID.description, VALID.building]) {
       expect(logs).not.toContain(value);
     }
+    for (const field of Object.keys(VALID)) {
+      expect(logs).not.toContain(`"${field}"`);
+    }
+  });
+});
+
+describe("POST /api/complaints with AI triage (plan §4)", () => {
+  const TICKET = {
+    id: "c0000000-0000-4000-8000-000000000001",
+    reference: "MIR-1001",
+    status: "submitted",
+  } as const;
+  const triage = vi.fn<(ticketId: string) => Promise<"assigned" | "needs_review" | undefined>>();
+  const getTriage = vi.fn((_actorId: string) => triage);
+  const aiApi = createComplaintsApi({
+    getActor: () => Promise.resolve(actor),
+    getClient: () => Promise.resolve(fakeClient),
+    getLogger: () => createLogger({ level: "debug", sink: (_level, line) => logLines.push(line) }),
+    getTriage,
+  });
+
+  beforeEach(() => {
+    triage.mockReset();
+    getTriage.mockClear();
+  });
+
+  it("runs triage after the ticket is stored and returns the status it ended in", async () => {
+    vi.mocked(repository.createTicket).mockResolvedValue({ ...TICKET, created: true });
+    triage.mockResolvedValue("assigned");
+
+    const response = await aiApi.create(post(VALID));
+
+    expect(response.status).toBe(201);
+    expect(await response.json()).toMatchObject({
+      id: TICKET.id,
+      status: "assigned",
+      created: true,
+    });
+    expect(getTriage).toHaveBeenCalledWith(student.id, expect.anything());
+    expect(triage).toHaveBeenCalledWith(TICKET.id);
+    expect(vi.mocked(repository.createTicket).mock.invocationCallOrder[0]).toBeLessThan(
+      triage.mock.invocationCallOrder[0] ?? 0,
+    );
+  });
+
+  it("never reruns AI for a replayed idempotency key", async () => {
+    vi.mocked(repository.createTicket).mockResolvedValue({ ...TICKET, created: false });
+
+    const response = await aiApi.create(post(VALID));
+
+    expect(response.status).toBe(200);
+    expect(triage).not.toHaveBeenCalled();
+  });
+
+  it("keeps the stored ticket when triage fails or even throws", async () => {
+    vi.mocked(repository.createTicket).mockResolvedValue({ ...TICKET, created: true });
+    triage.mockResolvedValueOnce(undefined).mockRejectedValueOnce(new Error("provider exploded"));
+
+    for (let attempt = 0; attempt < 2; attempt++) {
+      const response = await aiApi.create(post(VALID));
+      expect(response.status).toBe(201);
+      expect(await response.json()).toMatchObject({ id: TICKET.id, status: "submitted" });
+    }
+  });
+
+  it("does not run triage when creation itself failed", async () => {
+    vi.mocked(repository.createTicket).mockRejectedValue(new ComplaintError("RATE_LIMITED"));
+
+    expect((await aiApi.create(post(VALID))).status).toBe(429);
+    expect(triage).not.toHaveBeenCalled();
   });
 });
 

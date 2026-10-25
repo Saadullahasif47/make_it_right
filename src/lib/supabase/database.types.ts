@@ -5,7 +5,39 @@ export type Database = {
   
   "public": {
           Tables: {
-            "complaints": {
+            "agent_runs": {
+                  Row: {
+                    "complaint_id": string,"duration_ms": number | null,"failure_code": string | null,"finished_at": string | null,"id": string,"model": string,"outcome": Database["public"]['Enums']["agent_run_outcome"],"prompt_version": string,"proposed_category": Database["public"]['Enums']["complaint_category"] | null,"proposed_department_id": string | null,"proposed_priority": Database["public"]['Enums']["ticket_priority"] | null,"requested_by": string | null,"started_at": string,"tool_calls": NonNullable<Json>,"trigger": Database["public"]['Enums']["agent_run_trigger"]
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "complaint_id": string,"duration_ms"?: number | null,"failure_code"?: string | null,"finished_at"?: string | null,"id"?: string,"model": string,"outcome"?: Database["public"]['Enums']["agent_run_outcome"],"prompt_version": string,"proposed_category"?: Database["public"]['Enums']["complaint_category"] | null,"proposed_department_id"?: string | null,"proposed_priority"?: Database["public"]['Enums']["ticket_priority"] | null,"requested_by"?: string | null,"started_at"?: string,"tool_calls"?: NonNullable<Json>,"trigger": Database["public"]['Enums']["agent_run_trigger"]
+                  }
+                  Update: {
+                    "complaint_id"?: string,"duration_ms"?: number | null,"failure_code"?: string | null,"finished_at"?: string | null,"id"?: string,"model"?: string,"outcome"?: Database["public"]['Enums']["agent_run_outcome"],"prompt_version"?: string,"proposed_category"?: Database["public"]['Enums']["complaint_category"] | null,"proposed_department_id"?: string | null,"proposed_priority"?: Database["public"]['Enums']["ticket_priority"] | null,"requested_by"?: string | null,"started_at"?: string,"tool_calls"?: NonNullable<Json>,"trigger"?: Database["public"]['Enums']["agent_run_trigger"]
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "agent_runs_complaint_id_fkey"
+      columns: ["complaint_id"]
+isOneToOne: false
+      referencedRelation: "complaints"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "agent_runs_proposed_department_id_fkey"
+      columns: ["proposed_department_id"]
+isOneToOne: false
+      referencedRelation: "departments"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "agent_runs_requested_by_fkey"
+      columns: ["requested_by"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"complaints": {
                   Row: {
                     "acknowledged_at": string | null,"assigned_department_id": string | null,"building": string,"category": Database["public"]['Enums']["complaint_category"],"created_at": string,"created_by": string,"description": string,"id": string,"priority": Database["public"]['Enums']["ticket_priority"],"reference_no": number,"room": string | null,"status": Database["public"]['Enums']["ticket_state"],"title": string,"updated_at": string,"version": number
                   }
@@ -159,6 +191,16 @@ isOneToOne: false
               "event_id": number
             }[]
                            },
+"agent_begin_run":
+{ Args: { "p_model": string,"p_prompt_version": string,"p_requested_by": string,"p_ticket_id": string,"p_trigger": Database["public"]['Enums']["agent_run_trigger"] }; Returns: {
+              "description": string,"run_id": string,"ticket_version": number,"title": string
+            }[]
+                           },
+"agent_finish_run":
+{ Args: { "p_category"?: Database["public"]['Enums']["complaint_category"],"p_department_id"?: string,"p_duration_ms"?: number,"p_expected_version": number,"p_failure_code"?: string,"p_outcome": Database["public"]['Enums']["agent_run_outcome"],"p_priority"?: Database["public"]['Enums']["ticket_priority"],"p_reason"?: string,"p_run_id": string,"p_tool_calls"?: Json }; Returns: {
+              "outcome": Database["public"]['Enums']["agent_run_outcome"],"status": Database["public"]['Enums']["ticket_state"],"version": number
+            }[]
+                           },
 "assign_ticket":
 { Args: { "p_category": Database["public"]['Enums']["complaint_category"],"p_department_id": string,"p_expected_version": number,"p_note"?: string,"p_priority": Database["public"]['Enums']["ticket_priority"],"p_ticket_id": string }; Returns: {
               "assigned_department_id": string,"id": string,"status": Database["public"]['Enums']["ticket_state"],"version": number
@@ -205,7 +247,7 @@ isOneToOne: false
                            }
           }
           Enums: {
-            "app_role": "student"|"department"|"admin","complaint_category": "unclassified"|"electrical"|"it_equipment"|"plumbing"|"furniture"|"sanitation"|"other","ticket_actor_kind": "user"|"agent"|"rule"|"system","ticket_event_type": "created"|"assigned"|"acknowledged"|"status_changed"|"note_added","ticket_priority": "unassessed"|"low"|"medium"|"high","ticket_state": "submitted"|"triaging"|"needs_review"|"assigned"|"in_progress"|"resolved"|"reopened"|"closed"
+            "agent_run_outcome": "running"|"routed"|"needs_review"|"superseded","agent_run_trigger": "submission"|"admin_retry","app_role": "student"|"department"|"admin","complaint_category": "unclassified"|"electrical"|"it_equipment"|"plumbing"|"furniture"|"sanitation"|"other","ticket_actor_kind": "user"|"agent"|"rule"|"system","ticket_event_type": "created"|"assigned"|"acknowledged"|"status_changed"|"note_added"|"triage_started"|"review_requested","ticket_priority": "unassessed"|"low"|"medium"|"high","ticket_state": "submitted"|"triaging"|"needs_review"|"assigned"|"in_progress"|"resolved"|"reopened"|"closed"
           }
           CompositeTypes: {
             [_ in never]: never
@@ -321,7 +363,7 @@ export type CompositeTypes<
 export const Constants = {
   "public": {
           Enums: {
-            "app_role": ["student", "department", "admin"],"complaint_category": ["unclassified", "electrical", "it_equipment", "plumbing", "furniture", "sanitation", "other"],"ticket_actor_kind": ["user", "agent", "rule", "system"],"ticket_event_type": ["created", "assigned", "acknowledged", "status_changed", "note_added"],"ticket_priority": ["unassessed", "low", "medium", "high"],"ticket_state": ["submitted", "triaging", "needs_review", "assigned", "in_progress", "resolved", "reopened", "closed"]
+            "agent_run_outcome": ["running", "routed", "needs_review", "superseded"],"agent_run_trigger": ["submission", "admin_retry"],"app_role": ["student", "department", "admin"],"complaint_category": ["unclassified", "electrical", "it_equipment", "plumbing", "furniture", "sanitation", "other"],"ticket_actor_kind": ["user", "agent", "rule", "system"],"ticket_event_type": ["created", "assigned", "acknowledged", "status_changed", "note_added", "triage_started", "review_requested"],"ticket_priority": ["unassessed", "low", "medium", "high"],"ticket_state": ["submitted", "triaging", "needs_review", "assigned", "in_progress", "resolved", "reopened", "closed"]
           }
         }
 } as const

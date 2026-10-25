@@ -38,6 +38,16 @@ export default defineConfig({
         },
       },
       {
+        // Live model evaluation (P4.09): opt-in, uses the free-tier quota. `pnpm eval:agent`.
+        extends: true,
+        test: {
+          name: "eval",
+          environment: "node",
+          include: ["tests/eval/**/*.eval.ts"],
+          setupFiles: ["./tests/integration/support/load-env.ts"],
+        },
+      },
+      {
         extends: true,
         test: {
           name: "dom",

@@ -58,3 +58,17 @@ script is idempotent, and re-running it resets their roles and password.
   can keep a stale stylesheet. Delete `.next` and build again. CI always builds from scratch.
 - **Account-creating E2E tests are skipped**: they only run against a local stack, with
   `SUPABASE_SECRET_KEY` set and `PLAYWRIGHT_BASE_URL` unset.
+
+## AI triage locally (Phase 4)
+
+- **Off by default.** With `AI_ENABLED=false`, tickets wait for manual routing.
+- **E2E needs no key.** It starts a second server on port 3101 with AI on, talking to the local
+  Gemini stub (`tests/support/gemini-stub.mts`, port 3199). Markers such as `STUB:429` in a
+  report script failures; see the stub's header.
+- **Live evaluation** (uses your free-tier quota):
+  1. Put `GEMINI_API_KEY=...` in `.env.local` with an editor. Never type it on the command line.
+  2. Run `EVAL_LIMIT=3 pnpm eval:agent` to smoke-test the key, the model and tool calling.
+  3. Run `pnpm eval:agent` for the 30 held-out reports. The report is written to
+     `docs/evidence/p4-agent-eval-eval.md`.
+- **AI in the dev server:** set `AI_ENABLED=true` and the key in `.env.local`, then restart
+  `pnpm dev`.

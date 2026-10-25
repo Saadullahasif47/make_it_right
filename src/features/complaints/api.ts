@@ -2,7 +2,12 @@ import "server-only";
 
 import type { AppRole } from "@/features/auth/roles";
 import type { SessionUser } from "@/features/auth/session";
-import { apiErrorResponse, apiJsonResponse } from "@/lib/http/api-error";
+import {
+  apiErrorResponse,
+  apiJsonResponse,
+  type ApiErrorCode,
+  type FieldErrors,
+} from "@/lib/http/api-error";
 import type { Logger } from "@/lib/logging/logger";
 import { resolveRequestId } from "@/lib/logging/request-id";
 import type { AppSupabaseClient } from "@/lib/supabase/server";
@@ -11,9 +16,9 @@ import { decodeCursor } from "./cursor";
 import { ComplaintError } from "./errors";
 import { getComplaint, listComplaints } from "./repository";
 import { complaintIdSchema, pageSizeSchema } from "./schemas";
-import { submitComplaint } from "./service";
+import { submitComplaint, type SubmitDependencies } from "./service";
 import { STATUS_FILTERS, isStatusFilter } from "./statuses";
-import { assign, changeStatus, type WorkflowResult } from "./workflow-service";
+import { assign, changeStatus } from "./workflow-service";
 
 export const MAX_BODY_BYTES = 16 * 1024;
 export const IDEMPOTENCY_KEY_HEADER = "idempotency-key";
@@ -22,6 +27,14 @@ export interface ComplaintsApiDependencies {
   readonly getActor: () => Promise<SessionUser | null>;
   readonly getClient: () => Promise<AppSupabaseClient>;
   readonly getLogger: () => Logger;
+  /** The AI step for a new ticket, or undefined while AI is off (see submitComplaint). */
+  readonly getTriage?: (actorId: string, logger: Logger) => SubmitDependencies["triage"];
+  /** The admin's bounded AI retry (POST /api/complaints/[id]/retry-ai). */
+  readonly retryAi?: (
+    actor: SessionUser,
+    ticketId: string,
+    logger: Logger,
+  ) => Promise<ApiResult<unknown>>;
 }
 
 /**
@@ -36,9 +49,23 @@ export function isCrossSiteRequest(request: Request): boolean {
   return origin !== null && origin !== new URL(request.url).origin;
 }
 
+function isEmptyObject(value: unknown): boolean {
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    !Array.isArray(value) &&
+    Object.keys(value).length === 0
+  );
+}
+
 function isJson(request: Request): boolean {
   return /^application\/json\s*(;|$)/i.test(request.headers.get("content-type") ?? "");
 }
+
+/** Any use-case result the endpoints turn into a response (WorkflowResult is one). */
+type ApiResult<T> =
+  | { readonly ok: true; readonly value: T }
+  | { readonly ok: false; readonly code: ApiErrorCode; readonly fields?: FieldErrors };
 
 type GuardedRequest =
   | {
@@ -103,7 +130,7 @@ export function createComplaintsApi(deps: ComplaintsApiDependencies) {
     };
   }
 
-  function workflowResponse<T>(result: WorkflowResult<T>, requestId: string): Response {
+  function workflowResponse<T>(result: ApiResult<T>, requestId: string): Response {
     return result.ok
       ? apiJsonResponse(result.value, requestId)
       : apiErrorResponse(result.code, requestId, result.fields);
@@ -116,10 +143,10 @@ export function createComplaintsApi(deps: ComplaintsApiDependencies) {
       if (!guarded.ok) {
         return guarded.response;
       }
-      const { requestId, logger, body } = guarded;
+      const { requestId, logger, body, actor } = guarded;
 
       const result = await submitComplaint(
-        { client: await deps.getClient(), logger },
+        { client: await deps.getClient(), logger, triage: deps.getTriage?.(actor.id, logger) },
         body,
         request.headers.get(IDEMPOTENCY_KEY_HEADER),
       );
@@ -215,6 +242,26 @@ export function createComplaintsApi(deps: ComplaintsApiDependencies) {
         guarded.body,
       );
       return workflowResponse(result, guarded.requestId);
+    },
+
+    /** POST /api/complaints/[id]/retry-ai: an admin's bounded retry of the AI step (plan §11). */
+    async retryAi(request: Request, ticketId: string): Promise<Response> {
+      const guarded = await guardedJson(request, "POST /api/complaints/[id]/retry-ai", ["admin"]);
+      if (!guarded.ok) {
+        return guarded.response;
+      }
+      if (!isEmptyObject(guarded.body)) {
+        return apiErrorResponse("VALIDATION_FAILED", guarded.requestId, {
+          form: "This endpoint takes an empty JSON object.",
+        });
+      }
+      if (deps.retryAi === undefined) {
+        return apiErrorResponse("AI_DISABLED", guarded.requestId);
+      }
+      return workflowResponse(
+        await deps.retryAi(guarded.actor, ticketId, guarded.logger),
+        guarded.requestId,
+      );
     },
 
     /** POST /api/complaints/[id]/review: admin classification and (re)assignment. */

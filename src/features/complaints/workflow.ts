@@ -96,3 +96,18 @@ export const TRANSITION_LABELS: Readonly<Partial<Record<TicketState, string>>> =
   closed: "Yes, it is fixed",
   reopened: "No, it is still a problem",
 };
+
+/**
+ * An AI attempt that has held a ticket in "triaging" this long has stopped (its function ended
+ * after committing the start). It matches the takeover threshold in agent_begin_run.
+ */
+export const TRIAGE_STALE_AFTER_MS = 2 * 60 * 1000;
+
+export function isStalledTriage(
+  ticket: { readonly status: TicketState; readonly updatedAt: string },
+  nowMs: number,
+): boolean {
+  return (
+    ticket.status === "triaging" && nowMs - Date.parse(ticket.updatedAt) >= TRIAGE_STALE_AFTER_MS
+  );
+}
