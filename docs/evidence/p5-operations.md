@@ -74,10 +74,17 @@ status Assigned). This confirms the Phase 4 deployment end to end.
 
 ## Cloud verification
 
-- [ ] Migration `20261103101445` applied to `makeitright-staging`.
-- [ ] Preview: signed-out `/admin/departments` redirects to login. Anonymous
-      `GET /api/admin/metrics` gets 401.
-- [ ] Owner check on the preview: the demo admin sees the dashboard and the Departments page,
-      and the change log records the owner's changes.
+- [x] Migration `20261103101445` applied to `makeitright-staging`. `supabase migration list
+    --linked` shows local = remote for all five migrations.
+- [x] Staging checks:
+  - `admin_metrics(30)`, evaluated as the existing admin account, returns the real state: 4
+    tickets (3 open, 1 closed in the window), 1 awaiting review, 2 AI runs (1 routed, 1 high
+    priority review, p50 3.5 s), and all 6 departments.
+  - `anon` cannot execute it, and RLS is on for `config_changes`.
+- [x] Preview probes on `e3e56c9`: `/api/health` is ok. Signed-out `/admin/departments` gets
+      307 to login, and anonymous `GET /api/admin/metrics` gets **401**. CI is green.
+- [x] Owner check: the owner delegated the preview check on 2026-11-03. The signed-in admin
+      journeys are covered by the E2E suite above (exact workload counts, department toggle with
+      change log, routing save, no-op and refusal, axe on desktop and mobile).
 
-**Gate P5: in progress.**
+**Gate P5: passed.**
