@@ -63,6 +63,20 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"config_changes": {
+                  Row: {
+                    "after_value": NonNullable<Json>,"before_value": Json | null,"changed_by": string,"created_at": string,"entity": string,"entity_key": string,"id": number
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "after_value": NonNullable<Json>,"before_value"?: Json | null,"changed_by": string,"created_at"?: string,"entity": string,"entity_key": string,"id"?: never
+                  }
+                  Update: {
+                    "after_value"?: NonNullable<Json>,"before_value"?: Json | null,"changed_by"?: string,"created_at"?: string,"entity"?: string,"entity_key"?: string,"id"?: never
+                  }
+                  Relationships: [
+                    
+                  ]
                 },"departments": {
                   Row: {
                     "code": string,"created_at": string,"id": string,"is_active": boolean,"name": string
@@ -189,6 +203,19 @@ isOneToOne: false
 "add_ticket_note":
 { Args: { "p_note": string,"p_ticket_id": string }; Returns: {
               "event_id": number
+            }[]
+                           },
+"admin_metrics":
+{ Args: { "p_window_days"?: number }; Returns: Json
+                           },
+"admin_set_department_active":
+{ Args: { "p_active": boolean,"p_department_id": string }; Returns: {
+              "id": string,"is_active": boolean,"routes_affected": number
+            }[]
+                           },
+"admin_set_routing_rule":
+{ Args: { "p_category": Database["public"]['Enums']["complaint_category"],"p_department_id": string,"p_enabled": boolean }; Returns: {
+              "category": Database["public"]['Enums']["complaint_category"],"department_id": string,"enabled": boolean
             }[]
                            },
 "agent_begin_run":

@@ -1,11 +1,12 @@
 import type { NextRequest } from "next/server";
 
 import { complaintsApi } from "@/features/complaints/api-instance";
+import { timed } from "@/lib/http/timed";
 
-export async function PATCH(
-  request: NextRequest,
-  context: RouteContext<"/api/complaints/[id]/status">,
-): Promise<Response> {
-  const { id } = await context.params;
-  return complaintsApi.changeStatus(request, id);
-}
+export const PATCH = timed(
+  "PATCH /api/complaints/[id]/status",
+  async (request: NextRequest, context: RouteContext<"/api/complaints/[id]/status">) => {
+    const { id } = await context.params;
+    return complaintsApi.changeStatus(request, id);
+  },
+);
