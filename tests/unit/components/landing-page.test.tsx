@@ -11,7 +11,7 @@ describe("landing page", () => {
 
     const headings = screen.getAllByRole("heading", { level: 1 });
     expect(headings).toHaveLength(1);
-    expect(headings[0]).toHaveTextContent(/reported once and fixed right/i);
+    expect(headings[0]).toHaveTextContent("A better way to get campus problems fixed.");
   });
 
   it("lists all six reportable categories", () => {
@@ -29,11 +29,12 @@ describe("landing page", () => {
     render(<HomePage />);
 
     for (const name of [
-      /reported once and fixed right/i,
+      "A better way to get campus problems fixed.",
       "What you can report",
-      "From report to resolved in three steps",
-      "One platform, three clear roles",
+      "How a report gets resolved",
+      "Built for the people who fix things",
       "AI that helps, without taking control",
+      "One platform, three clear roles",
       "Spotted something broken on campus?",
     ]) {
       expect(screen.getByRole("region", { name })).toBeInTheDocument();
@@ -50,11 +51,16 @@ describe("landing page", () => {
     }
   });
 
-  it("hides the decorative ticket mock-up from assistive technology", () => {
+  it("hides the decorative product mock-ups from assistive technology", () => {
     render(<HomePage />);
-    expect(screen.queryByText("MIR-2041 · Electrical")?.closest("[aria-hidden='true']")).not.toBe(
-      null,
-    );
+    for (const text of ["MIR-1024", "MIR-1031"]) {
+      expect(screen.getByText(text).closest("[aria-hidden='true']")).not.toBe(null);
+    }
+  });
+
+  it("labels the product preview's numbers as example data", () => {
+    render(<HomePage />);
+    expect(screen.getByText(/^Example data\./)).toBeInTheDocument();
   });
 });
 

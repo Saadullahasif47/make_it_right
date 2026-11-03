@@ -1,22 +1,47 @@
+import Link from "next/link";
+
 import { Logo, PRODUCT_TAGLINE } from "@/components/brand/logo";
 import { Container } from "@/components/ui/container";
+
+const LINKS = [
+  { href: "/#how-it-works", label: "How it works" },
+  { href: "/#ai-safety", label: "AI and safety" },
+  { href: "/login", label: "Sign in" },
+  { href: "/signup", label: "Create a student account" },
+] as const;
 
 export function SiteFooter() {
   return (
     <footer className="border-t border-line bg-surface">
-      <Container className="flex flex-col gap-6 py-10 sm:flex-row sm:items-start sm:justify-between">
-        <div className="max-w-sm space-y-3">
+      <Container className="grid gap-8 py-12 sm:grid-cols-[minmax(0,1fr)_auto]">
+        <div className="max-w-md space-y-3">
           <Logo />
           <p className="text-sm text-ink-muted">{PRODUCT_TAGLINE}.</p>
-        </div>
-        <div className="max-w-md space-y-2 text-sm text-ink-muted sm:text-right">
-          <p>
+          <p className="text-sm text-pretty text-ink-muted">
             A cloud computing coursework prototype. It is not an official reporting channel and does
             not handle emergencies, harassment, medical or disciplinary matters.
           </p>
-          <p className="text-ink-subtle">Runs on Vercel, Supabase and the Gemini API.</p>
         </div>
+        <nav aria-label="Footer">
+          <ul className="grid gap-2 text-sm">
+            {LINKS.map((link) => (
+              <li key={link.href}>
+                <Link
+                  href={link.href}
+                  className="text-ink-muted transition-colors duration-150 hover:text-ink"
+                >
+                  {link.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
       </Container>
+      <div className="border-t border-line">
+        <Container className="py-4 text-xs text-ink-subtle">
+          Runs on Vercel, Supabase and the Gemini API.
+        </Container>
+      </div>
     </footer>
   );
 }

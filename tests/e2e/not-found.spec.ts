@@ -8,7 +8,9 @@ test("unknown routes show a branded 404 with a way back", async ({ page }) => {
 
   await page.getByRole("link", { name: "Back to home" }).click();
   await expect(page).toHaveURL(/\/$/);
-  await expect(page.getByRole("heading", { level: 1 })).toContainText("fixed right");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText(
+    "A better way to get campus problems fixed.",
+  );
 });
 
 test("unknown API routes return 404, not an HTML crash page", async ({ request }) => {
