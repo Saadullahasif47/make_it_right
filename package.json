@@ -30,6 +30,7 @@
     "drills": "node --env-file=.env.local scripts/failure-drills.mts",
     "latency:cloud": "node scripts/cloud-latency.mts",
     "smoke": "node scripts/smoke.mts",
+    "design:audit": "node scripts/design-audit.mts",
     "check": "pnpm lint && pnpm typecheck && pnpm format:check && pnpm test && pnpm build"
   },
   "dependencies": {

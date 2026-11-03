@@ -1,6 +1,7 @@
 # UI redesign plan
 
-Status: approved 2026-11-03; Stage 1 delivered 2026-11-04. Baseline: tag `v1.0.0` (`dd687ea`), which we can roll back to at
+Status: approved 2026-11-03; Stage 1 delivered 2026-11-04; Stage 2 delivered 2026-11-04 (gate record in
+`docs/design/stage-2/audit.md`). Baseline: tag `v1.0.0` (`dd687ea`), which we can roll back to at
 any time.
 
 ## 1. Audit
