@@ -131,7 +131,11 @@ the 90 dev reports. The 30 held-out reports were scored once for v1 and once for
       Vercel. The preview config parses (`/api/health` ok on `93b0bbf`).
 - [x] Preview probes: signed-out `/admin/review` and `/student/complaints/new` get 307 to login.
       Anonymous `POST …/retry-ai` gets **401**, and a cross-site request gets **403**.
-- [ ] Owner check on the preview: a demo student's fictional report is routed by the AI, and a
-      review case appears in the admin queue with its run details.
+- [x] Owner check on the preview (2026-10-25): a demo student's fictional report (MIR-1002) ran
+      through the live Gemini path on `triage-v3` in 2.6 s. It was classified Electrical, matched
+      to the approved department and rated high priority, so the policy sent it to the admin
+      review queue with its run details.
+- [x] The automatic-routing path is evidenced by the live held-out evaluation (25/25 routes to
+      the correct department) and the E2E journeys. The owner approved the merge on 2026-11-03.
 
-**Gate P4: in progress.**
+**Gate P4: passed.**
