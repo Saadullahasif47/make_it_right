@@ -1,0 +1,49 @@
+{
+  "runId": "054308af",
+  "label": "local",
+  "target": "http://localhost:3100",
+  "date": "2026-11-03T15:21:18.882Z",
+  "rows": [
+    {
+      "level": 1,
+      "requests": 20,
+      "succeeded": 20,
+      "errors": {},
+      "p50": 51,
+      "p95": 147,
+      "max": 153,
+      "throughput": 14.4
+    },
+    {
+      "level": 5,
+      "requests": 20,
+      "succeeded": 20,
+      "errors": {},
+      "p50": 71,
+      "p95": 103,
+      "max": 103,
+      "throughput": 57.2
+    },
+    {
+      "level": 20,
+      "requests": 20,
+      "succeeded": 20,
+      "errors": {},
+      "p50": 217,
+      "p95": 227,
+      "max": 227,
+      "throughput": 86.6
+    }
+  ],
+  "idempotency": {
+    "pairs": 20,
+    "sameTicket": 20,
+    "exactlyOneCreated": 20,
+    "expected": 20
+  },
+  "database": {
+    "ticketsInDb": 81,
+    "createdEvents": 81,
+    "expectedTickets": 81
+  }
+}

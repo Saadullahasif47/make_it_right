@@ -358,6 +358,8 @@ test.describe("accessibility of auth and dashboard pages", () => {
     await page.goto("/login");
     await signIn(page, student.email, student.password);
     await expect(page).toHaveURL(/\/student\/complaints$/);
+    // The URL changes before the streamed metadata lands; scan the finished page only.
+    await expect(page).toHaveTitle(/^My complaints · MakeItRight$/);
     const results = await new AxeBuilder({ page })
       .withTags(["wcag2a", "wcag2aa", "wcag21aa"])
       .analyze();
