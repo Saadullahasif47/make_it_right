@@ -26,6 +26,9 @@
     "db:types": "supabase gen types typescript --local --schema public > src/lib/supabase/database.types.ts",
     "db:env": "node scripts/local-supabase-env.mts --write",
     "seed:demo": "node --env-file=.env.local scripts/seed-demo-accounts.mts",
+    "load:test": "node --env-file=.env.local scripts/load-test.mts",
+    "drills": "node --env-file=.env.local scripts/failure-drills.mts",
+    "latency:cloud": "node scripts/cloud-latency.mts",
     "check": "pnpm lint && pnpm typecheck && pnpm format:check && pnpm test && pnpm build"
   },
   "dependencies": {
