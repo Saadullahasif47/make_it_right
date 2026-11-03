@@ -129,11 +129,7 @@ export function Timeline({ events }: { readonly events: readonly TimelineEvent[]
         const details = classification(event);
         const isLast = index === events.length - 1;
         return (
-          <li
-            key={event.id}
-            className="relative flex animate-step-in gap-4"
-            style={{ animationDelay: `${index * 60}ms` }}
-          >
+          <li key={event.id} className="relative flex gap-4">
             {isLast ? null : (
               <span
                 aria-hidden="true"

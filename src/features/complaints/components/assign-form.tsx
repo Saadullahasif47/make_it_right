@@ -99,9 +99,9 @@ export function AssignForm({
   return (
     <section
       aria-label="Route this ticket"
-      className="animate-fade-up space-y-4 rounded-2xl border border-brand/30 bg-surface p-6 shadow-soft"
+      className="space-y-4 rounded-xl border border-brand/30 bg-surface p-6 shadow-soft"
     >
-      <h2 className="text-lg font-bold text-ink">Route this ticket</h2>
+      <h2 className="text-lg font-semibold text-ink">Route this ticket</h2>
       <p className="text-sm text-ink-muted">
         Classify the report and choose the department that should fix it.
         {suggestion === undefined

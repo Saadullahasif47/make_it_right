@@ -2,13 +2,16 @@ import type { ReactNode } from "react";
 import { Suspense } from "react";
 
 import { Logo } from "@/components/brand/logo";
-import { Container } from "@/components/ui/container";
+import { Skeleton } from "@/components/layout/page-parts";
 import { AccountMenu } from "@/features/auth/components/account-menu";
 import { NavLinks } from "@/features/auth/components/nav-links";
-import { ROLE_NAVIGATION } from "@/features/auth/navigation";
 import { getSessionUser } from "@/features/auth/session";
 
-/** Role-aware chrome. Rendering it is cosmetic; each page authorises itself on the server. */
+/**
+ * Role-aware chrome. Rendering it is cosmetic; each page authorises itself on the server.
+ * The nav and account block are single elements whose order and styling change at `lg`, so
+ * there is exactly one navigation landmark and one sign-out button at every width.
+ */
 async function SessionChrome() {
   const user = await getSessionUser();
   if (user === null) {
@@ -17,18 +20,26 @@ async function SessionChrome() {
 
   return (
     <>
-      <div className="flex items-center">
+      <nav
+        aria-label="Workspace"
+        className="order-3 basis-full border-t border-line lg:order-none lg:basis-auto lg:border-t-0 lg:pt-2"
+      >
+        <NavLinks role={user.role} />
+      </nav>
+      <div className="order-2 ml-auto pr-2 lg:order-none lg:mt-auto lg:ml-0 lg:pr-0">
         <AccountMenu user={user} />
       </div>
-      <nav aria-label="Workspace" className="col-span-2 -mb-px">
-        <NavLinks items={ROLE_NAVIGATION[user.role]} />
-      </nav>
     </>
   );
 }
 
 function ChromeSkeleton() {
-  return <div aria-hidden="true" className="h-9 w-40 animate-pulse rounded-lg bg-surface-muted" />;
+  return (
+    <div className="order-2 ml-auto flex items-center gap-2.5 lg:order-none lg:mt-auto lg:ml-0 lg:px-4 lg:py-4">
+      <Skeleton className="h-4 w-20 lg:bg-band-active" />
+      <Skeleton className="size-8 rounded-full lg:bg-band-active" />
+    </div>
+  );
 }
 
 export default function AppLayout({ children }: { readonly children: ReactNode }) {
@@ -36,22 +47,22 @@ export default function AppLayout({ children }: { readonly children: ReactNode }
     <>
       <a
         href="#main"
-        className="sr-only z-50 rounded-lg bg-brand px-4 py-2 font-semibold text-brand-fg focus:not-sr-only focus:fixed focus:top-3 focus:left-3"
+        className="sr-only z-50 rounded-md bg-brand px-4 py-2 text-sm font-medium text-brand-fg focus:not-sr-only focus:fixed focus:top-3 focus:left-3"
       >
         Skip to content
       </a>
-      <header className="sticky top-0 z-40 border-b border-line bg-surface/90 backdrop-blur-md">
-        <Container className="grid grid-cols-[1fr_auto] items-center gap-x-4 pt-3">
-          <div className="flex h-11 items-center">
-            <Logo />
-          </div>
-          <Suspense fallback={<ChromeSkeleton />}>
-            <SessionChrome />
-          </Suspense>
-        </Container>
+      <header className="sticky top-0 z-40 flex flex-wrap items-center border-b border-line bg-surface lg:fixed lg:inset-y-0 lg:left-0 lg:w-60 lg:flex-col lg:flex-nowrap lg:items-stretch lg:border-r lg:border-b-0 lg:border-band-line lg:bg-band">
+        <div className="order-1 flex h-14 items-center px-4 lg:order-none lg:h-16 lg:px-5">
+          <Logo tone="sidebar" />
+        </div>
+        <Suspense fallback={<ChromeSkeleton />}>
+          <SessionChrome />
+        </Suspense>
       </header>
-      <main id="main" className="flex-1 py-10">
-        <Container>{children}</Container>
+      <main id="main" className="flex-1 lg:pl-60">
+        <div className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 lg:px-10 lg:py-10">
+          {children}
+        </div>
       </main>
     </>
   );

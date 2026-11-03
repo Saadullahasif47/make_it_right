@@ -6,24 +6,27 @@ import { cn } from "@/lib/utils/cn";
 export type ButtonVariant = "primary" | "secondary" | "ghost" | "inverse";
 export type ButtonSize = "sm" | "md" | "lg";
 
+/*
+ * Feedback is colour only: 150 ms on hover, a darker shade on press. Buttons never move, scale or
+ * shimmer, so a busy screen stays calm.
+ */
 const base =
-  "group inline-flex shrink-0 items-center justify-center gap-2 rounded-xl font-semibold whitespace-nowrap select-none " +
-  "transition-[transform,background-color,border-color,color,box-shadow] duration-200 ease-(--ease-out-soft) " +
-  "hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] " +
+  "group inline-flex shrink-0 items-center justify-center gap-2 rounded-lg font-medium whitespace-nowrap select-none " +
+  "transition-[background-color,border-color,color,box-shadow] duration-150 ease-(--ease-out-soft) " +
   "disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50";
 
 const variants: Record<ButtonVariant, string> = {
-  primary: "btn-sheen bg-brand text-brand-fg shadow-soft hover:bg-brand-hover hover:shadow-lift",
+  primary: "bg-brand text-brand-fg shadow-soft hover:bg-brand-hover active:bg-brand-strong",
   secondary:
-    "border border-line-strong bg-surface text-ink shadow-soft hover:border-brand hover:text-brand-strong hover:shadow-lift",
-  ghost: "text-ink-muted hover:bg-surface-muted hover:text-ink",
-  inverse: "btn-sheen bg-band-fg text-band shadow-soft hover:shadow-lift hover:bg-white",
+    "border border-line-strong bg-surface text-ink shadow-soft hover:border-ink-subtle hover:bg-surface-muted active:bg-line",
+  ghost: "text-ink-muted hover:bg-surface-muted hover:text-ink active:bg-line",
+  inverse: "bg-band-fg text-band hover:bg-white active:bg-band-muted",
 };
 
 const sizes: Record<ButtonSize, string> = {
-  sm: "h-9 px-3.5 text-sm",
-  md: "h-11 px-5 text-sm",
-  lg: "h-12 px-6 text-base",
+  sm: "h-8 px-3 text-sm",
+  md: "h-10 px-4 text-sm",
+  lg: "h-11 px-5 text-[15px]",
 };
 
 export interface ButtonStyleOptions {
@@ -54,6 +57,5 @@ export function ButtonLink({ variant, size, className, ...props }: ButtonLinkPro
   return <Link className={buttonClassName({ variant, size, className })} {...props} />;
 }
 
-/** Icon that nudges forward when its parent button is hovered. */
-export const buttonIconSlide =
-  "size-4 transition-transform duration-200 ease-(--ease-out-soft) group-hover:translate-x-0.5";
+/** Icon size inside buttons. */
+export const buttonIcon = "size-4";

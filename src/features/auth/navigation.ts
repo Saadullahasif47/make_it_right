@@ -1,8 +1,21 @@
+import {
+  Building2,
+  CirclePlus,
+  ClipboardList,
+  Inbox,
+  LayoutDashboard,
+  ListChecks,
+  type LucideIcon,
+} from "lucide-react";
+
 import type { AppRole } from "./roles";
 
 export interface NavItem {
   readonly href: `/${string}`;
   readonly label: string;
+  readonly icon: LucideIcon;
+  /** Other areas this item is the home of, e.g. the ticket pages reached from a queue. */
+  readonly also?: readonly `/${string}`[];
 }
 
 /**
@@ -11,13 +24,18 @@ export interface NavItem {
  */
 export const ROLE_NAVIGATION: Readonly<Record<AppRole, readonly NavItem[]>> = {
   student: [
-    { href: "/student/complaints", label: "My complaints" },
-    { href: "/student/complaints/new", label: "Report an issue" },
+    { href: "/student/complaints", label: "My complaints", icon: ClipboardList },
+    { href: "/student/complaints/new", label: "Report an issue", icon: CirclePlus },
   ],
-  department: [{ href: "/department", label: "Department queue" }],
+  department: [{ href: "/department", label: "Department queue", icon: Inbox }],
   admin: [
-    { href: "/admin", label: "Overview" },
-    { href: "/admin/review", label: "Review queue" },
-    { href: "/admin/departments", label: "Departments" },
+    { href: "/admin", label: "Overview", icon: LayoutDashboard },
+    {
+      href: "/admin/review",
+      label: "Review queue",
+      icon: ListChecks,
+      also: ["/admin/complaints"],
+    },
+    { href: "/admin/departments", label: "Departments", icon: Building2 },
   ],
 };

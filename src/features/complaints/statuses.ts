@@ -26,18 +26,22 @@ export const STATUS_LABELS: Readonly<Record<TicketState, string>> = {
   closed: "Closed",
 };
 
-export type StatusTone = "neutral" | "attention" | "active" | "done" | "warning";
+export type StatusTone =
+  "neutral" | "routing" | "attention" | "queued" | "active" | "done" | "warning" | "closed";
 
-/** Visual grouping only; the meaning of a state lives in the database and domain rules. */
+/**
+ * Visual grouping only; the meaning of a state lives in the database and domain rules. Each
+ * state a person acts on gets its own hue, so a list can be scanned by colour as well as by label.
+ */
 export const STATUS_TONES: Readonly<Record<TicketState, StatusTone>> = {
   submitted: "neutral",
-  triaging: "neutral",
+  triaging: "routing",
   needs_review: "attention",
-  assigned: "active",
+  assigned: "queued",
   in_progress: "active",
   resolved: "done",
   reopened: "warning",
-  closed: "done",
+  closed: "closed",
 };
 
 export const PRIORITY_LABELS: Readonly<Record<TicketPriority, string>> = {

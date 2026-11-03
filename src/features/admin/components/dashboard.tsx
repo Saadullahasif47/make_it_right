@@ -59,9 +59,9 @@ function Panel({
   return (
     <section
       aria-labelledby={id}
-      className={cn("rounded-2xl border border-line bg-surface p-6 shadow-soft", className)}
+      className={cn("rounded-xl border border-line bg-surface p-6 shadow-soft", className)}
     >
-      <h2 id={id} className="text-base font-bold text-ink">
+      <h2 id={id} className="text-base font-semibold text-ink">
         {title}
       </h2>
       {description === undefined ? null : (
@@ -86,12 +86,12 @@ function KpiTile({
   readonly tone?: "neutral" | "attention";
 }) {
   return (
-    <div className="group rounded-2xl border border-line bg-surface p-5 shadow-soft transition-[transform,box-shadow,border-color] duration-300 hover:-translate-y-0.5 hover:border-brand/40 hover:shadow-lift">
+    <div className="group rounded-xl border border-line bg-surface p-5 shadow-soft transition-[transform,box-shadow,border-color] duration-150 hover:border-brand/40">
       <div className="flex items-center justify-between">
         <p className="text-sm font-semibold text-ink-muted">{label}</p>
         <span
           className={cn(
-            "flex size-8 items-center justify-center rounded-lg transition-colors duration-300",
+            "flex size-8 items-center justify-center rounded-lg transition-colors duration-150",
             tone === "attention"
               ? "bg-accent-soft text-accent-ink"
               : "bg-brand-soft text-brand-strong",
@@ -100,7 +100,7 @@ function KpiTile({
           <Icon aria-hidden="true" className="size-4" />
         </span>
       </div>
-      <p className="mt-3 text-3xl font-extrabold tracking-tight text-ink tabular-nums">{value}</p>
+      <p className="mt-3 text-3xl font-semibold tracking-tight text-ink tabular-nums">{value}</p>
       <p className="mt-1 text-xs text-ink-muted">{hint}</p>
     </div>
   );
@@ -137,7 +137,7 @@ function BarList({
           </span>
           <span className="h-2.5 overflow-hidden rounded-full bg-surface-muted" aria-hidden="true">
             <span
-              className="block h-full rounded-full bg-brand transition-[width] duration-500"
+              className="block h-full rounded-full bg-brand transition-[width] duration-200"
               style={{ width: `${(row.value / max) * 100}%` }}
             />
           </span>
@@ -167,7 +167,7 @@ function DailyColumns({ days }: { readonly days: AdminMetrics["createdPerDay"] }
             ) : null}
             <span
               className={cn(
-                "block rounded-t-md transition-colors duration-200 group-hover:bg-brand-strong",
+                "block rounded-t-md transition-colors duration-150 group-hover:bg-brand-strong",
                 day.count === 0 ? "h-0.5 bg-line" : "bg-brand",
               )}
               style={
@@ -221,7 +221,7 @@ export function WindowFilter({ active }: { readonly active: MetricWindow }) {
               href={`/admin?window=${window}`}
               aria-current={window === active ? "page" : undefined}
               className={cn(
-                "inline-flex items-center rounded-full border px-3.5 py-1.5 text-sm font-semibold transition-colors duration-200",
+                "inline-flex items-center rounded-full border px-3.5 py-1.5 text-sm font-semibold transition-colors duration-150",
                 window === active
                   ? "border-brand bg-brand text-brand-fg"
                   : "border-line-strong bg-surface text-ink-muted hover:border-brand hover:text-ink",
@@ -352,7 +352,7 @@ export function MetricsDashboard({ metrics }: { readonly metrics: AdminMetrics }
             </thead>
             <tbody className="divide-y divide-line">
               {metrics.departments.map((department) => (
-                <tr key={department.id} className="transition-colors duration-200 hover:bg-canvas">
+                <tr key={department.id} className="transition-colors duration-150 hover:bg-canvas">
                   <td className="px-6 py-3 font-medium text-ink">
                     {department.name}
                     {department.isActive ? null : (
@@ -366,7 +366,7 @@ export function MetricsDashboard({ metrics }: { readonly metrics: AdminMetrics }
                   </td>
                   <td className="px-3 py-3 text-right tabular-nums">
                     {department.unacknowledged > 0 ? (
-                      <span className="rounded-full bg-accent px-2 py-0.5 text-xs font-bold text-ink">
+                      <span className="rounded-md bg-accent-soft px-1.5 py-0.5 text-xs font-medium text-accent-ink">
                         {department.unacknowledged}
                       </span>
                     ) : (
@@ -406,7 +406,7 @@ export function MetricsDashboard({ metrics }: { readonly metrics: AdminMetrics }
               ].map(([term, detail]) => (
                 <div key={term} className="rounded-xl bg-surface-muted px-4 py-3">
                   <dt className="text-xs text-ink-muted">{term}</dt>
-                  <dd className="mt-1 text-lg font-bold text-ink tabular-nums">{detail}</dd>
+                  <dd className="mt-1 text-lg font-semibold text-ink tabular-nums">{detail}</dd>
                 </div>
               ))}
             </dl>

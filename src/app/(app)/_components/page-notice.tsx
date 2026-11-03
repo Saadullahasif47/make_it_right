@@ -1,4 +1,4 @@
-import { Notice } from "@/components/ui/notice";
+import { Toast } from "@/components/ui/toast";
 
 const NOTICES: Readonly<Record<string, string>> = {
   "password-updated": "Your password has been updated.",
@@ -10,7 +10,7 @@ const NOTICES: Readonly<Record<string, string>> = {
   "no-change": "Nothing changed: that is already the current setting.",
 };
 
-/** Renders a one-off confirmation passed via `?notice=`; unknown values render nothing. */
+/** Shows a one-off confirmation passed via `?notice=` as a toast; unknown values render nothing. */
 export async function PageNotice({
   searchParams,
 }: {
@@ -18,5 +18,5 @@ export async function PageNotice({
 }) {
   const raw = (await searchParams).notice;
   const text = NOTICES[Array.isArray(raw) ? (raw[0] ?? "") : (raw ?? "")];
-  return text === undefined ? null : <Notice tone="success">{text}</Notice>;
+  return text === undefined ? null : <Toast>{text}</Toast>;
 }

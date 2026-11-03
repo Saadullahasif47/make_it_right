@@ -18,9 +18,9 @@ import {
   Zap,
   type LucideIcon,
 } from "lucide-react";
-import type { CSSProperties, ReactNode } from "react";
+import type { ReactNode } from "react";
 
-import { ButtonLink, buttonIconSlide } from "@/components/ui/button";
+import { ButtonLink, buttonIcon } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
 import {
   CATEGORY_LABELS,
@@ -29,11 +29,6 @@ import {
 } from "@/features/complaints/categories";
 
 import { TicketPreview } from "./ticket-preview";
-
-/** Entrance delay for the hero's staggered fade-up sequence. */
-function stagger(index: number): CSSProperties {
-  return { animationDelay: `${index * 90}ms` };
-}
 
 function SectionHeading({
   id,
@@ -51,7 +46,7 @@ function SectionHeading({
       <p className="text-sm font-semibold tracking-wide text-brand uppercase">{eyebrow}</p>
       <h2
         id={id}
-        className="mt-3 text-3xl font-extrabold tracking-tight text-balance text-ink sm:text-4xl"
+        className="mt-3 text-3xl font-semibold tracking-tight text-balance text-ink sm:text-4xl"
       >
         {title}
       </h2>
@@ -65,37 +60,27 @@ function SectionHeading({
 export function Hero() {
   return (
     <section aria-labelledby="hero-title" className="relative overflow-hidden">
-      <div className="bg-grid pointer-events-none absolute inset-0 -z-10 opacity-60" />
+      <div className="pointer-events-none absolute inset-0 -z-10 opacity-60" />
       <Container className="grid items-center gap-14 py-16 sm:py-20 lg:grid-cols-[1.05fr_1fr] lg:gap-12 lg:py-28">
         <div className="text-center lg:text-left">
-          <p
-            className="inline-flex animate-fade-up items-center gap-2 rounded-full border border-line bg-surface px-3 py-1 text-xs font-semibold text-ink-muted shadow-soft"
-            style={stagger(0)}
-          >
+          <p className="inline-flex items-center gap-2 rounded-full border border-line bg-surface px-3 py-1 text-xs font-semibold text-ink-muted shadow-soft">
             <span className="size-1.5 rounded-full bg-accent" />
             AI Cloud-Based University Complaint System
           </p>
           <h1
             id="hero-title"
-            className="mt-6 animate-fade-up text-4xl leading-[1.08] font-extrabold tracking-tight text-balance text-ink sm:text-5xl lg:text-6xl"
-            style={stagger(1)}
+            className="mt-6 text-4xl leading-[1.08] font-semibold tracking-tight text-balance text-ink sm:text-5xl lg:text-6xl"
           >
             Campus problems, reported once and <span className="text-brand">fixed right.</span>
           </h1>
-          <p
-            className="mx-auto mt-6 max-w-xl animate-fade-up text-lg text-pretty text-ink-muted lg:mx-0"
-            style={stagger(2)}
-          >
+          <p className="mx-auto mt-6 max-w-xl text-lg text-pretty text-ink-muted lg:mx-0">
             Report a broken fan, a leaking tap or a dead projector in under a minute. MakeItRight
             sends it to the right department and keeps you updated until it is fixed.
           </p>
-          <div
-            className="mt-9 flex animate-fade-up flex-col items-center justify-center gap-3 sm:flex-row lg:justify-start"
-            style={stagger(3)}
-          >
+          <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row lg:justify-start">
             <ButtonLink href="/student/complaints/new" size="lg" className="w-full sm:w-auto">
               Report an issue
-              <ArrowRight aria-hidden="true" className={buttonIconSlide} />
+              <ArrowRight aria-hidden="true" className={buttonIcon} />
             </ButtonLink>
             <ButtonLink
               href="#how-it-works"
@@ -139,9 +124,9 @@ export function Categories() {
             return (
               <li
                 key={category}
-                className="group flex items-center gap-3 rounded-xl border border-line bg-canvas px-4 py-3 transition-[transform,border-color,box-shadow] duration-200 hover:-translate-y-0.5 hover:border-brand/50 hover:shadow-soft"
+                className="group flex items-center gap-3 rounded-xl border border-line bg-canvas px-4 py-3 transition-[transform,border-color,box-shadow] duration-150 hover:border-brand/50 hover:shadow-soft"
               >
-                <span className="flex size-9 items-center justify-center rounded-lg bg-brand-soft text-brand-strong transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-6">
+                <span className="flex size-9 items-center justify-center rounded-lg bg-brand-soft text-brand-strong">
                   <Icon aria-hidden="true" className="size-4.5" />
                 </span>
                 <span className="text-sm font-semibold text-ink">{CATEGORY_LABELS[category]}</span>
@@ -191,18 +176,18 @@ export function HowItWorks() {
           {STEPS.map((step, index) => (
             <li
               key={step.title}
-              className="group relative rounded-2xl border border-line bg-surface p-7 shadow-soft transition-[transform,box-shadow,border-color] duration-300 ease-(--ease-out-soft) hover:-translate-y-1 hover:border-brand/40 hover:shadow-lift"
+              className="group relative rounded-xl border border-line bg-surface p-7 shadow-soft transition-[transform,box-shadow,border-color] duration-150 ease-(--ease-out-soft) hover:border-brand/40"
             >
               <span
                 aria-hidden="true"
-                className="absolute top-6 right-6 font-mono text-sm font-semibold text-ink-subtle transition-colors duration-300 group-hover:text-brand"
+                className="absolute top-6 right-6 font-mono text-sm font-semibold text-ink-subtle transition-colors duration-150 group-hover:text-brand"
               >
                 0{index + 1}
               </span>
-              <span className="flex size-12 items-center justify-center rounded-xl bg-brand text-brand-fg shadow-soft transition-transform duration-300 group-hover:scale-105">
+              <span className="flex size-12 items-center justify-center rounded-xl bg-brand text-brand-fg shadow-soft">
                 <step.icon aria-hidden="true" className="size-5.5" />
               </span>
-              <h3 className="mt-6 text-lg font-bold text-ink">{step.title}</h3>
+              <h3 className="mt-6 text-lg font-semibold text-ink">{step.title}</h3>
               <p className="mt-2 text-sm leading-relaxed text-ink-muted">{step.body}</p>
             </li>
           ))}
@@ -268,12 +253,12 @@ export function Audiences() {
           {AUDIENCES.map((audience) => (
             <li
               key={audience.title}
-              className="group rounded-2xl border border-line bg-canvas p-7 transition-[transform,box-shadow,border-color,background-color] duration-300 ease-(--ease-out-soft) hover:-translate-y-1 hover:border-brand/40 hover:bg-surface hover:shadow-lift"
+              className="group rounded-xl border border-line bg-canvas p-7 transition-[transform,box-shadow,border-color,background-color] duration-150 ease-(--ease-out-soft) hover:border-brand/40 hover:bg-surface"
             >
-              <span className="flex size-11 items-center justify-center rounded-xl bg-accent-soft text-accent-ink transition-transform duration-300 group-hover:-rotate-6">
+              <span className="flex size-11 items-center justify-center rounded-xl bg-accent-soft text-accent-ink">
                 <audience.icon aria-hidden="true" className="size-5" />
               </span>
-              <h3 className="mt-5 text-lg font-bold text-ink">{audience.title}</h3>
+              <h3 className="mt-5 text-lg font-semibold text-ink">{audience.title}</h3>
               <ul className="mt-4 space-y-2.5">
                 {audience.points.map((point) => (
                   <li key={point} className="flex gap-2.5 text-sm text-ink-muted">
@@ -317,17 +302,14 @@ export function AiSafety() {
   return (
     <section id="ai-safety" aria-labelledby="ai-title" className="py-20 sm:py-24">
       <Container>
-        <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-band px-6 py-14 text-band-fg sm:px-12 sm:py-16">
-          <div className="pointer-events-none absolute -top-24 -right-24 size-72 rounded-full bg-brand/30 blur-3xl" />
-          <div className="pointer-events-none absolute -bottom-24 -left-24 size-72 rounded-full bg-accent/15 blur-3xl" />
-
+        <div className="relative overflow-hidden rounded-xl border border-white/10 bg-band px-6 py-14 text-band-fg sm:px-12 sm:py-16">
           <div className="relative max-w-2xl">
-            <p className="text-sm font-semibold tracking-wide text-accent uppercase">
+            <p className="text-sm font-semibold tracking-wide text-brand-on-band uppercase">
               AI &amp; safety
             </p>
             <h2
               id="ai-title"
-              className="mt-3 text-3xl font-extrabold tracking-tight text-balance sm:text-4xl"
+              className="mt-3 text-3xl font-semibold tracking-tight text-balance sm:text-4xl"
             >
               AI that helps, without taking control
             </h2>
@@ -341,13 +323,13 @@ export function AiSafety() {
             {GUARANTEES.map((item) => (
               <li
                 key={item.title}
-                className="group flex gap-4 rounded-2xl border border-white/10 bg-white/5 p-5 transition-[background-color,border-color,transform] duration-300 hover:-translate-y-0.5 hover:border-white/20 hover:bg-white/10"
+                className="group flex gap-4 rounded-xl border border-white/10 bg-white/5 p-5 transition-[background-color,border-color,transform] duration-150 hover:border-white/20 hover:bg-white/10"
               >
-                <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-brand text-brand-fg transition-transform duration-300 group-hover:scale-110">
+                <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-brand text-brand-fg">
                   <item.icon aria-hidden="true" className="size-5" />
                 </span>
                 <div>
-                  <h3 className="font-bold">{item.title}</h3>
+                  <h3 className="font-semibold">{item.title}</h3>
                   <p className="mt-1 text-sm leading-relaxed text-band-muted">{item.body}</p>
                 </div>
               </li>
@@ -363,10 +345,10 @@ export function FinalCallToAction() {
   return (
     <section aria-labelledby="cta-title" className="pb-24">
       <Container>
-        <div className="flex flex-col items-center gap-6 rounded-3xl border border-line bg-surface px-6 py-14 text-center shadow-soft sm:px-12">
+        <div className="flex flex-col items-center gap-6 rounded-xl border border-line bg-surface px-6 py-14 text-center shadow-soft sm:px-12">
           <h2
             id="cta-title"
-            className="max-w-xl text-3xl font-extrabold tracking-tight text-balance text-ink sm:text-4xl"
+            className="max-w-xl text-3xl font-semibold tracking-tight text-balance text-ink sm:text-4xl"
           >
             Spotted something broken on campus?
           </h2>
@@ -375,7 +357,7 @@ export function FinalCallToAction() {
           </p>
           <ButtonLink href="/student/complaints/new" size="lg">
             Report an issue
-            <ArrowRight aria-hidden="true" className={buttonIconSlide} />
+            <ArrowRight aria-hidden="true" className={buttonIcon} />
           </ButtonLink>
         </div>
       </Container>

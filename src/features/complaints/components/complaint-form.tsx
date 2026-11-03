@@ -3,7 +3,7 @@
 import { Send } from "lucide-react";
 import { useActionState, useState } from "react";
 
-import { buttonIconSlide } from "@/components/ui/button";
+import { buttonIcon } from "@/components/ui/button";
 import { TextAreaField, TextField } from "@/components/ui/field";
 import { Notice } from "@/components/ui/notice";
 import { SubmitButton } from "@/components/ui/submit-button";
@@ -19,7 +19,7 @@ function CharacterCount({ length }: { readonly length: number }) {
     <span
       aria-live="polite"
       className={cn(
-        "text-xs tabular-nums transition-colors duration-200",
+        "text-xs tabular-nums transition-colors duration-150",
         length > max
           ? "font-semibold text-danger"
           : length >= min
@@ -121,7 +121,7 @@ export function ComplaintForm({ idempotencyKey }: { readonly idempotencyKey: str
         <p className="text-sm text-ink-muted">You can follow every update from your dashboard.</p>
         <SubmitButton pendingLabel="Submitting…">
           Submit report
-          <Send aria-hidden="true" className={buttonIconSlide} />
+          <Send aria-hidden="true" className={buttonIcon} />
         </SubmitButton>
       </div>
     </form>

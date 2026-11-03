@@ -10,9 +10,9 @@ interface AuthCardProps {
 
 export function AuthCard({ title, description, children, footer }: AuthCardProps) {
   return (
-    <div className="w-full max-w-md animate-fade-up">
-      <div className="rounded-2xl border border-line bg-surface p-6 shadow-lift sm:p-8">
-        <h1 className="text-2xl font-extrabold tracking-tight text-ink">{title}</h1>
+    <div className="w-full max-w-md">
+      <div className="rounded-xl border border-line bg-surface p-6 shadow-lift sm:p-8">
+        <h1 className="text-2xl font-semibold tracking-tight text-ink">{title}</h1>
         <p className="mt-2 text-sm text-pretty text-ink-muted">{description}</p>
         <div className="mt-7">{children}</div>
       </div>

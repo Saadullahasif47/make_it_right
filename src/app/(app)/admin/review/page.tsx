@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 
 import { EmptyState, PageHeader, PageSkeleton } from "@/components/layout/page-parts";
-import { ButtonLink, buttonIconSlide } from "@/components/ui/button";
+import { ButtonLink, buttonIcon } from "@/components/ui/button";
 import { AccessDenied } from "@/features/auth/components/access-denied";
 import { requirePageAccess } from "@/features/auth/session";
 import { ComplaintList } from "@/features/complaints/components/complaint-list";
@@ -40,7 +40,6 @@ async function ReviewQueue({
   return (
     <div className="space-y-8">
       <PageHeader
-        eyebrow="Administrator"
         title="Review queue"
         description="Tickets waiting for a person to classify and route them, longest-waiting first: reports the AI assistant sent for review, attempts that stalled, and every new report while AI routing is off."
       />
@@ -66,7 +65,7 @@ async function ReviewQueue({
             size="sm"
           >
             More tickets
-            <ArrowRight aria-hidden="true" className={buttonIconSlide} />
+            <ArrowRight aria-hidden="true" className={buttonIcon} />
           </ButtonLink>
         </div>
       )}

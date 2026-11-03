@@ -36,7 +36,7 @@ export function listHref(
 }
 
 const pill =
-  "inline-flex h-9 items-center rounded-full border px-4 text-sm font-semibold transition-[background-color,border-color,color] duration-200";
+  "inline-flex h-9 items-center rounded-full border px-4 text-sm font-semibold transition-[background-color,border-color,color] duration-150";
 
 export function FilterTabs({
   hrefFor,
@@ -89,7 +89,7 @@ export function SortLinks({
           href={hrefFor(sort)}
           aria-current={sort === active ? "page" : undefined}
           className={cn(
-            "rounded-lg px-2.5 py-1.5 font-semibold transition-colors duration-200",
+            "rounded-lg px-2.5 py-1.5 font-semibold transition-colors duration-150",
             sort === active ? "bg-surface-muted text-ink" : "text-ink-muted hover:text-ink",
           )}
         >

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 
 import { EmptyState, PageHeader, PageSkeleton } from "@/components/layout/page-parts";
-import { ButtonLink, buttonIconSlide } from "@/components/ui/button";
+import { ButtonLink, buttonIcon } from "@/components/ui/button";
 import { AccessDenied } from "@/features/auth/components/access-denied";
 import { requirePageAccess } from "@/features/auth/session";
 import { ComplaintList } from "@/features/complaints/components/complaint-list";
@@ -48,7 +48,7 @@ function FilterTabs({ active }: { readonly active: StatusFilter }) {
               href={listHref(filter)}
               aria-current={filter === active ? "page" : undefined}
               className={cn(
-                "inline-flex h-9 items-center rounded-full border px-4 text-sm font-semibold transition-[background-color,border-color,color] duration-200",
+                "inline-flex h-9 items-center rounded-full border px-4 text-sm font-semibold transition-[background-color,border-color,color] duration-150",
                 filter === active
                   ? "border-brand bg-brand text-brand-fg"
                   : "border-line-strong bg-surface text-ink-muted hover:border-brand hover:text-ink",
@@ -87,17 +87,13 @@ async function StudentComplaints({ searchParams }: { readonly searchParams: Sear
     <div className="space-y-8">
       <div className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
         <PageHeader
-          eyebrow="Student"
           title={
             firstName === undefined ? "My complaints" : `Hi ${firstName}, here are your reports`
           }
           description="Every issue you report appears here with its status and full history. Only you can see these."
         />
         <ButtonLink href="/student/complaints/new" className="self-start sm:self-auto">
-          <Plus
-            aria-hidden="true"
-            className="size-4 transition-transform duration-200 group-hover:rotate-90"
-          />
+          <Plus aria-hidden="true" className="size-4" />
           Report an issue
         </ButtonLink>
       </div>
@@ -140,7 +136,7 @@ async function StudentComplaints({ searchParams }: { readonly searchParams: Sear
         {page.nextCursor === null ? null : (
           <ButtonLink href={listHref(filter, page.nextCursor)} variant="secondary" size="sm">
             Older reports
-            <ArrowRight aria-hidden="true" className={buttonIconSlide} />
+            <ArrowRight aria-hidden="true" className={buttonIcon} />
           </ButtonLink>
         )}
       </div>

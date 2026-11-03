@@ -1,7 +1,7 @@
 import { ArrowRight } from "lucide-react";
 
 import { Logo } from "@/components/brand/logo";
-import { ButtonLink, buttonIconSlide } from "@/components/ui/button";
+import { ButtonLink, buttonIcon } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
 
 const NAV_LINKS = [
@@ -22,7 +22,7 @@ export function SiteHeader() {
               <li key={link.href}>
                 <a
                   href={link.href}
-                  className="relative rounded-lg px-3 py-2 text-sm font-medium text-ink-muted transition-colors duration-200 after:absolute after:inset-x-3 after:bottom-1 after:h-0.5 after:origin-left after:scale-x-0 after:rounded-full after:bg-brand after:transition-transform after:duration-300 hover:text-ink hover:after:scale-x-100"
+                  className="relative rounded-lg px-3 py-2 text-sm font-medium text-ink-muted transition-colors duration-150 after:absolute after:inset-x-3 after:bottom-1 after:h-0.5 after:origin-left after:scale-x-0 after:rounded-full after:bg-brand after:transition-transform after:duration-300 hover:text-ink hover:after:scale-x-100"
                 >
                   {link.label}
                 </a>
@@ -37,7 +37,7 @@ export function SiteHeader() {
           </ButtonLink>
           <ButtonLink href="/student/complaints/new" size="sm">
             Report an issue
-            <ArrowRight aria-hidden="true" className={buttonIconSlide} />
+            <ArrowRight aria-hidden="true" className={buttonIcon} />
           </ButtonLink>
         </div>
       </Container>
