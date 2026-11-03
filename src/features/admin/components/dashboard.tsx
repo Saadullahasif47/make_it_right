@@ -366,7 +366,7 @@ export function MetricsDashboard({ metrics }: { readonly metrics: AdminMetrics }
                   </td>
                   <td className="px-3 py-3 text-right tabular-nums">
                     {department.unacknowledged > 0 ? (
-                      <span className="rounded-full bg-accent px-2 py-0.5 text-xs font-semibold text-ink">
+                      <span className="rounded-md bg-accent-soft px-1.5 py-0.5 text-xs font-medium text-accent-ink">
                         {department.unacknowledged}
                       </span>
                     ) : (

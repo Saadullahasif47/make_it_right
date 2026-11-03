@@ -93,7 +93,7 @@ export function ComplaintList({
                   <StatusBadge status={complaint.status} />
                   {variant === "staff" ? <PriorityBadge priority={complaint.priority} /> : null}
                   {isNew ? (
-                    <span className="inline-flex items-center gap-1 rounded-full bg-accent px-2 py-0.5 text-xs font-semibold text-ink">
+                    <span className="inline-flex h-6 items-center gap-1 rounded-md bg-accent-soft px-2 text-xs font-medium text-accent-ink">
                       New
                     </span>
                   ) : null}
