@@ -338,14 +338,14 @@ export function ProductPreview() {
           </SectionHeading>
           <dl className="mt-8 space-y-6">
             {PRODUCT_POINTS.map(({ icon: Icon, title, body }) => (
-              <div key={title} className="flex gap-4">
-                <span className="flex size-9 shrink-0 items-center justify-center rounded-lg border border-line bg-surface text-brand">
-                  <Icon aria-hidden="true" className="size-4" strokeWidth={1.75} />
-                </span>
-                <div>
-                  <dt className="font-medium text-ink">{title}</dt>
-                  <dd className="mt-1 text-sm text-pretty text-ink-muted">{body}</dd>
-                </div>
+              <div key={title} className="relative pl-13">
+                <dt className="font-medium text-ink">
+                  <span className="absolute top-0 left-0 flex size-9 items-center justify-center rounded-lg border border-line bg-surface text-brand">
+                    <Icon aria-hidden="true" className="size-4" strokeWidth={1.75} />
+                  </span>
+                  {title}
+                </dt>
+                <dd className="mt-1 text-sm text-pretty text-ink-muted">{body}</dd>
               </div>
             ))}
           </dl>
@@ -424,16 +424,16 @@ export function AiSafety() {
         </div>
         <dl className="divide-y divide-line rounded-xl border border-line">
           {GUARANTEES.map(({ icon: Icon, title, body }) => (
-            <div key={title} className="flex gap-4 p-5">
-              <Icon
-                aria-hidden="true"
-                className="mt-0.5 size-5 shrink-0 text-brand"
-                strokeWidth={1.75}
-              />
-              <div>
-                <dt className="font-medium text-ink">{title}</dt>
-                <dd className="mt-1 text-sm text-pretty text-ink-muted">{body}</dd>
-              </div>
+            <div key={title} className="relative p-5 pl-14">
+              <dt className="font-medium text-ink">
+                <Icon
+                  aria-hidden="true"
+                  className="absolute top-5.5 left-5 size-5 text-brand"
+                  strokeWidth={1.75}
+                />
+                {title}
+              </dt>
+              <dd className="mt-1 text-sm text-pretty text-ink-muted">{body}</dd>
             </div>
           ))}
         </dl>
