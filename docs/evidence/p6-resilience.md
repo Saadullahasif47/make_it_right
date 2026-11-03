@@ -28,21 +28,21 @@ estimated. The scripts can be re-run at any time:
 
 Run from a clean database (`supabase db reset`, which re-creates the fictional seed accounts):
 
-| Suite                               | Local result                                    | CI       |
-| ----------------------------------- | ----------------------------------------------- | -------- |
-| lint / typecheck / format / build   | Pass                                            | CI_CHECK |
-| Unit + component (Vitest)           | **382 / 382**                                   | CI_CHECK |
-| pgTAP (`pnpm db:test`)              | **222 / 222**                                   | CI_CHECK |
-| API integration (Auth + REST)       | **80 / 80**                                     | CI_CHECK |
-| E2E (Playwright, desktop + Pixel 7) | **147 passed**, 1 skipped by design, 4 see note | CI_E2E   |
+| Suite                               | Local result                                    |
+| ----------------------------------- | ----------------------------------------------- |
+| lint / typecheck / format / build   | Pass                                            |
+| Unit + component (Vitest)           | **382 / 382**                                   |
+| pgTAP (`pnpm db:test`)              | **222 / 222**                                   |
+| API integration (Auth + REST)       | **80 / 80**                                     |
+| E2E (Playwright, desktop + Pixel 7) | **147 passed**, 1 skipped by design, 4 see note |
 
 Local E2E note: the first run had 9 failures. Five were the browser running out of memory on
 this low-memory laptop (`Target crashed`, `ERR_INSUFFICIENT_RESOURCES`) and passed on a single-worker
 re-run. The other four are the sign-up and password-reset email tests. Locally, Playwright
 reused a server left on port 3100 by the load test, which builds email links for port 3000, so
 those links pointed at another program. This is a test-environment problem, not an application
-fault. CI starts from a clean machine and never reuses a server, so the CI column is the verdict
-for those four tests.
+fault. CI starts from a clean machine and never reuses a server, so its run on
+[PR #7](https://github.com/Saadullahasif47/make_it_right/pull/7) is the verdict for those four tests.
 
 ## Load: concurrent submissions (P6.02)
 
