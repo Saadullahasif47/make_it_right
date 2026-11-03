@@ -143,3 +143,6 @@ findings only. Re-check when ESLint publishes an update.
   p95 under one second at 20 concurrent requests from Pakistan.
 - **Not covered:** a signed-in cloud load test (needs the owner's approval, above) and photo
   upload, which is deferred (ADR 0006).
+
+**Gate P6: passed.** The regression suite is green locally, with the four email tests left to
+CI. PR #7 was set to merge only when every CI check, those four tests included, is green.
