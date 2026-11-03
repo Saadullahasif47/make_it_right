@@ -75,7 +75,7 @@ status Assigned). This confirms the Phase 4 deployment end to end.
 ## Cloud verification
 
 - [x] Migration `20261103101445` applied to `makeitright-staging`. `supabase migration list
-    --linked` shows local = remote for all five migrations.
+--linked` shows local = remote for all five migrations.
 - [x] Staging checks:
   - `admin_metrics(30)`, evaluated as the existing admin account, returns the real state: 4
     tickets (3 open, 1 closed in the window), 1 awaiting review, 2 AI runs (1 routed, 1 high
