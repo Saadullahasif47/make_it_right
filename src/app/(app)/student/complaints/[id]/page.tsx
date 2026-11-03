@@ -52,15 +52,14 @@ async function ComplaintDetail({
       complaint={complaint}
       back={{ href: "/student/complaints", label: "My complaints" }}
       notice={
-        submission !== undefined ? (
+        submission === undefined ? undefined : (
           <>
             {submission} Your reference is{" "}
             <strong className="font-mono whitespace-nowrap">{complaint.reference}</strong>.
           </>
-        ) : (
-          workflow
         )
       }
+      toast={workflow}
       actions={
         <WorkflowPanel
           ticketId={complaint.id}

@@ -21,7 +21,7 @@ export function SignUpForm() {
 
   if (state.status === "success") {
     return (
-      <div className="animate-fade-up space-y-6 text-center">
+      <div className="space-y-6 text-center">
         <span className="mx-auto flex size-12 items-center justify-center rounded-xl bg-success-soft text-success">
           <MailCheck aria-hidden="true" className="size-5" />
         </span>

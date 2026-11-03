@@ -18,7 +18,7 @@ export function ForgotPasswordForm() {
 
   if (state.status === "success") {
     return (
-      <div className="animate-fade-up space-y-6">
+      <div className="space-y-6">
         <Notice tone="success">{state.message}</Notice>
         <ButtonLink href="/login" variant="secondary" className="w-full">
           Back to sign in

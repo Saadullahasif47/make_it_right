@@ -12,31 +12,35 @@ function initialsOf(user: SessionUser): string {
   return letters.toUpperCase();
 }
 
+/**
+ * Who is signed in, and the way out. Compact in the mobile top bar (role and avatar), a full row
+ * at the foot of the desktop sidebar (name, role and a labelled sign-out button).
+ */
 export function AccountMenu({ user }: { readonly user: SessionUser }) {
   const name = user.displayName ?? user.email ?? "Signed in";
 
   return (
-    <div className="flex items-center gap-3">
-      <div className="text-right">
-        <p className="hidden max-w-48 truncate text-sm font-semibold text-ink sm:block">{name}</p>
-        <p className="text-xs font-medium text-brand-strong">{ROLE_LABELS[user.role]}</p>
-      </div>
+    <div className="flex items-center gap-2.5 lg:border-t lg:border-band-line lg:px-4 lg:py-4">
       <span
         aria-hidden="true"
-        className="flex size-9 items-center justify-center rounded-full bg-brand-soft text-xs font-bold text-brand-strong ring-2 ring-surface"
+        className="order-2 flex size-8 shrink-0 items-center justify-center rounded-full bg-brand-soft text-xs font-semibold text-brand-strong lg:order-none lg:bg-band-active lg:text-band-fg"
       >
         {initialsOf(user)}
       </span>
-      <form action={signOutAction}>
+      <div className="order-1 min-w-0 text-right lg:order-none lg:flex-1 lg:text-left">
+        <p className="hidden truncate text-sm font-medium text-band-fg lg:block">{name}</p>
+        <p className="text-xs font-medium text-ink-muted lg:text-band-muted">
+          {ROLE_LABELS[user.role]}
+        </p>
+      </div>
+      <form action={signOutAction} className="order-3 lg:order-none">
         <button
           type="submit"
-          className="group inline-flex h-9 items-center gap-2 rounded-lg px-2.5 text-sm font-semibold text-ink-muted transition-colors duration-200 hover:bg-surface-muted hover:text-ink"
+          aria-label="Sign out"
+          title="Sign out"
+          className="flex size-9 items-center justify-center rounded-md text-ink-muted transition-colors duration-150 hover:bg-surface-muted hover:text-ink lg:size-8 lg:text-band-muted lg:hover:bg-band-hover lg:hover:text-band-fg"
         >
-          <LogOut
-            aria-hidden="true"
-            className="size-4 transition-transform duration-200 group-hover:translate-x-0.5"
-          />
-          <span className="sr-only sm:not-sr-only">Sign out</span>
+          <LogOut aria-hidden="true" className="size-4" strokeWidth={1.75} />
         </button>
       </form>
     </div>

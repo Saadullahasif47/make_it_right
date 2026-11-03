@@ -19,21 +19,36 @@ export function locationOf(complaint: {
     : `${complaint.building}, room ${complaint.room}`;
 }
 
-const PRIORITY_CLASSES: Readonly<Record<TicketPriority, string>> = {
-  high: "border-danger/30 text-danger",
-  medium: "border-accent/40 text-accent-ink",
-  low: "border-line-strong text-ink-muted",
-  unassessed: "border-line text-ink-subtle",
+const PRIORITY_LEVELS: Readonly<Record<TicketPriority, number>> = {
+  unassessed: 0,
+  low: 1,
+  medium: 2,
+  high: 3,
 };
 
+/** Priority as a three-bar signal plus its label; only "high" uses the attention colour. */
 export function PriorityBadge({ priority }: { readonly priority: TicketPriority }) {
+  const level = PRIORITY_LEVELS[priority];
+  const high = priority === "high";
   return (
     <span
       className={cn(
-        "inline-flex shrink-0 items-center rounded-full border px-2 py-0.5 text-xs font-semibold whitespace-nowrap",
-        PRIORITY_CLASSES[priority],
+        "inline-flex h-6 shrink-0 items-center gap-1.5 rounded-md border px-2 text-xs font-medium whitespace-nowrap",
+        high ? "border-accent/40 bg-accent-soft text-accent-ink" : "border-line text-ink-muted",
       )}
     >
+      <span aria-hidden="true" className="flex h-2.5 items-end gap-px">
+        {[1, 2, 3].map((bar) => (
+          <span
+            key={bar}
+            className={cn(
+              "w-[3px] rounded-[1px]",
+              bar === 1 ? "h-1" : bar === 2 ? "h-1.5" : "h-2.5",
+              bar <= level ? (high ? "bg-accent" : "bg-ink-muted") : "bg-line-strong",
+            )}
+          />
+        ))}
+      </span>
       {priority === "unassessed" ? "Priority not set" : `${PRIORITY_LABELS[priority]} priority`}
     </span>
   );
@@ -68,7 +83,7 @@ export function ComplaintList({
           <li key={complaint.id}>
             <Link
               href={hrefFor(complaint.id)}
-              className="group flex animate-fade-up items-center gap-4 rounded-2xl border border-line bg-surface p-4 shadow-soft transition-[transform,box-shadow,border-color] duration-200 hover:-translate-y-0.5 hover:border-brand/40 hover:shadow-lift sm:p-5"
+              className="group flex items-center gap-4 rounded-xl border border-line bg-surface p-4 shadow-soft transition-[transform,box-shadow,border-color] duration-150 hover:border-brand/40 sm:p-5"
             >
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
@@ -78,12 +93,12 @@ export function ComplaintList({
                   <StatusBadge status={complaint.status} />
                   {variant === "staff" ? <PriorityBadge priority={complaint.priority} /> : null}
                   {isNew ? (
-                    <span className="inline-flex items-center gap-1 rounded-full bg-accent px-2 py-0.5 text-xs font-bold text-ink">
+                    <span className="inline-flex items-center gap-1 rounded-full bg-accent px-2 py-0.5 text-xs font-semibold text-ink">
                       New
                     </span>
                   ) : null}
                   {isStalled ? (
-                    <span className="inline-flex items-center gap-1 rounded-full bg-danger-soft px-2 py-0.5 text-xs font-bold text-danger">
+                    <span className="inline-flex items-center gap-1 rounded-full bg-danger-soft px-2 py-0.5 text-xs font-semibold text-danger">
                       AI stalled
                     </span>
                   ) : null}
@@ -104,7 +119,7 @@ export function ComplaintList({
               </div>
               <ChevronRight
                 aria-hidden="true"
-                className="size-5 shrink-0 text-ink-subtle transition-transform duration-200 group-hover:translate-x-0.5 group-hover:text-brand"
+                className="size-5 shrink-0 text-ink-subtle group-hover:text-brand"
               />
             </Link>
           </li>

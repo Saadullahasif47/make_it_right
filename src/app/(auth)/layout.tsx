@@ -17,20 +17,16 @@ export default function AuthLayout({ children }: { readonly children: ReactNode 
         <div className="pointer-events-none absolute -bottom-32 -left-24 size-80 rounded-full bg-accent/10 blur-3xl" />
 
         <div className="relative">
-          <Logo inverse />
+          <Logo tone="inverse" />
         </div>
 
         <div className="relative max-w-md">
-          <h2 className="animate-fade-up text-4xl leading-tight font-extrabold tracking-tight text-balance">
+          <h2 className="text-4xl leading-tight font-semibold tracking-tight text-balance">
             Report it once. Follow it until it is fixed.
           </h2>
           <ul className="mt-8 space-y-4">
-            {ASSURANCES.map((item, index) => (
-              <li
-                key={item}
-                className="flex animate-step-in items-start gap-3 text-band-muted"
-                style={{ animationDelay: `${200 + index * 120}ms` }}
-              >
+            {ASSURANCES.map((item) => (
+              <li key={item} className="flex items-start gap-3 text-band-muted">
                 <CircleCheck aria-hidden="true" className="mt-0.5 size-5 shrink-0 text-brand" />
                 {item}
               </li>

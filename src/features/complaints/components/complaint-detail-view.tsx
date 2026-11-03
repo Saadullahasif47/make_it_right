@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 
 import { LocalTime } from "@/components/ui/local-time";
 import { Notice } from "@/components/ui/notice";
+import { Toast } from "@/components/ui/toast";
 
 import { CATEGORY_LABELS, isComplaintCategory } from "../categories";
 import type { ComplaintDetail } from "../repository";
@@ -24,7 +25,10 @@ function Detail({ label, children }: { readonly label: string; readonly children
 interface ComplaintDetailViewProps {
   readonly complaint: ComplaintDetail;
   readonly back: { readonly href: string; readonly label: string };
+  /** An inline confirmation that must stay visible (the reference of a new report). */
   readonly notice?: ReactNode;
+  /** A one-off confirmation of the action that just happened. */
+  readonly toast?: string | undefined;
   /** Role-specific controls; rendered above the timeline. */
   readonly actions?: ReactNode;
 }
@@ -34,6 +38,7 @@ export function ComplaintDetailView({
   complaint,
   back,
   notice,
+  toast,
   actions,
 }: ComplaintDetailViewProps) {
   return (
@@ -42,16 +47,14 @@ export function ComplaintDetailView({
         href={back.href}
         className="group inline-flex items-center gap-1.5 text-sm font-semibold text-ink-muted transition-colors hover:text-ink"
       >
-        <ArrowLeft
-          aria-hidden="true"
-          className="size-4 transition-transform duration-200 group-hover:-translate-x-0.5"
-        />
+        <ArrowLeft aria-hidden="true" className="size-4" />
         {back.label}
       </Link>
 
       {notice === undefined ? null : <Notice tone="success">{notice}</Notice>}
+      {toast === undefined ? null : <Toast>{toast}</Toast>}
 
-      <header className="animate-fade-up space-y-3">
+      <header className="space-y-3">
         <div className="flex flex-wrap items-center gap-3">
           <span className="font-mono text-sm font-semibold text-ink-subtle">
             {complaint.reference}
@@ -61,7 +64,7 @@ export function ComplaintDetailView({
             <PriorityBadge priority={complaint.priority} />
           )}
         </div>
-        <h1 className="text-3xl font-extrabold tracking-tight text-balance text-ink">
+        <h1 className="text-3xl font-semibold tracking-tight text-balance text-ink">
           {complaint.title}
         </h1>
       </header>
@@ -70,7 +73,7 @@ export function ComplaintDetailView({
         <div className="space-y-8">
           <section
             aria-labelledby="details-title"
-            className="rounded-2xl border border-line bg-surface p-6 shadow-soft"
+            className="rounded-xl border border-line bg-surface p-6 shadow-soft"
           >
             <h2 id="details-title" className="sr-only">
               Details
@@ -90,7 +93,7 @@ export function ComplaintDetailView({
           </section>
 
           <section aria-labelledby="description-title" className="space-y-3">
-            <h2 id="description-title" className="text-lg font-bold text-ink">
+            <h2 id="description-title" className="text-lg font-semibold text-ink">
               Description
             </h2>
             <p className="text-pretty whitespace-pre-wrap text-ink-muted">
@@ -103,9 +106,9 @@ export function ComplaintDetailView({
           {actions}
           <section
             aria-labelledby="history-title"
-            className="space-y-5 rounded-2xl border border-line bg-surface p-6 shadow-soft"
+            className="space-y-5 rounded-xl border border-line bg-surface p-6 shadow-soft"
           >
-            <h2 id="history-title" className="text-lg font-bold text-ink">
+            <h2 id="history-title" className="text-lg font-semibold text-ink">
               History
             </h2>
             <Timeline events={complaint.events} />

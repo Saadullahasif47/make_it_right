@@ -70,17 +70,16 @@ async function DepartmentsAdmin({
   return (
     <div className="space-y-8">
       <PageHeader
-        eyebrow="Administrator"
         title="Departments"
         description="Who can receive tickets, and where each category is routed by default. Every change is recorded."
       />
       <PageNotice searchParams={searchParams} />
 
       <section aria-labelledby="availability-title" className="space-y-4">
-        <h2 id="availability-title" className="text-lg font-bold text-ink">
+        <h2 id="availability-title" className="text-lg font-semibold text-ink">
           Availability
         </h2>
-        <div className="overflow-hidden rounded-2xl border border-line bg-surface shadow-soft">
+        <div className="overflow-hidden rounded-xl border border-line bg-surface shadow-soft">
           <ul aria-label="Departments" className="divide-y divide-line">
             {departments.map((department) => (
               <li
@@ -121,7 +120,7 @@ async function DepartmentsAdmin({
 
       <section aria-labelledby="routing-title" className="space-y-4">
         <div>
-          <h2 id="routing-title" className="text-lg font-bold text-ink">
+          <h2 id="routing-title" className="text-lg font-semibold text-ink">
             Default routing
           </h2>
           <p className="mt-1 text-sm text-ink-muted">
@@ -130,7 +129,7 @@ async function DepartmentsAdmin({
             sends that category to the review queue.
           </p>
         </div>
-        <div className="rounded-2xl border border-line bg-surface px-5 shadow-soft">
+        <div className="rounded-xl border border-line bg-surface px-5 shadow-soft">
           <div className="divide-y divide-line">
             {COMPLAINT_CATEGORIES.map((category) => {
               const rule = ruleFor.get(category);
@@ -153,7 +152,7 @@ async function DepartmentsAdmin({
       </section>
 
       <section aria-labelledby="changes-title" className="space-y-4">
-        <h2 id="changes-title" className="text-lg font-bold text-ink">
+        <h2 id="changes-title" className="text-lg font-semibold text-ink">
           Recent changes
         </h2>
         {changes.length === 0 ? (
@@ -163,7 +162,7 @@ async function DepartmentsAdmin({
         ) : (
           <ol
             aria-label="Recent configuration changes"
-            className="divide-y divide-line rounded-2xl border border-line bg-surface shadow-soft"
+            className="divide-y divide-line rounded-xl border border-line bg-surface shadow-soft"
           >
             {changes.map((change) => (
               <li

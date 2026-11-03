@@ -24,18 +24,14 @@ async function NewComplaint() {
         href="/student/complaints"
         className="group inline-flex items-center gap-1.5 text-sm font-semibold text-ink-muted transition-colors hover:text-ink"
       >
-        <ArrowLeft
-          aria-hidden="true"
-          className="size-4 transition-transform duration-200 group-hover:-translate-x-0.5"
-        />
+        <ArrowLeft aria-hidden="true" className="size-4" />
         My complaints
       </Link>
       <PageHeader
-        eyebrow="New report"
         title="Report an issue"
         description="Tell us what is broken and where. Your report is saved straight away, then routed to the right department."
       />
-      <div className="rounded-2xl border border-line bg-surface p-6 shadow-soft sm:p-8">
+      <div className="rounded-xl border border-line bg-surface p-6 shadow-soft sm:p-8">
         {/* One key per rendered form: retries and double submits can never create two tickets. */}
         <ComplaintForm idempotencyKey={randomUUID()} />
       </div>

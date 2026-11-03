@@ -10,13 +10,13 @@ export function AccessDenied({ user }: { readonly user: SessionUser }) {
   return (
     <section
       aria-labelledby="access-denied-title"
-      className="mx-auto flex max-w-md animate-fade-up flex-col items-center py-16 text-center"
+      className="mx-auto flex max-w-md flex-col items-center py-16 text-center"
     >
-      <span className="flex size-14 items-center justify-center rounded-2xl bg-danger-soft text-danger">
+      <span className="flex size-14 items-center justify-center rounded-xl bg-danger-soft text-danger">
         <ShieldX aria-hidden="true" className="size-6" />
       </span>
       <p className="mt-6 font-mono text-sm font-semibold text-ink-subtle">403</p>
-      <h1 id="access-denied-title" className="mt-2 text-2xl font-extrabold tracking-tight text-ink">
+      <h1 id="access-denied-title" className="mt-2 text-2xl font-semibold tracking-tight text-ink">
         You do not have access to this page
       </h1>
       <p className="mt-3 text-pretty text-ink-muted">

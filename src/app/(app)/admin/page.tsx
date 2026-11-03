@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 
 import { PageHeader, PageSkeleton, StatTile } from "@/components/layout/page-parts";
-import { ButtonLink, buttonIconSlide } from "@/components/ui/button";
+import { ButtonLink, buttonIcon } from "@/components/ui/button";
 import { MetricsDashboard, WindowFilter } from "@/features/admin/components/dashboard";
 import { DEFAULT_WINDOW, getAdminMetrics, parseWindow } from "@/features/admin/metrics";
 import { AccessDenied } from "@/features/auth/components/access-denied";
@@ -49,7 +49,6 @@ async function AdminOverview({
   return (
     <div className="space-y-8">
       <PageHeader
-        eyebrow="Administrator"
         title="Overview"
         description="The live picture across campus: open work, routing, ageing tickets, departments and AI routing."
       />
@@ -59,14 +58,14 @@ async function AdminOverview({
         <WindowFilter active={window} />
         <ButtonLink href="/admin/review" className="self-start sm:self-auto">
           Open review queue
-          <ArrowRight aria-hidden="true" className={buttonIconSlide} />
+          <ArrowRight aria-hidden="true" className={buttonIcon} />
         </ButtonLink>
       </div>
 
       <MetricsDashboard metrics={metrics} />
 
       <section aria-labelledby="accounts-title" className="space-y-4">
-        <h2 id="accounts-title" className="text-lg font-bold text-ink">
+        <h2 id="accounts-title" className="text-lg font-semibold text-ink">
           Accounts
         </h2>
         <div className="grid gap-4 sm:grid-cols-3">

@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 
 import { EmptyState, PageHeader, PageSkeleton } from "@/components/layout/page-parts";
-import { ButtonLink, buttonIconSlide } from "@/components/ui/button";
+import { ButtonLink, buttonIcon } from "@/components/ui/button";
 import { AccessDenied } from "@/features/auth/components/access-denied";
 import { requirePageAccess } from "@/features/auth/session";
 import { ComplaintList } from "@/features/complaints/components/complaint-list";
@@ -73,7 +73,6 @@ async function DepartmentQueue({
   return (
     <div className="space-y-8">
       <PageHeader
-        eyebrow="Department queue"
         title={departmentName}
         description="Tickets assigned to your department. Acknowledge new ones, start work, and resolve them with a note."
       />
@@ -113,7 +112,7 @@ async function DepartmentQueue({
         <div className="flex justify-end">
           <ButtonLink href={href({ cursor: page.nextCursor })} variant="secondary" size="sm">
             More tickets
-            <ArrowRight aria-hidden="true" className={buttonIconSlide} />
+            <ArrowRight aria-hidden="true" className={buttonIcon} />
           </ButtonLink>
         </div>
       )}

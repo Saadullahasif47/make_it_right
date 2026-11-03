@@ -69,7 +69,7 @@ async function AdminTicket({
     <ComplaintDetailView
       complaint={complaint}
       back={{ href: "/admin/review", label: "Review queue" }}
-      notice={notice}
+      toast={notice}
       actions={
         <>
           {canAssign(complaint.status, access.user.role) ? (

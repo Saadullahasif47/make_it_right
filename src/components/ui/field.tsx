@@ -2,10 +2,14 @@ import type { ComponentProps, ReactNode } from "react";
 
 import { cn } from "@/lib/utils/cn";
 
+/*
+ * 16 px text on phones (smaller text makes iOS zoom into the field), 14 px from the sm breakpoint.
+ * Focus is a brand border plus a soft ring; errors swap both to the danger colour.
+ */
 export const inputClassName =
-  "h-11 w-full rounded-xl border border-line-strong bg-surface px-3.5 text-[15px] text-ink shadow-soft " +
-  "placeholder:text-ink-subtle transition-[border-color,box-shadow] duration-200 " +
-  "hover:border-ink-subtle focus:border-brand focus:ring-4 focus:ring-brand/15 focus:outline-none " +
+  "h-10 w-full rounded-md border border-line-strong bg-surface px-3 text-base text-ink sm:text-sm " +
+  "placeholder:text-ink-subtle transition-[border-color,box-shadow] duration-150 " +
+  "hover:border-ink-subtle focus:border-brand focus:ring-3 focus:ring-brand/15 focus:outline-none " +
   "aria-invalid:border-danger aria-invalid:focus:ring-danger/15 disabled:opacity-60";
 
 interface FieldShellProps {
@@ -31,7 +35,7 @@ export function FieldShell({ id, label, hint, error, labelAside, children }: Fie
   return (
     <div className="space-y-1.5">
       <div className="flex items-baseline justify-between gap-3">
-        <label htmlFor={id} className="text-sm font-semibold text-ink">
+        <label htmlFor={id} className="text-sm font-medium text-ink">
           {label}
         </label>
         {labelAside}
@@ -43,7 +47,7 @@ export function FieldShell({ id, label, hint, error, labelAside, children }: Fie
         </p>
       )}
       {error === undefined ? null : (
-        <p id={`${id}-error`} className="animate-fade-up text-sm font-medium text-danger">
+        <p id={`${id}-error`} className="text-sm font-medium text-danger">
           {error}
         </p>
       )}
@@ -112,7 +116,7 @@ export function TextAreaField({
         name={name}
         aria-invalid={error === undefined ? undefined : true}
         aria-describedby={fieldDescriptionIds(id, hint, error)}
-        className={cn(inputClassName, "h-auto min-h-36 resize-y py-3 leading-relaxed", className)}
+        className={cn(inputClassName, "h-auto min-h-32 resize-y py-2.5 leading-relaxed", className)}
         {...props}
       />
     </FieldShell>

@@ -15,10 +15,7 @@ export default function NotFound() {
       description="The link may be broken, or the page may have moved. Head back to the start and try again."
       actions={
         <ButtonLink href="/" variant="secondary">
-          <ArrowLeft
-            aria-hidden="true"
-            className="size-4 transition-transform duration-200 group-hover:-translate-x-0.5"
-          />
+          <ArrowLeft aria-hidden="true" className="size-4" />
           Back to home
         </ButtonLink>
       }

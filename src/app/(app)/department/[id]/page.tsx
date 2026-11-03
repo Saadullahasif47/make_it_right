@@ -44,7 +44,7 @@ async function DepartmentTicket({
     <ComplaintDetailView
       complaint={complaint}
       back={{ href: "/department", label: "Department queue" }}
-      notice={notice}
+      toast={notice}
       actions={
         <WorkflowPanel
           ticketId={complaint.id}

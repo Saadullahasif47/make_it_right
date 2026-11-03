@@ -1,77 +1,91 @@
 @import "tailwindcss";
 
 /*
- * MakeItRight design tokens.
- * Palette: deep ink (trust, legibility) + pine teal (resolution, "fixed") + amber (attention,
- * used sparingly). Every text/background pair below meets WCAG AA (>= 4.5:1).
- * Components use the semantic names only, so dark mode is a token swap, not a rewrite.
+ * MakeItRight design tokens (docs/design/ui-redesign-plan.md).
+ *
+ * One accent (pine #176B5B) on a quiet green-grey canvas. Status hues are muted and always paired
+ * with a text label. Amber means "needs attention" and is never decoration. Every text/background
+ * pair below meets WCAG AA (>= 4.5:1). Components use the semantic names only, so dark mode is a
+ * token swap, not a rewrite.
  */
 :root {
-  --canvas: #f5f7f6;
+  --canvas: #f6f8f7;
   --surface: #ffffff;
-  --surface-muted: #eef3f1;
-  --ink: #0b1f2a;
-  --ink-muted: #475a63;
-  --ink-subtle: #5b6c74;
-  --line: #dce5e2;
-  --line-strong: #c3d1cd;
+  --surface-muted: #eef2f0;
+  --ink: #182d2b; /* 13.6:1 on canvas */
+  --ink-muted: #4a5d5a; /* 6.6:1 */
+  --ink-subtle: #5f716d; /* 4.8:1 */
+  --line: #e1e7e4;
+  --line-strong: #cbd5d1;
 
-  --brand: #0b7a6e;
-  --brand-hover: #086257;
+  --brand: #176b5b; /* 6.0:1 on canvas, 6.4:1 under white text */
+  --brand-hover: #125647;
   --brand-fg: #ffffff;
-  --brand-soft: #e2f3ef;
-  --brand-strong: #075e54;
+  --brand-soft: #e5f0ec;
+  --brand-strong: #125647; /* 7.4:1 on brand-soft */
 
-  --accent: #f2a516;
-  --accent-soft: #fef3d9;
-  --accent-ink: #8a4b00;
+  --accent: #c77700;
+  --accent-soft: #fbf1df;
+  --accent-ink: #8a4b00; /* 6.1:1 on accent-soft */
+
+  --info: #2f5d8a;
+  --info-soft: #e9eff6;
+  --info-ink: #284b70;
 
   --danger: #b42318;
-  --danger-soft: #fdecea;
-  --success: #13744a; /* 5.1:1 on success-soft, 5.8:1 on white */
-  --success-soft: #e3f5ec;
+  --danger-soft: #fcedeb;
+  --success: #13744a;
+  --success-soft: #e6f4ec;
 
-  --band: #0b1f2a;
-  --band-fg: #ffffff;
-  --band-muted: #a8bcc0;
-  --brand-on-band: #4fcdbb;
+  /* The app sidebar and other dark surfaces. */
+  --band: #182d2b;
+  --band-fg: #f1f5f3;
+  --band-muted: #a9bab5; /* 6.2:1 on band */
+  --band-line: rgb(255 255 255 / 0.08);
+  --band-hover: rgb(255 255 255 / 0.06);
+  --band-active: rgb(255 255 255 / 0.1);
+  --brand-on-band: #7fd0bc;
 
-  --focus: #0b7a6e;
-  --shadow-color: 200 40% 12%;
+  --focus: #176b5b;
+  --shadow-color: 168 30% 14%;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --canvas: #081316;
-    --surface: #0e1c20;
-    --surface-muted: #13262b;
-    --ink: #e6efed;
-    --ink-muted: #9fb3b0;
-    --ink-subtle: #8aa19d;
-    --line: #1f343a;
-    --line-strong: #2b464d;
+    --canvas: #0f1a19;
+    --surface: #152322;
+    --surface-muted: #1b2c2a;
+    --ink: #e7eeec;
+    --ink-muted: #a3b4b0;
+    --ink-subtle: #8fa29e;
+    --line: #243633;
+    --line-strong: #2f4542;
 
-    --brand: #2db7a5;
-    --brand-hover: #4fcdbb;
-    --brand-fg: #04211d;
-    --brand-soft: #0f3833;
-    --brand-strong: #4fcdbb;
+    --brand: #4fb39c;
+    --brand-hover: #6cc4af;
+    --brand-fg: #0b1f1b;
+    --brand-soft: #183a33;
+    --brand-strong: #7fd0bc;
 
-    --accent: #f5b940;
-    --accent-soft: #3a2a0c;
-    --accent-ink: #f5c86a;
+    --accent: #e0a13a;
+    --accent-soft: #3a2c12;
+    --accent-ink: #f1c27a;
 
-    --danger: #f97066;
-    --danger-soft: #3b1513;
-    --success: #47cd89;
-    --success-soft: #0f3221;
+    --info: #8db3e0;
+    --info-soft: #1a2a3d;
+    --info-ink: #a9c6ea;
 
-    --band: #0d2a2b;
-    --band-fg: #e6efed;
-    --band-muted: #9fb3b0;
+    --danger: #f0857b;
+    --danger-soft: #3a1917;
+    --success: #5cc994;
+    --success-soft: #12301f;
 
-    --focus: #4fcdbb;
-    --shadow-color: 200 60% 2%;
+    --band: #0b1514;
+    --band-fg: #e7eeec;
+    --band-muted: #93a6a1;
+
+    --focus: #6cc4af;
+    --shadow-color: 168 40% 2%;
   }
 }
 
@@ -92,6 +106,9 @@
   --color-accent: var(--accent);
   --color-accent-soft: var(--accent-soft);
   --color-accent-ink: var(--accent-ink);
+  --color-info: var(--info);
+  --color-info-soft: var(--info-soft);
+  --color-info-ink: var(--info-ink);
   --color-danger: var(--danger);
   --color-danger-soft: var(--danger-soft);
   --color-success: var(--success);
@@ -99,74 +116,40 @@
   --color-band: var(--band);
   --color-band-fg: var(--band-fg);
   --color-band-muted: var(--band-muted);
+  --color-band-line: var(--band-line);
+  --color-band-hover: var(--band-hover);
+  --color-band-active: var(--band-active);
   --color-brand-on-band: var(--brand-on-band);
   --color-focus: var(--focus);
 
-  --font-sans: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
-  --font-mono: var(--font-jetbrains), ui-monospace, monospace;
+  --font-sans: var(--font-geist), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
 
-  --shadow-soft:
-    0 1px 2px hsl(var(--shadow-color) / 0.06), 0 2px 8px hsl(var(--shadow-color) / 0.05);
+  /* Panels rest on borders; shadows are for things that float (menus, toasts, dialogs). */
+  --shadow-soft: 0 1px 2px hsl(var(--shadow-color) / 0.04);
   --shadow-lift:
-    0 2px 4px hsl(var(--shadow-color) / 0.06), 0 12px 32px -8px hsl(var(--shadow-color) / 0.18);
+    0 2px 4px hsl(var(--shadow-color) / 0.06), 0 8px 24px -6px hsl(var(--shadow-color) / 0.16);
 
-  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-out-soft: cubic-bezier(0.2, 0, 0, 1);
 
-  --animate-fade-up: fade-up 0.7s var(--ease-out-soft) both;
-  --animate-step-in: step-in 0.5s var(--ease-out-soft) both;
-  --animate-pulse-ring: pulse-ring 2s var(--ease-out-soft) infinite;
-  --animate-float: float 6s ease-in-out infinite;
+  --animate-fade-in: fade-in 150ms var(--ease-out-soft) both;
+  --animate-toast-in: toast-in 200ms var(--ease-out-soft) both;
 }
 
-/* Keyframes live outside @theme so custom component classes can always reference them. */
-@keyframes fade-up {
+/*
+ * Motion: short, purposeful, opacity and transform only. Nothing loops, nothing waits on a delay,
+ * and content never depends on an animation finishing.
+ */
+@keyframes fade-in {
   from {
     opacity: 0;
-    transform: translateY(14px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
   }
 }
 
-@keyframes step-in {
+@keyframes toast-in {
   from {
     opacity: 0;
-    transform: translateX(-8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@keyframes pulse-ring {
-  0% {
-    box-shadow: 0 0 0 0 color-mix(in oklab, var(--brand) 45%, transparent);
-  }
-  70%,
-  100% {
-    box-shadow: 0 0 0 10px color-mix(in oklab, var(--brand) 0%, transparent);
-  }
-}
-
-@keyframes float {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-6px);
-  }
-}
-
-@keyframes sheen {
-  from {
-    transform: translateX(-120%) skewX(-20deg);
-  }
-  to {
-    transform: translateX(220%) skewX(-20deg);
+    transform: translateY(8px);
   }
 }
 
@@ -180,54 +163,22 @@
     background-color: var(--color-canvas);
     color: var(--color-ink);
     font-family: var(--font-sans);
+    font-feature-settings: "ss01";
     text-rendering: optimizeLegibility;
   }
 
   ::selection {
-    background-color: color-mix(in oklab, var(--brand) 25%, transparent);
+    background-color: color-mix(in oklab, var(--brand) 22%, transparent);
   }
 
   /* One consistent, clearly visible keyboard focus style across the app. */
   :focus-visible {
     outline: 2px solid var(--color-focus);
-    outline-offset: 3px;
-    border-radius: 6px;
+    outline-offset: 2px;
   }
 
   [id] {
     scroll-margin-top: 6rem;
-  }
-}
-
-@layer components {
-  /* A light sweep across primary buttons on hover; purely decorative. */
-  .btn-sheen {
-    position: relative;
-    isolation: isolate;
-    overflow: hidden;
-  }
-
-  .btn-sheen::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    width: 40%;
-    background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.28), transparent);
-    transform: translateX(-120%) skewX(-20deg);
-    pointer-events: none;
-  }
-
-  .btn-sheen:hover::after {
-    animation: sheen 0.9s var(--ease-out-soft);
-  }
-
-  .bg-grid {
-    background-image:
-      linear-gradient(to right, var(--color-line) 1px, transparent 1px),
-      linear-gradient(to bottom, var(--color-line) 1px, transparent 1px);
-    background-size: 44px 44px;
-    mask-image: radial-gradient(ellipse 70% 60% at 50% 30%, black 30%, transparent 75%);
   }
 }
 
@@ -236,6 +187,7 @@
   ::before,
   ::after {
     animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;

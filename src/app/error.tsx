@@ -34,10 +34,7 @@ export default function ErrorPage({ error, retry }: ErrorPageProps) {
       actions={
         <>
           <Button onClick={retry}>
-            <RotateCcw
-              aria-hidden="true"
-              className="size-4 transition-transform duration-300 group-hover:-rotate-90"
-            />
+            <RotateCcw aria-hidden="true" className="size-4" />
             Try again
           </Button>
           <ButtonLink href="/" variant="secondary">

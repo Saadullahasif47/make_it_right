@@ -4,7 +4,7 @@ import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { useActionState } from "react";
 
-import { buttonIconSlide } from "@/components/ui/button";
+import { buttonIcon } from "@/components/ui/button";
 import { TextField } from "@/components/ui/field";
 import { Notice } from "@/components/ui/notice";
 import { PasswordField } from "@/components/ui/password-field";
@@ -55,7 +55,7 @@ export function SignInForm({ next }: { readonly next: string | undefined }) {
 
       <SubmitButton pendingLabel="Signing in…" className="w-full">
         Sign in
-        <ArrowRight aria-hidden="true" className={buttonIconSlide} />
+        <ArrowRight aria-hidden="true" className={buttonIcon} />
       </SubmitButton>
     </form>
   );
