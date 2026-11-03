@@ -12,7 +12,9 @@ test.describe("public landing page", () => {
 
     expect(response?.status()).toBe(200);
     await expect(page).toHaveTitle(/MakeItRight/);
-    await expect(page.getByRole("heading", { level: 1 })).toContainText("fixed right");
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText(
+      "A better way to get campus problems fixed.",
+    );
     await expect(page.getByRole("note", { name: "Prototype notice" })).toBeVisible();
     await expect(
       page.getByRole("banner").getByRole("link", { name: /report an issue/i }),
@@ -105,7 +107,25 @@ test.describe("public landing page", () => {
 
     await page.getByRole("link", { name: "See how it works" }).click();
     await expect(
-      page.getByRole("heading", { name: "From report to resolved in three steps" }),
+      page.getByRole("heading", { name: "How a report gets resolved" }),
     ).toBeInViewport();
+  });
+
+  test("on a phone, the menu opens as a dialog, closes on Escape and keeps the main action visible", async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto("/");
+
+    await expect(
+      page.getByRole("banner").getByRole("link", { name: /report an issue/i }),
+    ).toBeVisible();
+    await page.getByRole("button", { name: "Open menu" }).click();
+    const menu = page.getByRole("dialog", { name: "Menu" });
+    await expect(menu).toBeVisible();
+    await expect(menu.getByRole("link", { name: "How it works" })).toBeVisible();
+    await page.keyboard.press("Escape");
+    await expect(menu).toBeHidden();
+    await expect(page.getByRole("button", { name: "Open menu" })).toBeFocused();
   });
 });

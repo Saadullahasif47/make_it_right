@@ -5,6 +5,7 @@ import {
   FinalCallToAction,
   Hero,
   HowItWorks,
+  ProductPreview,
 } from "./_components/landing-sections";
 
 export default function HomePage() {
@@ -13,8 +14,9 @@ export default function HomePage() {
       <Hero />
       <Categories />
       <HowItWorks />
-      <Audiences />
+      <ProductPreview />
       <AiSafety />
+      <Audiences />
       <FinalCallToAction />
     </>
   );
