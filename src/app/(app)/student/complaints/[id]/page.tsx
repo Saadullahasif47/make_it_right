@@ -16,6 +16,7 @@ export const metadata: Metadata = { title: "Complaint" };
 
 const SUBMISSION_NOTICES: Readonly<Record<string, string>> = {
   created: "Your report has been saved. We will route it to the right department.",
+  "created-routed": "Your report has been saved and sent to the department that handles it.",
   "already-submitted": "This report was already saved, so we did not create a duplicate.",
 };
 

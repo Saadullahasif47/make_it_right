@@ -14,6 +14,9 @@ if (process.env.SUPABASE_SECRET_KEY === undefined && existsSync(".env.local")) {
 const externalBaseUrl = process.env.PLAYWRIGHT_BASE_URL;
 const isCI = process.env.CI === "true";
 const port = 3100;
+/** A second server with AI switched on, talking to the local Gemini stub (tests/e2e/agent.spec.ts). */
+export const AI_PORT = 3101;
+const GEMINI_STUB_PORT = 3199;
 
 export default defineConfig({
   testDir: "./tests/e2e",
@@ -35,13 +38,36 @@ export default defineConfig({
   ],
   webServer:
     externalBaseUrl === undefined
-      ? {
-          command: `pnpm start --port ${port}`,
-          url: `http://localhost:${port}/api/health`,
-          reuseExistingServer: !isCI,
-          timeout: 120_000,
-          // Links in emails must point at this test server.
-          env: { APP_BASE_URL: `http://localhost:${port}` },
-        }
+      ? [
+          {
+            command: `pnpm start --port ${port}`,
+            url: `http://localhost:${port}/api/health`,
+            reuseExistingServer: !isCI,
+            timeout: 120_000,
+            // Links in emails must point at this test server. AI stays off: the P1-P3 journeys
+            // run exactly as a deployment without a provider would.
+            env: { APP_BASE_URL: `http://localhost:${port}`, AI_ENABLED: "false" },
+          },
+          {
+            command: `node tests/support/gemini-stub.mts ${GEMINI_STUB_PORT}`,
+            url: `http://127.0.0.1:${GEMINI_STUB_PORT}/health`,
+            reuseExistingServer: !isCI,
+            timeout: 30_000,
+          },
+          {
+            command: `pnpm start --port ${AI_PORT}`,
+            url: `http://localhost:${AI_PORT}/api/health`,
+            reuseExistingServer: !isCI,
+            timeout: 120_000,
+            env: {
+              APP_BASE_URL: `http://localhost:${AI_PORT}`,
+              AI_ENABLED: "true",
+              GEMINI_API_KEY: "stub-key-not-a-secret",
+              GEMINI_MODEL: "gemini-3.1-flash-lite",
+              GEMINI_BASE_URL: `http://127.0.0.1:${GEMINI_STUB_PORT}`,
+              AI_TIMEOUT_MS: "3000",
+            },
+          },
+        ]
       : undefined,
 });

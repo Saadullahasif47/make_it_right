@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 
+import { submissionTriage } from "@/features/agent/instance";
 import { getSessionUser } from "@/features/auth/session";
 import { readFields, type FormState } from "@/lib/forms/form-state";
 import { getLogger } from "@/lib/logging";
@@ -47,10 +48,15 @@ export async function submitComplaintAction(
     return { status: "error", message: "Only student accounts can submit reports here.", values };
   }
 
+  const logger = getLogger().child({
+    requestId: createRequestId(),
+    route: "action submitComplaint",
+  });
   const result = await submitComplaint(
     {
       client: await createSupabaseServerClient(),
-      logger: getLogger().child({ requestId: createRequestId(), route: "action submitComplaint" }),
+      logger,
+      triage: submissionTriage(user.id, logger),
     },
     {
       title: values.title ?? "",
@@ -70,6 +76,10 @@ export async function submitComplaintAction(
     };
   }
 
-  const notice = result.ticket.created ? "created" : "already-submitted";
+  const notice = !result.ticket.created
+    ? "already-submitted"
+    : result.ticket.status === "assigned"
+      ? "created-routed"
+      : "created";
   redirect(`/student/complaints/${result.ticket.id}?notice=${notice}`);
 }

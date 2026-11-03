@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils/cn";
 
 import type { ComplaintSummary } from "../repository";
 import { PRIORITY_LABELS, type TicketPriority } from "../statuses";
-import { ACKNOWLEDGEABLE_STATES } from "../workflow";
+import { ACKNOWLEDGEABLE_STATES, isStalledTriage } from "../workflow";
 
 import { StatusBadge } from "./status-badge";
 
@@ -40,17 +40,21 @@ export function PriorityBadge({ priority }: { readonly priority: TicketPriority 
 }
 
 /**
- * Ticket list. The "staff" variant adds what a queue needs at a glance: priority, and a "New"
- * marker on tickets the department has not acknowledged yet.
+ * Ticket list. The "staff" variant adds what a queue needs at a glance: priority, a "New"
+ * marker on tickets the department has not acknowledged yet, and (given `now`) a marker on
+ * AI attempts that stopped before finishing.
  */
 export function ComplaintList({
   complaints,
   hrefFor,
   variant = "reporter",
+  now,
 }: {
   readonly complaints: readonly ComplaintSummary[];
   readonly hrefFor: (id: string) => string;
   readonly variant?: "reporter" | "staff";
+  /** Request time, when the list should flag AI attempts that have stalled (admin review). */
+  readonly now?: number;
 }) {
   return (
     <ul aria-label="Complaints" className="space-y-3">
@@ -59,6 +63,7 @@ export function ComplaintList({
           variant === "staff" &&
           complaint.acknowledgedAt === null &&
           ACKNOWLEDGEABLE_STATES.includes(complaint.status);
+        const isStalled = now !== undefined && isStalledTriage(complaint, now);
         return (
           <li key={complaint.id}>
             <Link
@@ -75,6 +80,11 @@ export function ComplaintList({
                   {isNew ? (
                     <span className="inline-flex items-center gap-1 rounded-full bg-accent px-2 py-0.5 text-xs font-bold text-ink">
                       New
+                    </span>
+                  ) : null}
+                  {isStalled ? (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-danger-soft px-2 py-0.5 text-xs font-bold text-danger">
+                      AI stalled
                     </span>
                   ) : null}
                 </div>

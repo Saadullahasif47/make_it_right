@@ -54,8 +54,17 @@ pnpm exec supabase db query --linked "select count(*) from public.routing_rules"
 | `NEXT_PUBLIC_SUPABASE_URL`             | Production, Preview | `https://ijmikxhkyrensmsnmvmb.supabase.co` |
 | `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Production, Preview | the project's `sb_publishable_…` key       |
 | `APP_BASE_URL`                         | Production only     | `https://makeitright-takeasy1.vercel.app`  |
+| `AI_ENABLED`                           | Production, Preview | `true` to turn on AI triage (Phase 4)      |
+| `GEMINI_MODEL`                         | Production, Preview | `gemini-3.1-flash-lite`                    |
+| `GEMINI_API_KEY`                       | Production, Preview | Google AI Studio key, **Sensitive**        |
+| `SUPABASE_SECRET_KEY`                  | Production, Preview | the `sb_secret_…` key, **Sensitive**       |
 
-Never add `SUPABASE_SECRET_KEY` to Vercel: the application does not use it.
+`SUPABASE_SECRET_KEY` is read only by the agent's privileged routing adapter (ADR 0005). Mark it
+Sensitive, never prefix it with `NEXT_PUBLIC_`, and rotate it in the Supabase dashboard if it is
+ever exposed. Never set `GEMINI_BASE_URL` on Vercel: the app refuses to start with it.
+
+To switch AI off quickly, set `AI_ENABLED=false` and redeploy. Tickets are still accepted and
+wait in the admin review queue.
 
 ## Demo accounts on the cloud project
 

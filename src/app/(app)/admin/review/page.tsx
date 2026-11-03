@@ -11,6 +11,7 @@ import { decodeCursor } from "@/features/complaints/cursor";
 import { listComplaints } from "@/features/complaints/repository";
 import { PAGE_SIZE } from "@/features/complaints/schemas";
 import { AWAITING_ROUTING_STATES } from "@/features/complaints/workflow";
+import { requestTime } from "@/lib/request-time";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = { title: "Review queue" };
@@ -25,6 +26,7 @@ async function ReviewQueue({
     return <AccessDenied user={access.user} />;
   }
 
+  const now = await requestTime();
   const rawCursor = (await searchParams).cursor;
   const cursor = decodeCursor(Array.isArray(rawCursor) ? rawCursor[0] : rawCursor);
   // Oldest first: the ticket that has waited longest for a person is handled next (P3.07).
@@ -40,7 +42,7 @@ async function ReviewQueue({
       <PageHeader
         eyebrow="Administrator"
         title="Review queue"
-        description="Tickets waiting for a person to classify and route them, longest-waiting first. While AI routing is off, every new report starts here."
+        description="Tickets waiting for a person to classify and route them, longest-waiting first: reports the AI assistant sent for review, attempts that stalled, and every new report while AI routing is off."
       />
 
       {page.items.length === 0 ? (
@@ -52,6 +54,7 @@ async function ReviewQueue({
           complaints={page.items}
           hrefFor={(id) => `/admin/complaints/${id}`}
           variant="staff"
+          now={now}
         />
       )}
 

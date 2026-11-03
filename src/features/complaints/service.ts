@@ -7,6 +7,7 @@ import type { AppSupabaseClient } from "@/lib/supabase/server";
 import { ComplaintError, type ComplaintFailureCode } from "./errors";
 import { createTicket, type CreatedTicket } from "./repository";
 import { complaintInputSchema, idempotencyKeySchema } from "./schemas";
+import type { TicketState } from "./statuses";
 
 export type SubmitResult =
   | { readonly ok: true; readonly ticket: CreatedTicket }
@@ -15,6 +16,11 @@ export type SubmitResult =
 export interface SubmitDependencies {
   readonly client: AppSupabaseClient;
   readonly logger: Logger;
+  /**
+   * The best-effort AI step (plan §4 steps 3-5), absent while AI is off. It runs only for a
+   * newly created ticket and resolves to the ticket's status afterwards.
+   */
+  readonly triage?: ((ticketId: string) => Promise<TicketState | undefined>) | undefined;
 }
 
 export function firstIssuePerField(
@@ -30,8 +36,9 @@ export function firstIssuePerField(
 
 /**
  * The single "submit a complaint" use case, shared by the JSON API and the web form.
- * Persistence is the whole job in Phase 2; the best-effort AI step is added after the
- * durable write in Phase 4 and can never turn a saved ticket into a failure.
+ * The ticket is stored first; the best-effort AI step runs only after that durable write and
+ * can never turn a saved ticket into a failure. A replayed idempotency key returns the original
+ * ticket without running AI again (plan §4 step 7).
  */
 export async function submitComplaint(
   deps: SubmitDependencies,
@@ -51,11 +58,11 @@ export async function submitComplaint(
     };
   }
 
+  let ticket: CreatedTicket;
   try {
-    const ticket = await createTicket(deps.client, input.data, key.data);
+    ticket = await createTicket(deps.client, input.data, key.data);
     // Identifiers only: complaint text never reaches the logs (plan §8, §11).
     deps.logger.info("complaint.submitted", { complaintId: ticket.id, created: ticket.created });
-    return { ok: true, ticket };
   } catch (error) {
     if (error instanceof ComplaintError) {
       deps.logger.warn("complaint.submit_rejected", { code: error.code });
@@ -63,5 +70,17 @@ export async function submitComplaint(
     }
     deps.logger.error("complaint.submit_failed", { error });
     return { ok: false, code: "SERVICE_UNAVAILABLE" };
+  }
+
+  if (!ticket.created || deps.triage === undefined) {
+    return { ok: true, ticket };
+  }
+  try {
+    const status = await deps.triage(ticket.id);
+    return { ok: true, ticket: status === undefined ? ticket : { ...ticket, status } };
+  } catch (error) {
+    // The triage contract is never to throw; if it does, the stored ticket still stands.
+    deps.logger.error("complaint.triage_failed", { complaintId: ticket.id, error });
+    return { ok: true, ticket };
   }
 }

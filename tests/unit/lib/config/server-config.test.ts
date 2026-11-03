@@ -25,8 +25,15 @@ describe("parseServerConfig", () => {
       supabase: {
         url: REQUIRED_ENV.NEXT_PUBLIC_SUPABASE_URL,
         publishableKey: REQUIRED_ENV.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
+        secretKey: undefined,
       },
-      ai: { enabled: false, model: "gemini-3.1-flash-lite", apiKey: undefined },
+      ai: {
+        enabled: false,
+        model: "gemini-3.1-flash-lite",
+        apiKey: undefined,
+        timeoutMs: 10_000,
+        baseUrl: undefined,
+      },
       deployment: { environment: "development", commitSha: undefined },
     });
   });
@@ -65,13 +72,51 @@ describe("parseServerConfig", () => {
     expect(error.message).not.toContain(key);
   });
 
-  it("keeps AI disabled when the flag is on but no key exists (tickets must not depend on AI)", () => {
-    expect(configWith({ AI_ENABLED: "true" }).ai.enabled).toBe(false);
+  it("follows the AI switch even without a key, so a missing key is recorded, not hidden", () => {
+    const config = configWith({ AI_ENABLED: "true" });
+    expect(config.ai.enabled).toBe(true);
+    expect(config.ai.apiKey).toBeUndefined();
   });
 
-  it("enables AI only when the flag is on and a key exists", () => {
-    expect(configWith({ AI_ENABLED: "true", GEMINI_API_KEY: "k" }).ai.enabled).toBe(true);
+  it("keeps AI off when the switch is off, whatever else is set", () => {
     expect(configWith({ AI_ENABLED: "false", GEMINI_API_KEY: "k" }).ai.enabled).toBe(false);
+  });
+
+  it("bounds the AI deadline", () => {
+    expect(configWith({ AI_TIMEOUT_MS: "4000" }).ai.timeoutMs).toBe(4000);
+    expect(() => configWith({ AI_TIMEOUT_MS: "500" })).toThrow(ConfigError);
+    expect(() => configWith({ AI_TIMEOUT_MS: "60000" })).toThrow(ConfigError);
+    expect(() => configWith({ AI_TIMEOUT_MS: "soon" })).toThrow(ConfigError);
+  });
+
+  it("accepts a loopback stub URL for local tests only", () => {
+    expect(configWith({ GEMINI_BASE_URL: "http://127.0.0.1:3199" }).ai.baseUrl).toBe(
+      "http://127.0.0.1:3199",
+    );
+    expect(() => configWith({ GEMINI_BASE_URL: "https://evil.example.com" })).toThrow(ConfigError);
+    const error = captureConfigError({
+      ...REQUIRED_ENV,
+      GEMINI_BASE_URL: "http://127.0.0.1:3199",
+      VERCEL_ENV: "preview",
+    });
+    expect(error.issues.join(" ")).toContain("GEMINI_BASE_URL");
+  });
+
+  it.each([
+    ["a new-style secret key", "sb_secret_TestOnlyKey0123456789"],
+    ["a legacy service_role JWT", legacyJwtKey("service_role")],
+  ])("accepts %s as the secret key", (_label, key) => {
+    expect(configWith({ SUPABASE_SECRET_KEY: key }).supabase.secretKey).toBe(key);
+  });
+
+  it.each([
+    ["the publishable key", "sb_publishable_TestOnlyKey0123456789"],
+    ["a legacy anon JWT", legacyJwtKey("anon")],
+    ["a malformed key", "not-a-key"],
+  ])("refuses %s as the secret key, without echoing it", (_label, key) => {
+    const error = captureConfigError({ ...REQUIRED_ENV, SUPABASE_SECRET_KEY: key });
+    expect(error.issues.join(" ")).toContain("SUPABASE_SECRET_KEY");
+    expect(error.message).not.toContain(key);
   });
 
   it.each([
@@ -100,7 +145,7 @@ describe("parseServerConfig", () => {
     expect(config.logLevel).toBe("info");
     expect(config.appBaseUrl).toBeUndefined();
     expect(config.ai.apiKey).toBeUndefined();
-    expect(config.ai.enabled).toBe(false);
+    expect(config.ai.enabled).toBe(true);
   });
 
   it("accepts http(s) base URLs and rejects other schemes", () => {
