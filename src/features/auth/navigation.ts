@@ -18,5 +18,6 @@ export const ROLE_NAVIGATION: Readonly<Record<AppRole, readonly NavItem[]>> = {
   admin: [
     { href: "/admin", label: "Overview" },
     { href: "/admin/review", label: "Review queue" },
+    { href: "/admin/departments", label: "Departments" },
   ],
 };

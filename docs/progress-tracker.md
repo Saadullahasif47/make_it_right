@@ -10,6 +10,6 @@ exit gate is demonstrated and the evidence is linked here.
 | P2 Complaint persistence  | VERIFIED    | [p2-complaints.md](evidence/p2-complaints.md) |
 | P3 Department workflow    | VERIFIED    | [p3-workflow.md](evidence/p3-workflow.md)     |
 | P4 Gemini agent           | VERIFIED    | [p4-agent.md](evidence/p4-agent.md)           |
-| P5 Dashboard & operations | NOT STARTED |                                               |
+| P5 Dashboard & operations | IN PROGRESS | [p5-operations.md](evidence/p5-operations.md) |
 | P6 QA / resilience        | NOT STARTED |                                               |
 | P7 Final deployment       | NOT STARTED |                                               |

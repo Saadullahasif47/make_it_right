@@ -1,9 +1,8 @@
 import { complaintsApi } from "@/features/complaints/api-instance";
+import { timed } from "@/lib/http/timed";
 
-export function POST(request: Request): Promise<Response> {
-  return complaintsApi.create(request);
-}
+export const POST = timed("POST /api/complaints", (request: Request) =>
+  complaintsApi.create(request),
+);
 
-export function GET(request: Request): Promise<Response> {
-  return complaintsApi.list(request);
-}
+export const GET = timed("GET /api/complaints", (request: Request) => complaintsApi.list(request));
