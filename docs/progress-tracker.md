@@ -12,4 +12,4 @@ exit gate is demonstrated and the evidence is linked here.
 | P4 Gemini agent           | VERIFIED    | [p4-agent.md](evidence/p4-agent.md)           |
 | P5 Dashboard & operations | VERIFIED    | [p5-operations.md](evidence/p5-operations.md) |
 | P6 QA / resilience        | VERIFIED    | [p6-resilience.md](evidence/p6-resilience.md) |
-| P7 Final deployment       | NOT STARTED |                                               |
+| P7 Final deployment       | IN PROGRESS | [p7-release.md](evidence/p7-release.md)       |
