@@ -253,7 +253,7 @@ export function TicketPreview() {
           Block C, room 214
         </p>
 
-        <dl className="mt-5 grid grid-cols-2 gap-x-4 gap-y-3 rounded-lg border border-line px-4 py-3 text-sm">
+        <dl className="mt-5 grid grid-cols-2 gap-x-4 gap-y-3 rounded-lg border border-line px-4 py-3 text-sm [@media(max-height:760px)]:hidden">
           <div>
             <dt className="text-xs text-ink-subtle">Category</dt>
             <dd className="mt-0.5 font-medium text-ink">
@@ -303,7 +303,7 @@ export function TicketPreview() {
                   </div>
                   <p className="text-xs text-ink-muted">{event.actor}</p>
                   {event.note === undefined ? null : (
-                    <p className="mt-1.5 rounded-md bg-surface-muted px-2.5 py-1.5 text-xs text-ink-muted">
+                    <p className="mt-1.5 rounded-md bg-surface-muted px-2.5 py-1.5 text-xs text-ink-muted [@media(max-height:820px)]:hidden">
                       {event.note}
                     </p>
                   )}

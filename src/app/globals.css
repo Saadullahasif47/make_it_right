@@ -1,5 +1,8 @@
 @import "tailwindcss";
 
+/* `dark:` follows the opt-in theme (src/components/theme), never the operating system. */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
 /*
  * MakeItRight design tokens (docs/design/ui-redesign-plan.md).
  *
@@ -141,6 +144,7 @@
   --animate-skeleton: skeleton 1.6s cubic-bezier(0.4, 0, 0.6, 1) 600ms infinite both;
   --animate-reveal: reveal 150ms cubic-bezier(0.2, 0, 0, 1) 150ms both;
   --animate-settle: settle 1.2s cubic-bezier(0.2, 0, 0, 1) both;
+  --animate-rise: rise 640ms cubic-bezier(0.2, 0, 0, 1) both;
 }
 
 /*
@@ -156,6 +160,8 @@
   --motion-base: 200ms;
   /* drawers and dialogs: the largest surfaces that move */
   --motion-slow: 250ms;
+  /* the public notice bar and header above the homepage hero (so the hero fills one screen) */
+  --public-chrome: 6.125rem;
   /* entering or responding: decelerate into place */
   --ease-enter: cubic-bezier(0.2, 0, 0, 1);
   /* leaving: accelerate away, a little faster than entering */
@@ -180,6 +186,43 @@
 @keyframes reveal {
   from {
     opacity: 0;
+  }
+}
+
+/* Homepage entrances: content rises 16 px into place, once. */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+}
+
+/*
+ * Homepage sections below the fold rise into view, once, as they are reached
+ * (scroll-reveal.tsx). Without JavaScript, or with reduced motion, nothing is ever hidden: only
+ * the script marks a section "pending", and only when it is below the fold and motion is allowed.
+ */
+[data-reveal="pending"] > * > * {
+  opacity: 0;
+}
+[data-reveal="shown"] > * > * {
+  animation: rise 640ms cubic-bezier(0.2, 0, 0, 1) both;
+}
+[data-reveal="shown"] > * > :nth-child(2) {
+  animation-delay: 90ms;
+}
+[data-reveal="shown"] > * > :nth-child(3) {
+  animation-delay: 180ms;
+}
+[data-reveal="shown"] > * > :nth-child(n + 4) {
+  animation-delay: 270ms;
+}
+
+/* On a laptop the homepage settles one section per screen, gently (proximity, not mandatory). */
+@media (min-width: 64rem) {
+  html:has(#hero-title) {
+    scroll-snap-type: y proximity;
+    scroll-padding-top: 4rem;
   }
 }
 
