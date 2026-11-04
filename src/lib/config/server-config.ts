@@ -66,6 +66,9 @@ const serverEnvSchema = z
     SUPABASE_SECRET_KEY: secretKeySchema.optional(),
     AI_ENABLED: z.stringbool().default(false),
     GEMINI_MODEL: z.string().trim().min(1).default("gemini-3.1-flash-lite"),
+    // Used when GEMINI_MODEL is overloaded or rate limited; "off" switches it off. (An empty value
+    // means "not set" here, like every other variable, so it keeps the default.)
+    GEMINI_FALLBACK_MODEL: z.string().trim().default("gemini-3.5-flash"),
     GEMINI_API_KEY: z.string().trim().min(1).optional(),
     AI_TIMEOUT_MS: z.coerce.number().int().min(1_000).max(30_000).default(10_000),
     // Test stub only (tests/support/gemini-stub): a loopback address, never on a deployment.
@@ -102,6 +105,8 @@ export interface ServerConfig {
      */
     readonly enabled: boolean;
     readonly model: string;
+    /** Started over with when `model` is overloaded or rate limited; undefined when off. */
+    readonly fallbackModel: string | undefined;
     readonly apiKey: string | undefined;
     /** Deadline for a whole triage attempt, every model call and tool exchange included. */
     readonly timeoutMs: number;
@@ -161,6 +166,10 @@ export function parseServerConfig(source: EnvSource): ServerConfig {
     ai: {
       enabled: env.AI_ENABLED,
       model: env.GEMINI_MODEL,
+      fallbackModel:
+        env.GEMINI_FALLBACK_MODEL === "off" || env.GEMINI_FALLBACK_MODEL === env.GEMINI_MODEL
+          ? undefined
+          : env.GEMINI_FALLBACK_MODEL,
       apiKey: env.GEMINI_API_KEY,
       timeoutMs: env.AI_TIMEOUT_MS,
       baseUrl: env.GEMINI_BASE_URL,

@@ -94,6 +94,7 @@ function traceToJson(trace: readonly ToolTraceEntry[]): Json {
     if (entry.category !== undefined) row.category = entry.category;
     if (entry.departmentId !== undefined) row.departmentId = entry.departmentId;
     if (entry.priority !== undefined) row.priority = entry.priority;
+    if (entry.model !== undefined) row.model = entry.model;
     return row;
   });
 }

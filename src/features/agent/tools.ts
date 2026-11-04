@@ -55,6 +55,8 @@ export interface ToolTraceEntry {
   readonly category?: ComplaintCategory;
   readonly departmentId?: string;
   readonly priority?: ProposedPriority;
+  /** The model the attempt switched to (switch_model entries only). */
+  readonly model?: string;
 }
 
 export interface ProposalSummary {

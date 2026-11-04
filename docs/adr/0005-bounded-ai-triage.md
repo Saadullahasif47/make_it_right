@@ -146,3 +146,23 @@ was unavailable" (or "could not decide"), the run's trace records `keyword_route
 code, and `agent.run_finished` logs `keywordFallback`. On the labelled evaluation set (120 reports) it routes 65, all
 to the correct department, holds the 6 safety reports, and leaves 49 to a person; it was tuned on that set, so the
 unit tests also check wordings it was not tuned on.
+
+## Amendment 3 (2026-11-04): a backup model when the primary is overloaded
+
+MIR-1018 went to review because `gemini-3.1-flash-lite` answered 503 "high demand" on both tries. Each Gemini model
+has its own capacity and quota, so a second model is usually available when the first is not. The agent loop now
+takes an optional `fallbackModel`, set by `GEMINI_FALLBACK_MODEL` (default `gemini-3.5-flash`, a stable model that
+accepts the minimal thinking level; `off`, or the same name as `GEMINI_MODEL`, disables it). When the primary attempt
+ends in `PROVIDER_UNAVAILABLE` or `RATE_LIMITED`:
+
+- the attempt starts over on the fallback in a fresh conversation (Gemini thought signatures belong to the model that
+  produced them), inside the same deadline. Nothing switches once the deadline has fired;
+- the same-model retry from amendment 1 is skipped while a fallback is configured, since switching is the better use
+  of the remaining time. Without a fallback, amendment 1 applies unchanged;
+- there is one switch at most. If the fallback also fails, its failure code is recorded and amendment 2's keyword
+  fallback still applies;
+- the trace records `switch_model` with the primary's failure code and the model it continued on. The admin panel
+  shows "continued on <model>", and `agent.run_finished` logs `modelUsed`.
+
+Other failures (`PROVIDER_REJECTED`, `INVALID_OUTPUT`, safety review) never switch: another model would not change
+the answer the report deserves.

@@ -21,6 +21,8 @@ export interface TriageDependencies {
   readonly store: AgentStore;
   /** Undefined when AI is on but no API key is configured: the attempt is recorded as failed. */
   readonly model: ModelClient | undefined;
+  /** Started over with when `model` is overloaded or rate limited (run-agent.ts). */
+  readonly fallbackModel?: ModelClient | undefined;
   readonly modelName: string;
   readonly timeoutMs: number;
   readonly logger: Logger;
@@ -52,6 +54,7 @@ function review(failureCode: AgentFailureCode): AgentResult {
     exchanges: 0,
     safetySignals: [],
     providerRetried: false,
+    model: "none",
   };
 }
 
@@ -145,6 +148,7 @@ export async function triageTicket(
       snapshot = await deps.store.loadRoutingSnapshot();
       result = await runAgent({
         model: deps.model,
+        fallbackModel: deps.fallbackModel,
         snapshot,
         report: run.report,
         deadline: AbortSignal.timeout(deps.timeoutMs),
@@ -222,6 +226,7 @@ export async function triageTicket(
       safetySignals: result.safetySignals,
       providerRetried: result.providerRetried,
       keywordFallback: fallback !== undefined,
+      modelUsed: result.model,
     });
     return { ok: true, runId: run.runId, outcome, status: finished.status, failureCode };
   } catch (error) {

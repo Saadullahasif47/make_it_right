@@ -109,6 +109,84 @@ describe("runAgent", () => {
     expect((await run(model)).decision).toEqual({ kind: "review", failureCode });
   });
 
+  describe("switching to the fallback model", () => {
+    const overloaded = () => new ApiError({ message: "high demand", status: 503 });
+    const backup = (turns: Parameters<typeof scriptedModel>[0]) => {
+      const scripted = scriptedModel(turns);
+      return { model: { ...scripted.model, model: "backup-model" }, log: scripted.log };
+    };
+    const runWith = (
+      primary: ReturnType<typeof scriptedModel>["model"],
+      fallbackModel: ReturnType<typeof backup>["model"],
+      deadline = liveDeadline(),
+    ) => runAgent({ model: primary, fallbackModel, snapshot: SNAPSHOT, report: REPORT, deadline });
+
+    it.each([
+      ["overloaded", overloaded(), "PROVIDER_UNAVAILABLE"],
+      ["rate limited", new ApiError({ message: "quota", status: 429 }), "RATE_LIMITED"],
+    ])(
+      "starts over on the fallback when the primary is %s, and routes",
+      async (_l, error, code) => {
+        const primary = scriptedModel([error, [ROUTE_ELECTRICAL]]);
+        const fallback = backup([[ROUTE_ELECTRICAL], [propose()]]);
+        const result = await runWith(primary.model, fallback.model);
+
+        expect(result.decision.kind).toBe("route");
+        expect(result.model).toBe("backup-model");
+        // Straight to the fallback: the overloaded primary is not tried a second time.
+        expect(primary.log.resultsPerTurn).toHaveLength(1);
+        // A fresh conversation on the fallback: its first turn carries no tool results.
+        expect(fallback.log.resultsPerTurn[0]).toEqual([]);
+        expect(result.trace).toEqual([
+          expect.objectContaining({
+            tool: "switch_model",
+            verdict: "ok",
+            code,
+            model: "backup-model",
+          }),
+          expect.objectContaining({ tool: "find_category_route", verdict: "ok" }),
+          expect.objectContaining({ tool: "propose_assignment", verdict: "accepted" }),
+        ]);
+      },
+    );
+
+    it("does not switch for a refusal (a key or model problem is not about capacity)", async () => {
+      const primary = scriptedModel([new ApiError({ message: "bad key", status: 400 })]);
+      const fallback = backup([[ROUTE_ELECTRICAL], [propose()]]);
+      const result = await runWith(primary.model, fallback.model);
+
+      expect(result.decision).toEqual({ kind: "review", failureCode: "PROVIDER_REJECTED" });
+      expect(fallback.log.resultsPerTurn).toHaveLength(0);
+    });
+
+    it("goes to review with the fallback's reason if the fallback fails too", async () => {
+      const primary = scriptedModel([overloaded()]);
+      const fallback = backup([new ApiError({ message: "quota", status: 429 })]);
+      const result = await runWith(primary.model, fallback.model);
+
+      expect(result.decision).toEqual({ kind: "review", failureCode: "RATE_LIMITED" });
+      expect(result.trace.map((entry) => entry.tool)).toEqual(["switch_model"]);
+    });
+
+    it("does not switch once the deadline has fired", async () => {
+      const controller = new AbortController();
+      const primary = scriptedModel([
+        (deadline) =>
+          new Promise((_resolve, reject) => {
+            deadline.addEventListener("abort", () => {
+              reject(new DOMException("This operation was aborted", "AbortError"));
+            });
+            controller.abort();
+          }),
+      ]);
+      const fallback = backup([[ROUTE_ELECTRICAL], [propose()]]);
+      const result = await runWith(primary.model, fallback.model, controller.signal);
+
+      expect(result.decision).toEqual({ kind: "review", failureCode: "TIMEOUT" });
+      expect(fallback.log.resultsPerTurn).toHaveLength(0);
+    });
+  });
+
   describe("one retry for a brief provider outage", () => {
     const overloaded = () => new ApiError({ message: "overloaded", status: 503 });
 

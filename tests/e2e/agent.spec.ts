@@ -232,6 +232,32 @@ test("a dangerous report is never routed automatically; the admin form starts fr
   await expect(routing.getByText("starts from the AI assistant's suggestion")).toBeVisible();
 });
 
+test("when the primary model is overloaded, the fallback model routes the report", async ({
+  browser,
+}) => {
+  test.setTimeout(90_000);
+  const title = `Corridor light ${randomUUID().slice(0, 8)}`;
+  const studentPage = await signedIn(browser, student, /\/student\/complaints$/);
+  const ticketId = await report(
+    studentPage,
+    title,
+    "The light in corridor 7 is off. STUB:PRIMARY-DOWN",
+  );
+
+  // Routed by the AI on the fallback model, not by the keyword rules.
+  await expect(studentPage).toHaveURL(/notice=created-routed$/);
+  await expect(history(studentPage).getByText("Assigned to Electrical Maintenance")).toBeVisible();
+  await expect(history(studentPage).getByText(/keyword rules/)).toHaveCount(0);
+
+  const adminPage = await signedIn(browser, admin, /\/admin$/);
+  await adminPage.goto(`/admin/complaints/${ticketId}`);
+  const panel = aiPanel(adminPage);
+  await expect(panel.getByText("Routed automatically")).toBeVisible();
+  await expect(panel.getByText("switch_model")).toBeVisible();
+  await expect(panel.getByText("PROVIDER_UNAVAILABLE")).toBeVisible();
+  await expect(panel.getByText("continued on gemini-3.5-flash")).toBeVisible();
+});
+
 test("with the AI down, a clear report still reaches its department by keyword rules", async ({
   browser,
 }) => {
