@@ -43,6 +43,8 @@ export function Notice({ tone, children, className }: NoticeProps) {
     <div
       role={tone === "error" ? "alert" : "status"}
       className={cn(
+        // Enters with the same short rise as a toast, so a new message is noticed, not missed.
+        "animate-toast-in",
         "flex items-start gap-3 rounded-lg border px-4 py-3 text-sm text-ink",
         toneClassName,
         className,

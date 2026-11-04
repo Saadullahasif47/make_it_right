@@ -7,6 +7,7 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import Link from "next/link";
+import type { CSSProperties } from "react";
 
 import { FAILURE_LABELS, isRunRecordCode } from "@/features/agent/failures";
 import { STATUS_LABELS, TICKET_STATES } from "@/features/complaints/statuses";
@@ -136,9 +137,13 @@ function BarList({
             {row.label}
           </span>
           <span className="h-2.5 overflow-hidden rounded-full bg-surface-muted" aria-hidden="true">
+            {/*
+              The bar scales from the left (composited, cheap) rather than animating width: it
+              grows in on first view and glides to its new length when the period changes.
+            */}
             <span
-              className="block h-full rounded-full bg-brand"
-              style={{ width: `${(row.value / max) * 100}%` }}
+              className="block h-full origin-left scale-x-(--fill) rounded-full bg-brand transition-[scale] duration-(--motion-slow) starting:scale-x-0"
+              style={{ "--fill": row.value / max } as CSSProperties}
             />
           </span>
           <span className="text-right font-semibold text-ink tabular-nums">{row.value}</span>

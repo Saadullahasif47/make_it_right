@@ -53,6 +53,12 @@ export async function runAudit(options: AuditOptions): Promise<boolean> {
         colorScheme: scheme,
         reducedMotion: "reduce",
       });
+      // Dark is an opt-in theme (src/components/theme), so choose it the way a person does.
+      if (scheme === "dark") {
+        await context.addInitScript(() => {
+          localStorage.setItem("mir-theme", "dark");
+        });
+      }
       const page = await context.newPage();
       await options.prepare?.(page);
       for (const { path, name } of options.pages) {
