@@ -225,6 +225,60 @@ describe("read isolation (BR-10, P2.08)", () => {
   });
 });
 
+describe("search stays inside RLS (UI redesign Stage 3)", () => {
+  let reference = 0;
+
+  beforeAll(async () => {
+    const { data } = await create(studentA.client, {
+      title: "Searchable projector fault",
+      description: "The projector in the seminar room shows no picture at all.",
+      building: "Search Library",
+      room: "Seminar 9",
+    });
+    reference = data?.reference_no ?? 0;
+  });
+
+  const search = (client: Client, query: string) =>
+    client.rpc("list_complaints", { p_limit: 50, p_query: query });
+
+  it("the owner finds the ticket by title, building, room and reference", async () => {
+    for (const query of ["SEARCHABLE", "search library", "seminar 9", `MIR-${reference}`]) {
+      const { data, error } = await search(studentA.client, query);
+      expect(error).toBeNull();
+      expect(data?.map((row) => row.reference_no)).toEqual([reference]);
+    }
+  });
+
+  it("another student, and staff it is not assigned to, find nothing", async () => {
+    for (const client of [studentB.client, staff.client]) {
+      for (const query of ["Searchable projector", `MIR-${reference}`]) {
+        const { data, error } = await search(client, query);
+        expect(error).toBeNull();
+        expect(data).toEqual([]);
+      }
+    }
+  });
+
+  it("an admin finds it by reference", async () => {
+    const { data } = await search(admin.client, `mir${reference}`);
+    expect(data?.map((row) => row.reference_no)).toEqual([reference]);
+  });
+
+  it("the summary counts only what the caller may see", async () => {
+    const { count, error } = await studentB.client
+      .from("complaints")
+      .select("id", { count: "exact", head: true })
+      .eq("building", "Search Library");
+    expect(error).toBeNull();
+    expect(count).toBe(0);
+  });
+
+  it("refuses search text longer than 100 characters", async () => {
+    const { error } = await search(studentA.client, "a".repeat(101));
+    expect(error?.code).toBe("22023");
+  });
+});
+
 describe("no direct writes (P2.09)", () => {
   let ownTicket: string;
 

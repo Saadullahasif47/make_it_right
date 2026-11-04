@@ -15,7 +15,7 @@ import type { AppSupabaseClient } from "@/lib/supabase/server";
 import { decodeCursor } from "./cursor";
 import { ComplaintError } from "./errors";
 import { getComplaint, listComplaints } from "./repository";
-import { complaintIdSchema, pageSizeSchema } from "./schemas";
+import { complaintIdSchema, pageSizeSchema, searchQuerySchema } from "./schemas";
 import { submitComplaint, type SubmitDependencies } from "./service";
 import { STATUS_FILTERS, isStatusFilter } from "./statuses";
 import { assign, changeStatus } from "./workflow-service";
@@ -167,7 +167,10 @@ export function createComplaintsApi(deps: ComplaintsApiDependencies) {
       );
     },
 
-    /** GET /api/complaints: the caller's visible tickets, newest first, keyset-paginated. */
+    /**
+     * GET /api/complaints: the caller's visible tickets, newest first, keyset-paginated.
+     * `q` searches title, building, room and reference within what the caller may see.
+     */
     async list(request: Request): Promise<Response> {
       const requestId = resolveRequestId(request.headers);
       const actor = await deps.getActor();
@@ -180,13 +183,15 @@ export function createComplaintsApi(deps: ComplaintsApiDependencies) {
       const rawCursor = params.get("cursor");
       const cursor = decodeCursor(rawCursor);
       const status = params.get("status") ?? "all";
+      const query = searchQuerySchema.safeParse(params.get("q") ?? undefined);
 
       const invalidCursor = rawCursor !== null && cursor === undefined;
-      if (!limit.success || invalidCursor || !isStatusFilter(status)) {
+      if (!limit.success || invalidCursor || !isStatusFilter(status) || !query.success) {
         return apiErrorResponse("VALIDATION_FAILED", requestId, {
           ...(limit.success ? {} : { limit: "Use a whole number from 1 to 50." }),
           ...(invalidCursor ? { cursor: "This page link is invalid." } : {}),
           ...(isStatusFilter(status) ? {} : { status: "Unknown status filter." }),
+          ...(query.success ? {} : { q: query.error.issues[0]?.message ?? "Invalid search." }),
         });
       }
 
@@ -195,6 +200,7 @@ export function createComplaintsApi(deps: ComplaintsApiDependencies) {
           limit: limit.data,
           cursor,
           statuses: STATUS_FILTERS[status].states,
+          query: query.data,
         });
         return apiJsonResponse(page, requestId);
       } catch (error) {

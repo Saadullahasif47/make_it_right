@@ -32,6 +32,8 @@ function CharacterCount({ length }: { readonly length: number }) {
   );
 }
 
+const legendClassName = "mb-4 text-base font-semibold text-ink";
+
 interface FieldsProps {
   readonly values: Partial<Record<ComplaintField, string>>;
   readonly errors: Partial<Record<ComplaintField, string>>;
@@ -45,52 +47,61 @@ function ComplaintFields({ values, errors }: FieldsProps) {
 
   return (
     <>
-      <TextField
-        name="title"
-        label="What is wrong?"
-        hint="A short summary, for example “Ceiling fan not working”."
-        required
-        minLength={COMPLAINT_LIMITS.title.min}
-        maxLength={COMPLAINT_LIMITS.title.max}
-        defaultValue={values.title}
-        error={errors.title}
-        autoComplete="off"
-      />
+      <fieldset>
+        <legend className={legendClassName}>The problem</legend>
+        <div className="space-y-5">
+          <TextField
+            name="title"
+            label="What is wrong?"
+            hint="A short summary, for example “Ceiling fan not working”."
+            required
+            minLength={COMPLAINT_LIMITS.title.min}
+            maxLength={COMPLAINT_LIMITS.title.max}
+            defaultValue={values.title}
+            error={errors.title}
+            autoComplete="off"
+          />
+          <TextAreaField
+            name="description"
+            label="Describe the problem"
+            hint="What you noticed and since when. Please do not include personal or sensitive information."
+            required
+            rows={6}
+            maxLength={COMPLAINT_LIMITS.description.max}
+            defaultValue={values.description}
+            error={errors.description}
+            labelAside={<CharacterCount length={descriptionLength} />}
+            onChange={(event) => {
+              setDescriptionLength(event.currentTarget.value.trim().length);
+            }}
+          />
+        </div>
+      </fieldset>
 
-      <div className="grid gap-6 sm:grid-cols-[2fr_1fr]">
-        <TextField
-          name="building"
-          label="Building"
-          required
-          maxLength={COMPLAINT_LIMITS.building.max}
-          defaultValue={values.building}
-          error={errors.building}
-          autoComplete="off"
-        />
-        <TextField
-          name="room"
-          label="Room (optional)"
-          maxLength={COMPLAINT_LIMITS.room.max}
-          defaultValue={values.room}
-          error={errors.room}
-          autoComplete="off"
-        />
-      </div>
+      <hr className="border-line" />
 
-      <TextAreaField
-        name="description"
-        label="Describe the problem"
-        hint="Where exactly it is, what you noticed, and since when. Please do not include personal or sensitive information."
-        required
-        rows={6}
-        maxLength={COMPLAINT_LIMITS.description.max}
-        defaultValue={values.description}
-        error={errors.description}
-        labelAside={<CharacterCount length={descriptionLength} />}
-        onChange={(event) => {
-          setDescriptionLength(event.currentTarget.value.trim().length);
-        }}
-      />
+      <fieldset>
+        <legend className={legendClassName}>The place</legend>
+        <div className="grid gap-5 sm:grid-cols-[2fr_1fr]">
+          <TextField
+            name="building"
+            label="Building"
+            required
+            maxLength={COMPLAINT_LIMITS.building.max}
+            defaultValue={values.building}
+            error={errors.building}
+            autoComplete="off"
+          />
+          <TextField
+            name="room"
+            label="Room (optional)"
+            maxLength={COMPLAINT_LIMITS.room.max}
+            defaultValue={values.room}
+            error={errors.room}
+            autoComplete="off"
+          />
+        </div>
+      </fieldset>
     </>
   );
 }

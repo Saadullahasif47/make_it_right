@@ -51,6 +51,7 @@ async function ComplaintDetail({
     <ComplaintDetailView
       complaint={complaint}
       back={{ href: "/student/complaints", label: "My complaints" }}
+      layout="stacked"
       notice={
         submission === undefined ? undefined : (
           <>

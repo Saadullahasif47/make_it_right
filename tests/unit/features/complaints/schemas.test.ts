@@ -5,8 +5,10 @@ import { describe, expect, it } from "vitest";
 
 import {
   COMPLAINT_LIMITS,
+  SEARCH_LIMITS,
   complaintInputSchema,
   pageSizeSchema,
+  searchQuerySchema,
 } from "@/features/complaints/schemas";
 
 const valid = {
@@ -90,6 +92,27 @@ describe("limits stay in sync with the database", () => {
     expect(sql, `no check constraint "${field} between ${limits.min} and ${limits.max}"`).toMatch(
       pattern,
     );
+  });
+
+  it("the search limit matches list_complaints", () => {
+    expect(sql).toContain(`if length(v_query) > ${SEARCH_LIMITS.max} then`);
+  });
+});
+
+describe("searchQuerySchema", () => {
+  it("trims, and treats blank text as no search", () => {
+    expect(searchQuerySchema.parse("  fan  ")).toBe("fan");
+    expect(searchQuerySchema.parse("   ")).toBeUndefined();
+    expect(searchQuerySchema.parse(undefined)).toBeUndefined();
+  });
+
+  it("keeps wildcard characters as plain text", () => {
+    expect(searchQuerySchema.parse("50%_off")).toBe("50%_off");
+  });
+
+  it("rejects over-long text and control characters", () => {
+    expect(searchQuerySchema.safeParse("a".repeat(SEARCH_LIMITS.max + 1)).success).toBe(false);
+    expect(searchQuerySchema.safeParse("fan\u0000").success).toBe(false);
   });
 });
 

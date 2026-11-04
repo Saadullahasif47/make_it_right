@@ -58,6 +58,17 @@ export const complaintIdSchema = z.uuid();
 
 export const PAGE_SIZE = { default: 20, max: 50 } as const;
 
+/** Search text for ticket lists; list_complaints refuses anything longer, too. */
+export const SEARCH_LIMITS = { max: 100 } as const;
+
+export const searchQuerySchema = z
+  .string()
+  .trim()
+  .max(SEARCH_LIMITS.max, `Search text can be at most ${SEARCH_LIMITS.max} characters.`)
+  .regex(NO_CONTROL_CHARACTERS, "Remove unsupported characters.")
+  .transform((value) => (value === "" ? undefined : value))
+  .optional();
+
 export const pageSizeSchema = z.coerce
   .number()
   .int()

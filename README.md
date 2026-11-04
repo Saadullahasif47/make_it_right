@@ -137,7 +137,7 @@ All endpoints use the signed-in session cookie, answer JSON with `Cache-Control:
 | Method and path                      | Who                   | Result                                                         |
 | ------------------------------------ | --------------------- | -------------------------------------------------------------- |
 | `POST /api/complaints`               | Student               | 201 created / 200 replayed; requires an `Idempotency-Key` UUID |
-| `GET /api/complaints`                | Signed in             | Visible tickets; `?limit` (≤ 50), `?cursor`, `?status`         |
+| `GET /api/complaints`                | Signed in             | Visible tickets; `?limit` (≤ 50), `?cursor`, `?status`, `?q`   |
 | `GET /api/complaints/[id]`           | Viewer of ticket      | Ticket with timeline; 404 if missing or not visible            |
 | `PATCH /api/complaints/[id]/status`  | Staff, admin, student | `{ target, expectedVersion, note? }`; 409 if the ticket moved  |
 | `POST /api/complaints/[id]/review`   | Admin                 | Classify and assign: `{ departmentId, category, priority, … }` |
