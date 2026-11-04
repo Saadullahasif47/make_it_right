@@ -6,6 +6,7 @@ import { Skeleton } from "@/components/layout/page-parts";
 import { AccountMenu } from "@/features/auth/components/account-menu";
 import { NavLinks } from "@/features/auth/components/nav-links";
 import { getSessionUser } from "@/features/auth/session";
+import { aiJobsPanelEnabled } from "@/features/background-jobs/visibility";
 
 /**
  * Role-aware chrome. Rendering it is cosmetic; each page authorises itself on the server.
@@ -24,7 +25,7 @@ async function SessionChrome() {
         aria-label="Workspace"
         className="order-3 min-w-0 basis-full border-t border-line lg:order-none lg:basis-auto lg:border-t-0 lg:pt-2"
       >
-        <NavLinks role={user.role} />
+        <NavLinks role={user.role} options={{ aiJobs: aiJobsPanelEnabled() }} />
       </nav>
       <div className="order-2 ml-auto pr-2 lg:order-none lg:mt-auto lg:ml-0 lg:pr-0">
         <AccountMenu user={user} />

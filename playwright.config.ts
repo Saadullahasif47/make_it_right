@@ -14,7 +14,7 @@ if (process.env.SUPABASE_SECRET_KEY === undefined && existsSync(".env.local")) {
 const externalBaseUrl = process.env.PLAYWRIGHT_BASE_URL;
 const isCI = process.env.CI === "true";
 const port = 3100;
-/** A second server with AI switched on, talking to the local Gemini stub (tests/e2e/agent.spec.ts). */
+/** A second server with AI and the add-on features switched on, talking to the local Gemini stub. */
 export const AI_PORT = 3101;
 const GEMINI_STUB_PORT = 3199;
 
@@ -66,6 +66,9 @@ export default defineConfig({
               GEMINI_MODEL: "gemini-3.1-flash-lite",
               GEMINI_BASE_URL: `http://127.0.0.1:${GEMINI_STUB_PORT}`,
               AI_TIMEOUT_MS: "3000",
+              // Add-on features under test run here; the first server keeps every flag OFF, so
+              // its journeys also prove that switched-off features stay invisible (plan v2 A0.02).
+              FEATURE_VISUAL_INSPECTION: "true",
             },
           },
         ]

@@ -29,6 +29,10 @@ export const API_ERRORS = {
     message: "An AI attempt is already running for this ticket. Refresh in a moment.",
   },
   PAYLOAD_TOO_LARGE: { status: 413, message: "The request is too large." },
+  EVIDENCE_REJECTED: {
+    status: 422,
+    message: "That file is not a usable photo. Upload a JPEG, PNG or WebP image of up to 2 MB.",
+  },
   UNSUPPORTED_MEDIA_TYPE: { status: 415, message: "Send the request as JSON." },
   RATE_LIMITED: { status: 429, message: "Too many requests. Please wait a moment and try again." },
   AI_RETRY_LIMIT: {

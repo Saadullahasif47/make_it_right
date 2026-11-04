@@ -87,3 +87,23 @@ NEXT_PUBLIC_SUPABASE_URL=https://ijmikxhkyrensmsnmvmb.supabase.co \
 SUPABASE_SECRET_KEY='sb_secret_…' DEMO_ACCOUNT_PASSWORD='…' \
 node scripts/seed-demo-accounts.mts
 ```
+
+## AI job worker (add-on A1, ADR 0009)
+
+The queue consumer is the `makeitright-ai-worker` Edge Function. Supabase Cron calls it every
+minute while jobs are pending, but only once both Vault secrets below exist. Deploy it with the
+owner, as part of plan A7.03:
+
+1. `pnpm exec supabase functions deploy makeitright-ai-worker` (it uses `verify_jwt = false` from
+   `supabase/config.toml`; the shared secret is the authentication).
+2. Generate a random secret of at least 32 characters, never typed on a command line. Set it
+   both as the function secret `AI_WORKER_SECRET` (`supabase secrets set --env-file <tmp file>`)
+   and as the Vault secret `makeitright_ai_worker_secret`.
+3. Store the function URL `https://<project-ref>.supabase.co/functions/v1/makeitright-ai-worker`
+   as the Vault secret `makeitright_ai_worker_url`.
+4. Check the result in **Admin → AI jobs** (shown when a queue feature flag is on), or in
+   `public.ai_jobs`.
+
+To pause the worker, delete the two Vault secrets; Cron then sends nothing. Never set
+`AI_WORKER_FAULTS` on a hosted project: the worker ignores it there anyway, but it exists for
+local drills only.

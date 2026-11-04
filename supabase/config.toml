@@ -114,9 +114,11 @@ port = 54324
 # sender_name = "Admin"
 
 [storage]
-enabled = false
+# Private evidence photos (plan v2 F1, A1). The bucket itself, with its 2 MiB limit and MIME
+# allowlist, is created by a migration so that local and cloud match.
+enabled = true
 # The maximum file size allowed (e.g. "5MB", "500KB").
-file_size_limit = "50MiB"
+file_size_limit = "2MiB"
 
 # Uncomment to configure local storage buckets
 # [storage.buckets.images]
@@ -381,8 +383,9 @@ authorization_url_path = "/oauth/consent"
 # Allow dynamic client registration
 allow_dynamic_registration = false
 
+# The background AI worker (plan v2 §05, A1): supabase/functions/makeitright-ai-worker.
 [edge_runtime]
-enabled = false
+enabled = true
 # Supported request policies: `oneshot`, `per_worker`.
 # `per_worker` (default) — enables hot reload during local development.
 # `oneshot` — fallback mode if hot reload causes issues (e.g. in large repos or with symlinks).
@@ -392,8 +395,15 @@ inspector_port = 8083
 # The Deno major version to use.
 deno_version = 2
 
-# [edge_runtime.secrets]
-# secret_key = "env(SECRET_VALUE)"
+# Local Docker only; hosted values come from `supabase secrets set`. The worker refuses this
+# well-known secret, and fault injection, anywhere but the local stack.
+[edge_runtime.secrets]
+AI_WORKER_SECRET = "local-only-ai-worker-secret-0123456789abcdef"
+AI_WORKER_FAULTS = "true"
+
+# Called by Supabase Cron with a shared secret, not with a user JWT.
+[functions.makeitright-ai-worker]
+verify_jwt = false
 
 [analytics]
 enabled = false

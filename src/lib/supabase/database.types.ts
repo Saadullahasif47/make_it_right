@@ -39,14 +39,14 @@ isOneToOne: false
                   ]
                 },"ai_jobs": {
                   Row: {
-                    "attempts": number,"created_at": string,"dedupe_key": string,"id": string,"job_type": Database["public"]['Enums']["ai_job_type"],"last_error_code": string | null,"next_retry_at": string | null,"status": Database["public"]['Enums']["ai_job_status"],"target_id": string,"updated_at": string
+                    "admin_retries": number,"attempts": number,"created_at": string,"dedupe_key": string,"finished_at": string | null,"id": string,"job_type": Database["public"]['Enums']["ai_job_type"],"last_error_code": string | null,"next_retry_at": string | null,"queue_msg_id": number | null,"started_at": string | null,"status": Database["public"]['Enums']["ai_job_status"],"target_id": string,"updated_at": string
                   }
                   ComputedFields: never
                   Insert: {
-                    "attempts"?: number,"created_at"?: string,"dedupe_key": string,"id"?: string,"job_type": Database["public"]['Enums']["ai_job_type"],"last_error_code"?: string | null,"next_retry_at"?: string | null,"status"?: Database["public"]['Enums']["ai_job_status"],"target_id": string,"updated_at"?: string
+                    "admin_retries"?: number,"attempts"?: number,"created_at"?: string,"dedupe_key": string,"finished_at"?: string | null,"id"?: string,"job_type": Database["public"]['Enums']["ai_job_type"],"last_error_code"?: string | null,"next_retry_at"?: string | null,"queue_msg_id"?: number | null,"started_at"?: string | null,"status"?: Database["public"]['Enums']["ai_job_status"],"target_id": string,"updated_at"?: string
                   }
                   Update: {
-                    "attempts"?: number,"created_at"?: string,"dedupe_key"?: string,"id"?: string,"job_type"?: Database["public"]['Enums']["ai_job_type"],"last_error_code"?: string | null,"next_retry_at"?: string | null,"status"?: Database["public"]['Enums']["ai_job_status"],"target_id"?: string,"updated_at"?: string
+                    "admin_retries"?: number,"attempts"?: number,"created_at"?: string,"dedupe_key"?: string,"finished_at"?: string | null,"id"?: string,"job_type"?: Database["public"]['Enums']["ai_job_type"],"last_error_code"?: string | null,"next_retry_at"?: string | null,"queue_msg_id"?: number | null,"started_at"?: string | null,"status"?: Database["public"]['Enums']["ai_job_status"],"target_id"?: string,"updated_at"?: string
                   }
                   Relationships: [
                     
@@ -390,6 +390,11 @@ isOneToOne: false
 "admin_metrics":
 { Args: { "p_window_days"?: number }; Returns: Json
                            },
+"admin_retry_ai_job":
+{ Args: { "p_job_id": string }; Returns: {
+              "admin_retries": number,"job_id": string,"status": Database["public"]['Enums']["ai_job_status"]
+            }[]
+                           },
 "admin_set_department_active":
 { Args: { "p_active": boolean,"p_department_id": string }; Returns: {
               "id": string,"is_active": boolean,"routes_affected": number
@@ -420,6 +425,14 @@ isOneToOne: false
               "created": boolean,"id": string,"reference_no": number,"status": Database["public"]['Enums']["ticket_state"]
             }[]
                            },
+"discard_evidence_upload":
+{ Args: { "p_attachment_id": string }; Returns: undefined
+                           },
+"finalize_evidence_upload":
+{ Args: { "p_attachment_id": string,"p_byte_size": number,"p_mime_type": string,"p_sha256": string }; Returns: {
+              "attachment_id": string,"job_id": string
+            }[]
+                           },
 "list_complaints":
 { Args: { "p_cursor_created_at"?: string,"p_cursor_id"?: string,"p_cursor_priority"?: Database["public"]['Enums']["ticket_priority"],"p_limit"?: number,"p_query"?: string,"p_sort"?: string,"p_statuses"?: (Database["public"]['Enums']["ticket_state"])[] }; Returns: {
               "acknowledged_at": string | null,
@@ -444,6 +457,11 @@ isOneToOne: false
         isOneToOne: false
         isSetofReturn: true
       } },
+"request_evidence_upload":
+{ Args: { "p_byte_size": number,"p_complaint_id": string,"p_mime_type": string }; Returns: {
+              "attachment_id": string,"object_path": string
+            }[]
+                           },
 "ticket_transition_rules":
 { Args: Record<PropertyKey, never>; Returns: {
               "actor_role": Database["public"]['Enums']["app_role"],"from_state": Database["public"]['Enums']["ticket_state"],"to_state": Database["public"]['Enums']["ticket_state"]
@@ -453,6 +471,17 @@ isOneToOne: false
 { Args: { "p_expected_version": number,"p_note"?: string,"p_target": Database["public"]['Enums']["ticket_state"],"p_ticket_id": string }; Returns: {
               "id": string,"status": Database["public"]['Enums']["ticket_state"],"version": number
             }[]
+                           },
+"worker_claim_ai_jobs":
+{ Args: { "p_batch"?: number,"p_visibility_seconds"?: number }; Returns: {
+              "attempt": number,"job_id": string,"job_type": Database["public"]['Enums']["ai_job_type"],"msg_id": number,"target_id": string
+            }[]
+                           },
+"worker_complete_ai_job":
+{ Args: { "p_attempt": number,"p_job_id": string,"p_msg_id": number }; Returns: Database["public"]['Enums']["ai_job_status"]
+                           },
+"worker_fail_ai_job":
+{ Args: { "p_attempt": number,"p_error_code": string,"p_job_id": string,"p_msg_id": number,"p_retry_delay_seconds"?: number,"p_retryable": boolean }; Returns: Database["public"]['Enums']["ai_job_status"]
                            }
           }
           Enums: {
