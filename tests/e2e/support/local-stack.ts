@@ -17,6 +17,15 @@ export function hasLocalStack(): boolean {
 export const LOCAL_STACK_REASON =
   "needs the local Supabase stack (pnpm db:start) and a local app build";
 
+/** Rows of a ticket list: table body rows on desktop, list items on phones. */
+export function ticketRows(page: Page) {
+  return page
+    .getByRole("table", { name: "Complaints" })
+    .locator("tbody")
+    .getByRole("row")
+    .or(page.getByRole("list", { name: "Complaints" }).getByRole("listitem"));
+}
+
 export async function signIn(page: Page, email: string, password: string): Promise<void> {
   await page.getByLabel("Email").fill(email);
   await page.getByLabel("Password", { exact: true }).fill(password);

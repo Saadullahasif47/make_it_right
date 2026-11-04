@@ -13,7 +13,7 @@ import {
   type TestUser,
 } from "../integration/support/supabase";
 
-import { LOCAL_STACK_REASON, hasLocalStack, signIn } from "./support/local-stack";
+import { LOCAL_STACK_REASON, hasLocalStack, signIn, ticketRows } from "./support/local-stack";
 
 test.skip(!hasLocalStack(), LOCAL_STACK_REASON);
 
@@ -30,15 +30,6 @@ async function signInAs(page: Page, user: TestUser): Promise<void> {
   await page.goto("/login");
   await signIn(page, user.email, user.password);
   await expect(page).toHaveURL(/\/student\/complaints$/);
-}
-
-/** The student's ticket rows: table body rows on desktop, list items on phones. */
-function ticketRows(page: Page) {
-  return page
-    .getByRole("table", { name: "Complaints" })
-    .locator("tbody")
-    .getByRole("row")
-    .or(page.getByRole("list", { name: "Complaints" }).getByRole("listitem"));
 }
 
 async function complaintCount(userId: string): Promise<number> {

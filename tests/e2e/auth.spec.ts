@@ -62,7 +62,7 @@ test.describe("each role signs in to its own area", () => {
       links: 1,
       label: "Department staff",
     },
-    { name: "admin", home: /\/admin$/, nav: "Overview", links: 3, label: "Administrator" },
+    { name: "admin", home: /\/admin$/, nav: "Overview", links: 4, label: "Administrator" },
   ] as const;
 
   for (const role of cases) {

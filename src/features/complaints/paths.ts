@@ -12,6 +12,16 @@ export function ticketPathFor(role: AppRole, ticketId: string): string {
   }
 }
 
+/**
+ * Where a workflow action returns to. Staff acting from the queue's inspection panel go back to
+ * the queue with the same ticket open; everyone else goes back to the ticket page.
+ */
+export function workflowReturnPath(role: AppRole, ticketId: string, view: unknown): string {
+  return role === "department" && view === "panel"
+    ? `/department?ticket=${ticketId}`
+    : ticketPathFor(role, ticketId);
+}
+
 /** One-off confirmations shown after a workflow action (`?notice=`). */
 export const WORKFLOW_NOTICES: Readonly<Record<string, string>> = {
   acknowledged: "Acknowledged. The reporter can see that the department has the ticket.",

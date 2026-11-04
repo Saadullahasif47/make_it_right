@@ -6,7 +6,7 @@ import { EmptyState, PageHeader, PageSkeleton } from "@/components/layout/page-p
 import { ButtonLink, buttonIcon } from "@/components/ui/button";
 import { AccessDenied } from "@/features/auth/components/access-denied";
 import { requirePageAccess } from "@/features/auth/session";
-import { ComplaintList } from "@/features/complaints/components/complaint-list";
+import { ComplaintTable } from "@/features/complaints/components/complaint-table";
 import { decodeCursor } from "@/features/complaints/cursor";
 import { listComplaints } from "@/features/complaints/repository";
 import { PAGE_SIZE } from "@/features/complaints/schemas";
@@ -38,7 +38,7 @@ async function ReviewQueue({
   });
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       <PageHeader
         title="Review queue"
         description="Tickets waiting for a person to classify and route them, longest-waiting first: reports the AI assistant sent for review, attempts that stalled, and every new report while AI routing is off."
@@ -49,10 +49,10 @@ async function ReviewQueue({
           No tickets are waiting for routing. New reports will appear here.
         </EmptyState>
       ) : (
-        <ComplaintList
+        <ComplaintTable
           complaints={page.items}
           hrefFor={(id) => `/admin/complaints/${id}`}
-          variant="staff"
+          variant="review"
           now={now}
         />
       )}

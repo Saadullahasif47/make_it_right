@@ -1,6 +1,6 @@
 import { CirclePlus, Eye, MapPin, Route, Sparkles, Wrench, type LucideIcon } from "lucide-react";
 
-import { PriorityBadge } from "@/features/complaints/components/complaint-list";
+import { PriorityBadge } from "@/features/complaints/components/ticket-parts";
 import { StatusBadge } from "@/features/complaints/components/status-badge";
 import { cn } from "@/lib/utils/cn";
 

@@ -39,7 +39,7 @@ Recorded 2026-11-04 against local production builds on the local Supabase stack.
 
 ## Screens, axe and overflow
 
-`pnpm design:audit:student` (`scripts/design-audit-student.mts`, localhost only) creates a throwaway student, files
+`pnpm design:audit:student` (`scripts/design-audit-student.mts`, localhost only; Stage 4 generalised it to `pnpm design:audit:app --roles student`) creates a throwaway student, files
 four reports through the real API, moves one to resolved and one to in progress, and audits four screens. It captures
 `/student/complaints`, `?q=library`, `/student/complaints/new` and the resolved ticket at 390, 768, 1366 and 1440 px in
 light mode, and at 390 and 1440 px in dark mode. Then it deletes the student.

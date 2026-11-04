@@ -1,29 +1,24 @@
-import { ArrowRight, ClipboardList, Plus, Search, SearchX } from "lucide-react";
+import { ArrowRight, ClipboardList, Plus, SearchX } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
 
 import { EmptyState, PageHeader, Skeleton, SkeletonRows } from "@/components/layout/page-parts";
-import { Button, ButtonLink, buttonIcon } from "@/components/ui/button";
-import { inputClassName } from "@/components/ui/field";
+import { ButtonLink, buttonIcon } from "@/components/ui/button";
 import { AccessDenied } from "@/features/auth/components/access-denied";
 import { requirePageAccess } from "@/features/auth/session";
 import { ComplaintTable } from "@/features/complaints/components/complaint-table";
+import { FilterTabs } from "@/features/complaints/components/list-controls";
+import { SearchForm } from "@/features/complaints/components/search-form";
 import { decodeCursor } from "@/features/complaints/cursor";
 import {
   countComplaints,
   listComplaints,
   type ComplaintCounts,
 } from "@/features/complaints/repository";
-import { PAGE_SIZE, SEARCH_LIMITS, searchQuerySchema } from "@/features/complaints/schemas";
-import {
-  STATUS_FILTERS,
-  STATUS_FILTER_ORDER,
-  isStatusFilter,
-  type StatusFilter,
-} from "@/features/complaints/statuses";
+import { PAGE_SIZE, searchQuerySchema } from "@/features/complaints/schemas";
+import { STATUS_FILTERS, isStatusFilter, type StatusFilter } from "@/features/complaints/statuses";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { cn } from "@/lib/utils/cn";
 
 import { PageNotice } from "../../_components/page-notice";
 
@@ -69,62 +64,6 @@ function SummaryStrip({ counts }: { readonly counts: ComplaintCounts }) {
         </div>
       ))}
     </dl>
-  );
-}
-
-/** A plain GET form: the results page is a shareable URL and works without JavaScript. */
-function SearchForm({ view }: { readonly view: ListView }) {
-  return (
-    <form role="search" action="/student/complaints" className="flex gap-2">
-      {view.filter === "all" ? null : <input type="hidden" name="status" value={view.filter} />}
-      <div className="relative min-w-0 flex-1">
-        <label htmlFor="complaint-search" className="sr-only">
-          Search your reports
-        </label>
-        <Search
-          aria-hidden="true"
-          className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-ink-subtle"
-        />
-        <input
-          id="complaint-search"
-          type="search"
-          name="q"
-          defaultValue={view.query}
-          maxLength={SEARCH_LIMITS.max}
-          placeholder="Title, place or MIR-1234"
-          autoComplete="off"
-          className={cn(inputClassName, "pl-9")}
-        />
-      </div>
-      <Button type="submit" variant="secondary">
-        Search
-      </Button>
-    </form>
-  );
-}
-
-function FilterTabs({ view }: { readonly view: ListView }) {
-  return (
-    <nav aria-label="Filter by status">
-      <ul className="flex flex-wrap gap-2">
-        {STATUS_FILTER_ORDER.map((filter) => (
-          <li key={filter}>
-            <Link
-              href={listHref({ ...view, filter })}
-              aria-current={filter === view.filter ? "page" : undefined}
-              className={cn(
-                "inline-flex h-8 items-center rounded-md border px-3 text-sm font-medium transition-[background-color,border-color,color] duration-150",
-                filter === view.filter
-                  ? "border-brand bg-brand text-brand-fg"
-                  : "border-line-strong bg-surface text-ink-muted hover:border-ink-subtle hover:text-ink",
-              )}
-            >
-              {STATUS_FILTERS[filter].label}
-            </Link>
-          </li>
-        ))}
-      </ul>
-    </nav>
   );
 }
 
@@ -178,8 +117,13 @@ async function StudentComplaints({ searchParams }: { readonly searchParams: Sear
         <>
           <SummaryStrip counts={counts} />
           <div className="space-y-3">
-            <SearchForm view={view} />
-            <FilterTabs view={view} />
+            <SearchForm
+              action="/student/complaints"
+              label="Search your reports"
+              query={view.query}
+              keep={view.filter === "all" ? {} : { status: view.filter }}
+            />
+            <FilterTabs active={view.filter} hrefFor={(filter) => listHref({ ...view, filter })} />
           </div>
         </>
       ) : null}

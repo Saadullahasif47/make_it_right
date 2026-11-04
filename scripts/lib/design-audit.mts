@@ -66,7 +66,10 @@ export async function runAudit(options: AuditOptions): Promise<boolean> {
         );
         results.push({
           shot,
-          violations: axe.violations.map((item) => `${item.id} (${item.nodes.length})`),
+          violations: axe.violations.map(
+            (item) =>
+              `${item.id} (${item.nodes.length}, first: ${String(item.nodes[0]?.target[0])})`,
+          ),
           overflow,
         });
       }

@@ -47,6 +47,8 @@ function describeChange(change: ConfigChange, departments: readonly DepartmentRe
   }
 }
 
+const headerCell = "px-4 py-2.5 text-left text-xs font-medium text-ink-muted";
+
 async function DepartmentsAdmin({
   searchParams,
 }: {
@@ -79,42 +81,66 @@ async function DepartmentsAdmin({
         <h2 id="availability-title" className="text-lg font-semibold text-ink">
           Availability
         </h2>
-        <div className="overflow-hidden rounded-xl border border-line bg-surface shadow-soft">
-          <ul aria-label="Departments" className="divide-y divide-line">
-            {departments.map((department) => (
-              <li
-                key={department.id}
-                className="flex flex-wrap items-center justify-between gap-4 px-5 py-4"
-              >
-                <div>
-                  <p className="font-semibold text-ink">{department.name}</p>
-                  <p className="mt-0.5 text-sm text-ink-muted">
-                    <span className="font-mono text-xs">{department.code}</span>
-                    {" · "}
-                    {routedTo(department.id) === 0
-                      ? "no categories routed here"
-                      : `default for ${routedTo(department.id)} ${routedTo(department.id) === 1 ? "category" : "categories"}`}
-                  </p>
-                </div>
-                <div className="flex items-center gap-4">
-                  <span
-                    className={
-                      department.isActive
-                        ? "inline-flex rounded-full bg-success-soft px-2.5 py-0.5 text-xs font-semibold text-success"
-                        : "inline-flex rounded-full bg-surface-muted px-2.5 py-0.5 text-xs font-semibold text-ink-muted"
-                    }
-                  >
-                    {department.isActive ? "Active" : "Inactive"}
-                  </span>
-                  <DepartmentToggleForm
-                    departmentId={department.id}
-                    name={department.name}
-                    active={department.isActive}
-                  />
-                </div>
-              </li>
-            ))}
-          </ul>
+        <div className="overflow-hidden rounded-xl border border-line bg-surface">
+          <table aria-label="Departments" className="w-full text-sm">
+            <thead className="border-b border-line bg-surface-muted">
+              <tr>
+                <th scope="col" className={headerCell}>
+                  Department
+                </th>
+                <th scope="col" className={`${headerCell} hidden sm:table-cell`}>
+                  Default for
+                </th>
+                <th scope="col" className={headerCell}>
+                  Status
+                </th>
+                <th scope="col" className={`${headerCell} text-right`}>
+                  <span className="sr-only">Action</span>
+                </th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-line">
+              {departments.map((department) => {
+                const routed = routedTo(department.id);
+                const routedText =
+                  routed === 0
+                    ? "No categories"
+                    : `${routed} ${routed === 1 ? "category" : "categories"}`;
+                return (
+                  <tr key={department.id}>
+                    <td className="px-4 py-3 align-middle">
+                      <p className="font-medium text-ink">{department.name}</p>
+                      <p className="mt-0.5 text-ink-muted">
+                        <span className="font-mono text-xs">{department.code}</span>
+                        <span className="sm:hidden"> · {routedText}</span>
+                      </p>
+                    </td>
+                    <td className="hidden px-4 py-3 align-middle text-ink-muted sm:table-cell">
+                      {routedText}
+                    </td>
+                    <td className="px-4 py-3 align-middle">
+                      <span
+                        className={
+                          department.isActive
+                            ? "inline-flex h-6 items-center rounded-md bg-success-soft px-2 text-xs font-medium text-success"
+                            : "inline-flex h-6 items-center rounded-md bg-surface-muted px-2 text-xs font-medium text-ink-muted"
+                        }
+                      >
+                        {department.isActive ? "Active" : "Inactive"}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-right align-middle">
+                      <DepartmentToggleForm
+                        departmentId={department.id}
+                        name={department.name}
+                        active={department.isActive}
+                      />
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
         </div>
       </section>
 

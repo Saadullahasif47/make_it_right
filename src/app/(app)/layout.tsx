@@ -22,7 +22,7 @@ async function SessionChrome() {
     <>
       <nav
         aria-label="Workspace"
-        className="order-3 basis-full border-t border-line lg:order-none lg:basis-auto lg:border-t-0 lg:pt-2"
+        className="order-3 min-w-0 basis-full border-t border-line lg:order-none lg:basis-auto lg:border-t-0 lg:pt-2"
       >
         <NavLinks role={user.role} />
       </nav>

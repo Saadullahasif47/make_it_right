@@ -134,6 +134,8 @@ interface WorkflowPanelProps {
   readonly status: TicketState;
   readonly acknowledgedAt: string | null;
   readonly role: AppRole;
+  /** "panel" when shown in the queue's inspection panel, so actions return to the queue. */
+  readonly view?: "panel";
 }
 
 function Section({ title, children }: { readonly title: string; readonly children: ReactNode }) {
@@ -158,8 +160,10 @@ export function WorkflowPanel({
   status,
   acknowledgedAt,
   role,
+  view,
 }: WorkflowPanelProps) {
-  const ids = { ticketId, expectedVersion: String(version) };
+  const returnTo: Record<string, string> = view === undefined ? {} : { view };
+  const ids = { ticketId, expectedVersion: String(version), ...returnTo };
   const targets = allowedTargets(status, role);
   const showAcknowledge = canAcknowledge({ status, acknowledgedAt }, role);
   const showNote = canAddNote(status, role);
@@ -211,7 +215,7 @@ export function WorkflowPanel({
         <div className="border-t border-line pt-4">
           <ActionForm
             action={addNoteAction}
-            hidden={{ ticketId }}
+            hidden={{ ticketId, ...returnTo }}
             submitLabel="Add note"
             pendingLabel="Adding…"
             icon={MessageSquarePlus}

@@ -10,7 +10,7 @@ import { createRequestId } from "@/lib/logging/request-id";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 import { FAILURE_MESSAGES } from "./messages";
-import { ticketPathFor } from "./paths";
+import { workflowReturnPath } from "./paths";
 import {
   acknowledge,
   addNote,
@@ -75,7 +75,8 @@ async function perform<T>(
       values: { note: text(formData, "note") ?? "" },
     };
   }
-  redirect(`${ticketPathFor(user.role, ticketId)}?notice=${notice(result.value)}`);
+  const back = workflowReturnPath(user.role, ticketId, text(formData, "view"));
+  redirect(`${back}${back.includes("?") ? "&" : "?"}notice=${notice(result.value)}`);
 }
 
 export async function changeStatusAction(
