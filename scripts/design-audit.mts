@@ -7,7 +7,7 @@
  *   pnpm design:audit --label before --base-url https://<preview>.vercel.app
  *
  * Screenshots land in test-results/design-audit/<label>/ (ignored by git); copy the ones worth
- * keeping into docs/design/stage-N/. Signed-in screens: scripts/design-audit-student.mts.
+ * keeping into docs/design/stage-N/. Signed-in screens: scripts/design-audit-app.mts.
  */
 import { parseArgs } from "node:util";
 

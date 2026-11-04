@@ -17,7 +17,7 @@ import {
   type TestUser,
 } from "../integration/support/supabase";
 
-import { LOCAL_STACK_REASON, hasLocalStack, signIn } from "./support/local-stack";
+import { LOCAL_STACK_REASON, hasLocalStack, signIn, ticketRows } from "./support/local-stack";
 
 test.skip(!hasLocalStack(), LOCAL_STACK_REASON);
 
@@ -104,10 +104,7 @@ test("Gate P4: a normal complaint is routed by the agent to its approved departm
 
   // It is in the electrical queue, marked new, like a manually routed ticket.
   const staffPage = await signedIn(browser, electrician, /\/department$/);
-  const item = staffPage
-    .getByRole("list", { name: "Complaints" })
-    .getByRole("listitem")
-    .filter({ hasText: title });
+  const item = ticketRows(staffPage).filter({ hasText: title });
   await expect(item.getByText("New", { exact: true })).toBeVisible();
 
   const { data } = await adminClient()

@@ -134,8 +134,8 @@ test("an admin can take a department offline and back; every change is logged", 
   await page.goto("/admin/departments");
 
   const item = page
-    .getByRole("list", { name: "Departments" })
-    .getByRole("listitem")
+    .getByRole("table", { name: "Departments" })
+    .getByRole("row")
     .filter({ hasText: department.name });
   await expect(item.getByText("Active", { exact: true })).toBeVisible();
   await item.getByRole("button", { name: `Deactivate ${department.name}` }).click();

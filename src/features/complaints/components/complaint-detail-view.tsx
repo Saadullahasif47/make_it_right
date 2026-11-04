@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils/cn";
 import { CATEGORY_LABELS, isComplaintCategory } from "../categories";
 import type { ComplaintDetail } from "../repository";
 
-import { PriorityBadge, locationOf } from "./complaint-list";
+import { PriorityBadge, locationOf } from "./ticket-parts";
 import { StatusBadge } from "./status-badge";
 import { Timeline } from "./timeline";
 
@@ -33,11 +33,11 @@ interface ComplaintDetailViewProps {
   /** Role-specific controls; rendered above the timeline. */
   readonly actions?: ReactNode;
   /**
-   * "split" puts the history beside the details (staff and admin work from it). "stacked" is
-   * the reporter's reading order: the decision they owe first, then details, then a full-width
-   * history.
+   * "workbench" (staff and admin) keeps the record on the left (details, description and the
+   * full history, never buried under forms) and the actions on the right. "stacked" is the
+   * reporter's reading order: the decision they owe first, then details, then the history.
    */
-  readonly layout?: "split" | "stacked";
+  readonly layout?: "workbench" | "stacked";
 }
 
 function DetailsPanel({ complaint }: { readonly complaint: ComplaintDetail }) {
@@ -97,7 +97,7 @@ export function ComplaintDetailView({
   notice,
   toast,
   actions,
-  layout = "split",
+  layout = "workbench",
 }: ComplaintDetailViewProps) {
   return (
     <div className={cn("space-y-8", layout === "stacked" && "mx-auto max-w-3xl")}>
@@ -135,15 +135,13 @@ export function ComplaintDetailView({
           <History complaint={complaint} />
         </>
       ) : (
-        <div className="grid gap-8 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
+        <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
           <div className="space-y-8">
             <DetailsPanel complaint={complaint} />
             <Description text={complaint.description} />
-          </div>
-          <div className="space-y-6">
-            {actions}
             <History complaint={complaint} />
           </div>
+          {actions === undefined ? null : <div className="space-y-6">{actions}</div>}
         </div>
       )}
     </div>

@@ -103,6 +103,19 @@ export const TRANSITION_LABELS: Readonly<Partial<Record<TicketState, string>>> =
  */
 export const TRIAGE_STALE_AFTER_MS = 2 * 60 * 1000;
 
+/** Why a ticket is in the admin review queue, in the words the queue shows. */
+export function reviewReason(
+  ticket: { readonly status: TicketState; readonly updatedAt: string },
+  nowMs: number,
+): string {
+  if (ticket.status === "needs_review") return "AI asked for a person";
+  if (ticket.status === "triaging") {
+    return isStalledTriage(ticket, nowMs) ? "AI attempt stalled" : "AI is routing it";
+  }
+  if (ticket.status === "submitted") return "Not routed yet";
+  return "Already routed";
+}
+
 export function isStalledTriage(
   ticket: { readonly status: TicketState; readonly updatedAt: string },
   nowMs: number,

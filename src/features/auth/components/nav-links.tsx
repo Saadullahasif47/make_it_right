@@ -39,7 +39,7 @@ export function NavLinks({ role }: { readonly role: AppRole }) {
 
   return (
     <ul className="-mb-px flex items-center gap-1 overflow-x-auto px-2 lg:mb-0 lg:flex-col lg:items-stretch lg:gap-0.5 lg:overflow-visible lg:px-3">
-      {items.map(({ href, label, icon: Icon }) => {
+      {items.map(({ href, label, shortLabel, icon: Icon }) => {
         const active = href === current;
         return (
           <li key={href}>
@@ -47,8 +47,8 @@ export function NavLinks({ role }: { readonly role: AppRole }) {
               href={href}
               aria-current={active ? "page" : undefined}
               className={cn(
-                "relative flex h-11 items-center gap-2.5 px-3 text-sm font-medium whitespace-nowrap transition-colors duration-150",
-                "after:absolute after:inset-x-3 after:bottom-0 after:h-0.5 after:rounded-full lg:after:hidden",
+                "relative flex h-11 items-center gap-2.5 px-2.5 text-sm font-medium whitespace-nowrap transition-colors duration-150",
+                "after:absolute after:inset-x-2.5 after:bottom-0 after:h-0.5 after:rounded-full lg:after:hidden",
                 "lg:h-9 lg:rounded-md lg:px-2.5",
                 active
                   ? "text-ink after:bg-brand lg:bg-band-active lg:text-band-fg"
@@ -63,7 +63,14 @@ export function NavLinks({ role }: { readonly role: AppRole }) {
                   active ? "text-brand-on-band" : "text-band-muted",
                 )}
               />
-              {label}
+              {shortLabel === undefined ? (
+                label
+              ) : (
+                <>
+                  <span className="sm:hidden">{shortLabel}</span>
+                  <span className="hidden sm:inline">{label}</span>
+                </>
+              )}
             </Link>
           </li>
         );

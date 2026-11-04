@@ -59,7 +59,7 @@ function Panel({
   return (
     <section
       aria-labelledby={id}
-      className={cn("rounded-xl border border-line bg-surface p-6 shadow-soft", className)}
+      className={cn("rounded-xl border border-line bg-surface p-5", className)}
     >
       <h2 id={id} className="text-base font-semibold text-ink">
         {title}
@@ -245,8 +245,8 @@ export function MetricsDashboard({ metrics }: { readonly metrics: AdminMetrics }
   const reviewReasons = Object.entries(ai.reviewReasons).sort(([, a], [, b]) => b - a);
 
   return (
-    <div className="space-y-6">
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+    <div className="space-y-4">
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
         <KpiTile
           label="Open tickets"
           value={String(totals.open)}
@@ -282,7 +282,7 @@ export function MetricsDashboard({ metrics }: { readonly metrics: AdminMetrics }
         />
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid gap-4 lg:grid-cols-2">
         <Panel
           title="Tickets by status"
           description="Every ticket in the system, in lifecycle order."

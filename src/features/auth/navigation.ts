@@ -5,6 +5,7 @@ import {
   Inbox,
   LayoutDashboard,
   ListChecks,
+  Ticket,
   type LucideIcon,
 } from "lucide-react";
 
@@ -13,6 +14,8 @@ import type { AppRole } from "./roles";
 export interface NavItem {
   readonly href: `/${string}`;
   readonly label: string;
+  /** A shorter label for the phone tab bar, where four tabs share 390 px. */
+  readonly shortLabel?: string;
   readonly icon: LucideIcon;
   /** Other areas this item is the home of, e.g. the ticket pages reached from a queue. */
   readonly also?: readonly `/${string}`[];
@@ -30,9 +33,11 @@ export const ROLE_NAVIGATION: Readonly<Record<AppRole, readonly NavItem[]>> = {
   department: [{ href: "/department", label: "Department queue", icon: Inbox }],
   admin: [
     { href: "/admin", label: "Overview", icon: LayoutDashboard },
+    { href: "/admin/tickets", label: "Tickets", icon: Ticket },
     {
       href: "/admin/review",
       label: "Review queue",
+      shortLabel: "Review",
       icon: ListChecks,
       also: ["/admin/complaints"],
     },

@@ -15,7 +15,7 @@ import {
   type TestUser,
 } from "../integration/support/supabase";
 
-import { LOCAL_STACK_REASON, hasLocalStack, signIn } from "./support/local-stack";
+import { LOCAL_STACK_REASON, hasLocalStack, signIn, ticketRows } from "./support/local-stack";
 
 test.skip(!hasLocalStack(), LOCAL_STACK_REASON);
 
@@ -114,10 +114,7 @@ test("Gate P3: a ticket goes from report to closed through the UI, by three role
 
   // 3. The electrician sees it as new in the queue, acknowledges, works and resolves it.
   const staffPage = await signedIn(browser, electrician, /\/department$/);
-  const queueItem = staffPage
-    .getByRole("list", { name: "Complaints" })
-    .getByRole("listitem")
-    .filter({ hasText: title });
+  const queueItem = ticketRows(staffPage).filter({ hasText: title });
   await expect(queueItem.getByText("New", { exact: true })).toBeVisible();
   await expect(queueItem.getByText("High priority")).toBeVisible();
   await queueItem.getByRole("link").click();

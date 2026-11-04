@@ -27,7 +27,7 @@ import {
   COMPLAINT_CATEGORIES,
   type ComplaintCategory,
 } from "@/features/complaints/categories";
-import { PriorityBadge } from "@/features/complaints/components/complaint-list";
+import { PriorityBadge } from "@/features/complaints/components/ticket-parts";
 import { StatusBadge } from "@/features/complaints/components/status-badge";
 import type { TicketPriority, TicketState } from "@/features/complaints/statuses";
 
