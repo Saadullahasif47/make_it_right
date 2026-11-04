@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 
 import { cn } from "@/lib/utils/cn";
 
-import { ROLE_NAVIGATION, type NavItem } from "../navigation";
+import { navigationFor, type NavItem, type NavOptions } from "../navigation";
 import type { AppRole } from "../roles";
 
 function matches(pathname: string, prefix: string): boolean {
@@ -49,9 +49,15 @@ function PendingHint() {
  * The role's destinations. Below `lg` they are tabs under the top bar (one tap, never hidden in
  * a menu: no role has more than a handful); from `lg` they are the sidebar's vertical list.
  */
-export function NavLinks({ role }: { readonly role: AppRole }) {
+export function NavLinks({
+  role,
+  options,
+}: {
+  readonly role: AppRole;
+  readonly options: NavOptions;
+}) {
   const pathname = usePathname();
-  const items = ROLE_NAVIGATION[role];
+  const items = navigationFor(role, options);
   const current = activeHref(pathname, items);
 
   return (

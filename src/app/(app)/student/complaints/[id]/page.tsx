@@ -10,6 +10,8 @@ import { WorkflowPanel } from "@/features/complaints/components/workflow-panel";
 import { WORKFLOW_NOTICES } from "@/features/complaints/paths";
 import { getComplaint } from "@/features/complaints/repository";
 import { complaintIdSchema } from "@/features/complaints/schemas";
+import { PhotoEvidence } from "@/features/evidence/components/photo-evidence";
+import { isFeatureEnabled } from "@/lib/config";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = { title: "Complaint" };
@@ -34,10 +36,9 @@ async function ComplaintDetail({
   }
 
   const parsedId = complaintIdSchema.safeParse(id);
+  const client = await createSupabaseServerClient();
   // RLS returns nothing for someone else's ticket, which is indistinguishable from "missing".
-  const complaint = parsedId.success
-    ? await getComplaint(await createSupabaseServerClient(), parsedId.data)
-    : null;
+  const complaint = parsedId.success ? await getComplaint(client, parsedId.data) : null;
   if (complaint === null) {
     notFound();
   }
@@ -62,13 +63,22 @@ async function ComplaintDetail({
       }
       toast={workflow}
       actions={
-        <WorkflowPanel
-          ticketId={complaint.id}
-          version={complaint.version}
-          status={complaint.status}
-          acknowledgedAt={complaint.acknowledgedAt}
-          role={access.user.role}
-        />
+        <>
+          <WorkflowPanel
+            ticketId={complaint.id}
+            version={complaint.version}
+            status={complaint.status}
+            acknowledgedAt={complaint.acknowledgedAt}
+            role={access.user.role}
+          />
+          {isFeatureEnabled("visualInspection") ? (
+            <PhotoEvidence
+              client={client}
+              complaintId={complaint.id}
+              canUpload={complaint.status !== "closed"}
+            />
+          ) : null}
+        </>
       }
     />
   );

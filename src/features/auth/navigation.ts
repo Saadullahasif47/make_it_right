@@ -2,6 +2,7 @@ import {
   Building2,
   CirclePlus,
   ClipboardList,
+  Cpu,
   Inbox,
   LayoutDashboard,
   ListChecks,
@@ -19,6 +20,13 @@ export interface NavItem {
   readonly icon: LucideIcon;
   /** Other areas this item is the home of, e.g. the ticket pages reached from a queue. */
   readonly also?: readonly `/${string}`[];
+  /** Shown only while a feature that needs this page is switched on (plan v2 A0.02). */
+  readonly requires?: "aiJobs";
+}
+
+/** Which flag-dependent items the current deployment shows. */
+export interface NavOptions {
+  readonly aiJobs: boolean;
 }
 
 /**
@@ -37,5 +45,12 @@ export const ROLE_NAVIGATION: Readonly<Record<AppRole, readonly NavItem[]>> = {
     { href: "/admin/tickets", label: "Tickets", icon: Ticket, also: ["/admin/complaints"] },
     { href: "/admin/review", label: "Review queue", shortLabel: "Review", icon: ListChecks },
     { href: "/admin/departments", label: "Departments", icon: Building2 },
+    { href: "/admin/jobs", label: "AI jobs", shortLabel: "Jobs", icon: Cpu, requires: "aiJobs" },
   ],
 };
+
+export function navigationFor(role: AppRole, options: NavOptions): readonly NavItem[] {
+  return ROLE_NAVIGATION[role].filter(
+    (item) => item.requires === undefined || options[item.requires],
+  );
+}

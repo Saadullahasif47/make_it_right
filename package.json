@@ -19,7 +19,7 @@
     "test:e2e": "playwright test",
     "test:integration": "vitest run --project integration",
     "eval:agent": "vitest run --project eval",
-    "db:start": "supabase start -x vector,logflare,supavisor,imgproxy,postgres-meta,studio,realtime,storage-api,edge-runtime",
+    "db:start": "supabase start -x vector,logflare,supavisor,imgproxy,postgres-meta,studio,realtime",
     "db:stop": "supabase stop",
     "db:reset": "supabase db reset",
     "db:test": "supabase test db",
