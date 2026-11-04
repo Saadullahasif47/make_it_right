@@ -79,8 +79,9 @@ export function Hero() {
     >
       <Container className="grid items-center gap-12 py-14 sm:py-20 lg:grid-cols-[minmax(0,1fr)_minmax(0,27rem)] lg:gap-16 lg:py-8">
         <div>
-          <p className="inline-flex animate-rise items-center gap-2 rounded-full border border-line bg-surface px-3 py-1 text-xs font-medium text-ink-muted">
-            <span aria-hidden="true" className="size-1.5 rounded-full bg-brand" />
+          {/* An editorial label: brand text led by a short rule, no pill or dot. */}
+          <p className="flex animate-rise items-center gap-3 text-sm font-semibold tracking-wide text-brand">
+            <span aria-hidden="true" className="h-0.5 w-8 rounded-full bg-brand" />
             Campus maintenance, from report to fix
           </p>
           <h1
