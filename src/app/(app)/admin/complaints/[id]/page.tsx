@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 
-import { PageSkeleton } from "@/components/layout/page-parts";
+import { TicketSkeleton } from "@/components/layout/page-parts";
 import { AgentRunsPanel } from "@/features/agent/components/agent-runs-panel";
 import { MAX_RUNS_PER_TICKET, listAgentRuns } from "@/features/agent/runs";
 import { AccessDenied } from "@/features/auth/components/access-denied";
@@ -68,7 +68,7 @@ async function AdminTicket({
   return (
     <ComplaintDetailView
       complaint={complaint}
-      back={{ href: "/admin/review", label: "Review queue" }}
+      back={{ href: "/admin/tickets", label: "All tickets" }}
       toast={notice}
       actions={
         <>
@@ -111,7 +111,7 @@ export default function AdminTicketPage({
   searchParams,
 }: PageProps<"/admin/complaints/[id]">) {
   return (
-    <Suspense fallback={<PageSkeleton />}>
+    <Suspense fallback={<TicketSkeleton />}>
       <AdminTicket params={params} searchParams={searchParams} />
     </Suspense>
   );

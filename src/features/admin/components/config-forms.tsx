@@ -3,6 +3,7 @@
 import { Power, Save } from "lucide-react";
 import { useActionState, useId } from "react";
 
+import { buttonIcon } from "@/components/ui/button";
 import { inputClassName } from "@/components/ui/field";
 import { Notice } from "@/components/ui/notice";
 import { SubmitButton } from "@/components/ui/submit-button";
@@ -33,7 +34,7 @@ export function DepartmentToggleForm({
         variant="secondary"
         aria-label={`${active ? "Deactivate" : "Activate"} ${name}`}
       >
-        <Power aria-hidden="true" className="size-3.5" />
+        <Power aria-hidden="true" className={buttonIcon} />
         {active ? "Deactivate" : "Activate"}
       </SubmitButton>
     </form>
@@ -64,7 +65,7 @@ export function RoutingRuleForm({
       className="grid gap-3 py-4 sm:grid-cols-[9rem_1fr_9rem_auto] sm:items-center"
     >
       <input type="hidden" name="category" value={category} />
-      <p className="font-semibold text-ink">{label}</p>
+      <p className="text-sm font-medium text-ink">{label}</p>
       <div>
         <label htmlFor={`${id}-department`} className="sr-only">
           Department for {label}
@@ -101,8 +102,13 @@ export function RoutingRuleForm({
           <option value="false">Disabled</option>
         </select>
       </div>
-      <SubmitButton pendingLabel="Saving…" size="sm" aria-label={`Save routing for ${label}`}>
-        <Save aria-hidden="true" className="size-3.5" />
+      <SubmitButton
+        pendingLabel="Saving…"
+        size="sm"
+        variant="secondary"
+        aria-label={`Save routing for ${label}`}
+      >
+        <Save aria-hidden="true" className={buttonIcon} />
         Save
       </SubmitButton>
       {state.message === undefined ? null : (

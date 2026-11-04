@@ -131,7 +131,16 @@ async function StudentComplaints({ searchParams }: { readonly searchParams: Sear
       {page.items.length > 0 ? (
         <ComplaintTable complaints={page.items} hrefFor={(id) => `/student/complaints/${id}`} />
       ) : !hasAny ? (
-        <EmptyState icon={ClipboardList} title="No complaints yet">
+        <EmptyState
+          icon={ClipboardList}
+          title="No complaints yet"
+          action={
+            <ButtonLink href="/student/complaints/new">
+              <Plus aria-hidden="true" className={buttonIcon} />
+              Report your first issue
+            </ButtonLink>
+          }
+        >
           When something on campus needs fixing, report it here. You will get a reference number and
           can follow every step.
         </EmptyState>

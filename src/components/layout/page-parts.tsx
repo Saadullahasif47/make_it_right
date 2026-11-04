@@ -46,14 +46,17 @@ export function Panel({
   );
 }
 
+/** An empty view: what it means, and (where there is one) the single next step as `action`. */
 export function EmptyState({
   icon: Icon,
   title,
   children,
+  action,
 }: {
   readonly icon: LucideIcon;
   readonly title: string;
   readonly children: ReactNode;
+  readonly action?: ReactNode;
 }) {
   return (
     <section
@@ -65,6 +68,7 @@ export function EmptyState({
       </span>
       <h2 className="mt-4 text-base font-semibold text-ink">{title}</h2>
       <div className="mt-1.5 max-w-md text-sm text-pretty text-ink-muted">{children}</div>
+      {action === undefined ? null : <div className="mt-5">{action}</div>}
     </section>
   );
 }
@@ -114,6 +118,97 @@ export function SkeletonRows() {
           <Skeleton className="h-6 w-20" />
         </div>
       ))}
+    </div>
+  );
+}
+
+/** A ticket page while it loads: the same header, and panels in the same layout as the real one. */
+export function TicketSkeleton({
+  layout = "workbench",
+}: {
+  readonly layout?: "workbench" | "stacked";
+}) {
+  const panel = "rounded-xl border border-line bg-surface p-6";
+  const record = (
+    <>
+      <div className={`${panel} grid gap-5 sm:grid-cols-2`}>
+        {[0, 1, 2, 3].map((cell) => (
+          <div key={cell} className="space-y-2">
+            <Skeleton className="h-3 w-20" />
+            <Skeleton className="h-4 w-36" />
+          </div>
+        ))}
+      </div>
+      <div className="space-y-2.5">
+        <Skeleton className="h-5 w-28" />
+        <Skeleton className="h-4 w-full" />
+        <Skeleton className="h-4 w-2/3" />
+      </div>
+      <div className={`${panel} space-y-4`}>
+        <Skeleton className="h-5 w-20" />
+        {[0, 1].map((event) => (
+          <div key={event} className="flex gap-4">
+            <Skeleton className="size-9 rounded-full" />
+            <div className="flex-1 space-y-2 pt-1">
+              <Skeleton className="h-4 w-40" />
+              <Skeleton className="h-3 w-56" />
+            </div>
+          </div>
+        ))}
+      </div>
+    </>
+  );
+  return (
+    <div
+      aria-hidden="true"
+      className={cn("space-y-8", layout === "stacked" && "mx-auto max-w-3xl")}
+    >
+      <Skeleton className="h-4 w-28" />
+      <div className="space-y-3">
+        <div className="flex gap-3">
+          <Skeleton className="h-6 w-20" />
+          <Skeleton className="h-6 w-24" />
+        </div>
+        <Skeleton className="h-8 w-80 max-w-full" />
+      </div>
+      {layout === "stacked" ? (
+        <div className="space-y-8">{record}</div>
+      ) : (
+        <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
+          <div className="space-y-8">{record}</div>
+          <div className={`${panel} space-y-4`}>
+            <Skeleton className="h-5 w-40" />
+            <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-10 w-full" />
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/** The admin overview while it loads: period filter, the KPI grid and two report panels. */
+export function OverviewSkeleton() {
+  return (
+    <div aria-hidden="true" className="space-y-6">
+      <div className="space-y-2.5">
+        <Skeleton className="h-7 w-40" />
+        <Skeleton className="h-4 w-96 max-w-full" />
+      </div>
+      <div className="flex gap-2">
+        {[0, 1, 2].map((filter) => (
+          <Skeleton key={filter} className="h-8 w-24" />
+        ))}
+      </div>
+      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+        {[0, 1, 2, 3].map((tile) => (
+          <Skeleton key={tile} className="h-28 rounded-xl" />
+        ))}
+      </div>
+      <div className="grid gap-4 lg:grid-cols-2">
+        <Skeleton className="h-64 rounded-xl" />
+        <Skeleton className="h-64 rounded-xl" />
+      </div>
     </div>
   );
 }

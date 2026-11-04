@@ -17,7 +17,7 @@ import { Timeline } from "./timeline";
 function Detail({ label, children }: { readonly label: string; readonly children: ReactNode }) {
   return (
     <div>
-      <dt className="text-xs font-semibold tracking-wide text-ink-subtle uppercase">{label}</dt>
+      <dt className="text-xs font-medium text-ink-muted">{label}</dt>
       <dd className="mt-1 text-sm font-medium text-ink">{children}</dd>
     </div>
   );
@@ -44,7 +44,7 @@ function DetailsPanel({ complaint }: { readonly complaint: ComplaintDetail }) {
   return (
     <section
       aria-labelledby="details-title"
-      className="rounded-xl border border-line bg-surface p-6 shadow-soft"
+      className="rounded-xl border border-line bg-surface p-6"
     >
       <h2 id="details-title" className="sr-only">
         Details
@@ -86,7 +86,7 @@ function History({
   return (
     <section
       aria-labelledby="history-title"
-      className="space-y-5 rounded-xl border border-line bg-surface p-6 shadow-soft"
+      className="space-y-5 rounded-xl border border-line bg-surface p-6"
     >
       <h2 id="history-title" className="text-lg font-semibold text-ink">
         History
@@ -143,13 +143,22 @@ export function ComplaintDetailView({
           <History complaint={complaint} highlightLatest={justChanged} />
         </>
       ) : (
-        <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
-          <div className="space-y-8">
+        // One grid, so the order can differ by width: on a laptop the actions sit beside the whole
+        // record; on phones and tablets they come straight after the description, before a
+        // history that may be long, so the job is never at the bottom of the page.
+        <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)] lg:grid-rows-[auto_auto_1fr]">
+          <div className="lg:col-start-1 lg:row-start-1">
             <DetailsPanel complaint={complaint} />
+          </div>
+          <div className="lg:col-start-1 lg:row-start-2">
             <Description text={complaint.description} />
+          </div>
+          {actions === undefined ? null : (
+            <div className="space-y-6 lg:col-start-2 lg:row-span-3 lg:row-start-1">{actions}</div>
+          )}
+          <div className="lg:col-start-1 lg:row-start-3">
             <History complaint={complaint} highlightLatest={justChanged} />
           </div>
-          {actions === undefined ? null : <div className="space-y-6">{actions}</div>}
         </div>
       )}
     </div>

@@ -175,6 +175,14 @@ test.describe("admin tickets table (Stage 4)", () => {
     await ticketRows(page).first().getByRole("link").click();
     await expect(page).toHaveURL(new RegExp(`/admin/complaints/${UUID.source}$`));
     await expect(page.getByRole("heading", { level: 1, name: title })).toBeVisible();
+    // A ticket page belongs to the full list: the way back and the active tab both say so.
+    await expect(page.getByRole("link", { name: "All tickets" })).toHaveAttribute(
+      "href",
+      "/admin/tickets",
+    );
+    await expect(
+      page.getByRole("navigation", { name: "Workspace" }).getByRole("link", { name: "Tickets" }),
+    ).toHaveAttribute("aria-current", "page");
 
     await page.context().clearCookies();
     await signInAs(page, staff, /\/department$/);

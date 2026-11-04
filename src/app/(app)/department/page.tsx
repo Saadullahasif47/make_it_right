@@ -115,6 +115,17 @@ async function DepartmentQueue({
             <EmptyState
               icon={Inbox}
               title={cursor === undefined ? "Nothing in this view" : "No more tickets"}
+              action={
+                state.filter === DEFAULTS.filter && cursor === undefined ? undefined : (
+                  <ButtonLink
+                    href={href({ filter: DEFAULTS.filter, cursor: undefined, ticket: undefined })}
+                    variant="secondary"
+                    size="sm"
+                  >
+                    Show active tickets
+                  </ButtonLink>
+                )
+              }
             >
               {state.filter === "open"
                 ? `No active tickets for ${departmentName} right now. New assignments appear here.`

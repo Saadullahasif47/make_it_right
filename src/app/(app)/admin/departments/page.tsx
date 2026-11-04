@@ -155,7 +155,7 @@ async function DepartmentsAdmin({
             sends that category to the review queue.
           </p>
         </div>
-        <div className="rounded-xl border border-line bg-surface px-5 shadow-soft">
+        <div className="rounded-xl border border-line bg-surface px-5">
           <div className="divide-y divide-line">
             {COMPLAINT_CATEGORIES.map((category) => {
               const rule = ruleFor.get(category);
@@ -188,7 +188,7 @@ async function DepartmentsAdmin({
         ) : (
           <ol
             aria-label="Recent configuration changes"
-            className="divide-y divide-line rounded-xl border border-line bg-surface shadow-soft"
+            className="divide-y divide-line rounded-xl border border-line bg-surface"
           >
             {changes.map((change) => (
               <li
