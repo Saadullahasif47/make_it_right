@@ -5,23 +5,6 @@ import { cn } from "@/lib/utils/cn";
 export const PRODUCT_NAME = "MakeItRight";
 export const PRODUCT_TAGLINE = "AI Cloud-Based University Complaint System";
 
-/** Brand mark: a check on the brand tile, i.e. "reported, then fixed". */
-export function LogoMark({ className }: { readonly className?: string }) {
-  return (
-    <svg viewBox="0 0 32 32" aria-hidden="true" className={cn("size-8", className)}>
-      <rect width="32" height="32" rx="8" className="fill-brand" />
-      <path
-        d="M9 16.5l4.5 4.5L23 11.5"
-        fill="none"
-        strokeWidth="3.2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        className="stroke-brand-fg"
-      />
-    </svg>
-  );
-}
-
 type LogoTone = "default" | "inverse" | "sidebar";
 
 const TONES: Readonly<Record<LogoTone, { word: string; accent: string }>> = {
@@ -40,13 +23,13 @@ interface LogoProps {
 export function Logo({ className, tone = "default" }: LogoProps) {
   const colours = TONES[tone];
   return (
+    // The wordmark alone: "MakeIt" in ink, "Right" in the accent.
     <Link
       href="/"
       aria-label={`${PRODUCT_NAME} home`}
-      className={cn("inline-flex items-center gap-2.5 rounded-md", className)}
+      className={cn("inline-flex items-center rounded-md", className)}
     >
-      <LogoMark className="size-7" />
-      <span className={cn("text-[17px] font-semibold tracking-tight", colours.word)}>
+      <span className={cn("text-lg font-semibold tracking-tight", colours.word)}>
         MakeIt<span className={colours.accent}>Right</span>
       </span>
     </Link>
