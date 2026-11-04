@@ -1,5 +1,7 @@
 import { LogOut } from "lucide-react";
 
+import { ThemeToggle } from "@/components/theme/theme-toggle";
+
 import { signOutAction } from "../actions";
 import { ROLE_LABELS } from "../roles";
 import type { SessionUser } from "../session";
@@ -13,7 +15,7 @@ function initialsOf(user: SessionUser): string {
 }
 
 /**
- * Who is signed in, and the way out. Compact in the mobile top bar (role and avatar), a full row
+ * Who is signed in, the theme switch, and the way out. Compact in the mobile top bar (role and avatar), a full row
  * at the foot of the desktop sidebar (name, role and a labelled sign-out button).
  */
 export function AccountMenu({ user }: { readonly user: SessionUser }) {
@@ -33,7 +35,8 @@ export function AccountMenu({ user }: { readonly user: SessionUser }) {
           {ROLE_LABELS[user.role]}
         </p>
       </div>
-      <form action={signOutAction} className="order-3 lg:order-none">
+      <ThemeToggle className="order-3 text-ink-muted hover:bg-surface-muted hover:text-ink lg:order-none lg:size-8 lg:text-band-muted lg:hover:bg-band-hover lg:hover:text-band-fg" />
+      <form action={signOutAction} className="order-4 lg:order-none">
         <button
           type="submit"
           aria-label="Sign out"

@@ -3,23 +3,23 @@
 /*
  * MakeItRight design tokens (docs/design/ui-redesign-plan.md).
  *
- * One accent (pine #176B5B) on a quiet green-grey canvas. Status hues are muted and always paired
- * with a text label. Amber means "needs attention" and is never decoration. Every text/background
- * pair below meets WCAG AA (>= 4.5:1). Components use the semantic names only, so dark mode is a
- * token swap, not a rewrite.
+ * Light first: an off-white canvas, white panels, a dark forest-green sidebar and one restrained
+ * emerald accent (#18735D). Status hues are muted and always paired with a text label. Amber means
+ * "needs attention" and is never decoration. Every text/background pair below meets WCAG AA
+ * (>= 4.5:1). Components use the semantic names only, so the opt-in dark theme is a token swap.
  */
 :root {
-  --canvas: #f6f8f7;
+  --canvas: #f8faf9;
   --surface: #ffffff;
   --surface-muted: #eef2f0;
-  --ink: #182d2b; /* 13.6:1 on canvas */
-  --ink-muted: #4a5d5a; /* 6.6:1 */
-  --ink-subtle: #5f716d; /* 4.8:1 */
-  --line: #e1e7e4;
+  --ink: #182d2b; /* 13.8:1 on canvas */
+  --ink-muted: #4a5d5a; /* 6.7:1 */
+  --ink-subtle: #5f716d; /* 4.9:1 */
+  --line: #e3eae6;
   --line-strong: #cbd5d1;
 
-  --brand: #176b5b; /* 6.0:1 on canvas, 6.4:1 under white text */
-  --brand-hover: #125647;
+  --brand: #18735d; /* 5.5:1 on canvas, 5.8:1 under white text */
+  --brand-hover: #135c4a;
   --brand-fg: #ffffff;
   --brand-soft: #e5f0ec;
   --brand-strong: #125647; /* 7.4:1 on brand-soft */
@@ -38,55 +38,55 @@
   --success-soft: #e6f4ec;
 
   /* The app sidebar and other dark surfaces. */
-  --band: #182d2b;
+  --band: #192d2b;
   --band-fg: #f1f5f3;
-  --band-muted: #a9bab5; /* 6.2:1 on band */
+  --band-muted: #a9bab5; /* 7.2:1 on band */
   --band-line: rgb(255 255 255 / 0.08);
   --band-hover: rgb(255 255 255 / 0.06);
   --band-active: rgb(255 255 255 / 0.1);
   --brand-on-band: #7fd0bc;
 
-  --focus: #176b5b;
+  --focus: #18735d;
   --shadow-color: 168 30% 14%;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --canvas: #0f1a19;
-    --surface: #152322;
-    --surface-muted: #1b2c2a;
-    --ink: #e7eeec;
-    --ink-muted: #a3b4b0;
-    --ink-subtle: #8fa29e;
-    --line: #243633;
-    --line-strong: #2f4542;
+/* The dark theme is opt-in (account menu), never inferred from the operating system. */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --canvas: #0f1a19;
+  --surface: #152322;
+  --surface-muted: #1b2c2a;
+  --ink: #e7eeec;
+  --ink-muted: #a3b4b0;
+  --ink-subtle: #8fa29e;
+  --line: #243633;
+  --line-strong: #2f4542;
 
-    --brand: #4fb39c;
-    --brand-hover: #6cc4af;
-    --brand-fg: #0b1f1b;
-    --brand-soft: #183a33;
-    --brand-strong: #7fd0bc;
+  --brand: #4fb39c;
+  --brand-hover: #6cc4af;
+  --brand-fg: #0b1f1b;
+  --brand-soft: #183a33;
+  --brand-strong: #7fd0bc;
 
-    --accent: #e0a13a;
-    --accent-soft: #3a2c12;
-    --accent-ink: #f1c27a;
+  --accent: #e0a13a;
+  --accent-soft: #3a2c12;
+  --accent-ink: #f1c27a;
 
-    --info: #8db3e0;
-    --info-soft: #1a2a3d;
-    --info-ink: #a9c6ea;
+  --info: #8db3e0;
+  --info-soft: #1a2a3d;
+  --info-ink: #a9c6ea;
 
-    --danger: #f0857b;
-    --danger-soft: #3a1917;
-    --success: #5cc994;
-    --success-soft: #12301f;
+  --danger: #f0857b;
+  --danger-soft: #3a1917;
+  --success: #5cc994;
+  --success-soft: #12301f;
 
-    --band: #0b1514;
-    --band-fg: #e7eeec;
-    --band-muted: #93a6a1;
+  --band: #0b1514;
+  --band-fg: #e7eeec;
+  --band-muted: #93a6a1;
 
-    --focus: #6cc4af;
-    --shadow-color: 168 40% 2%;
-  }
+  --focus: #6cc4af;
+  --shadow-color: 168 40% 2%;
 }
 
 @theme inline {
@@ -196,7 +196,7 @@
 @layer base {
   html {
     scroll-behavior: smooth;
-    color-scheme: light dark;
+    color-scheme: light;
   }
 
   body {
