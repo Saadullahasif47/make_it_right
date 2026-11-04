@@ -24,7 +24,7 @@ export function StatusBadge({
   return (
     <span
       className={cn(
-        "inline-flex h-6 shrink-0 items-center gap-1.5 rounded-md px-2 text-xs font-medium whitespace-nowrap transition-colors duration-200",
+        "inline-flex h-6 shrink-0 items-center gap-1.5 rounded-md px-2 text-xs font-medium whitespace-nowrap transition-colors duration-(--motion-base)",
         tone.badge,
         className,
       )}

@@ -175,7 +175,7 @@ export function ComplaintTable({
               <tr
                 key={complaint.id}
                 className={cn(
-                  "transition-colors duration-150",
+                  "transition-colors",
                   selected ? "bg-brand-soft" : "hover:bg-surface-muted",
                 )}
               >
@@ -217,7 +217,7 @@ export function ComplaintTable({
           <li key={complaint.id}>
             <Link
               href={phoneHrefFor(complaint.id)}
-              className="flex items-center gap-3 px-4 py-3.5 transition-colors duration-150 hover:bg-surface-muted"
+              className="flex items-center gap-3 px-4 py-3.5 transition-colors hover:bg-surface-muted"
             >
               <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-x-2.5 gap-y-1">

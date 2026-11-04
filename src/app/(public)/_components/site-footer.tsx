@@ -26,10 +26,7 @@ export function SiteFooter() {
           <ul className="grid gap-2 text-sm">
             {LINKS.map((link) => (
               <li key={link.href}>
-                <Link
-                  href={link.href}
-                  className="text-ink-muted transition-colors duration-150 hover:text-ink"
-                >
+                <Link href={link.href} className="text-ink-muted transition-colors hover:text-ink">
                   {link.label}
                 </Link>
               </li>

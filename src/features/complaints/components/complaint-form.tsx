@@ -19,7 +19,7 @@ function CharacterCount({ length }: { readonly length: number }) {
     <span
       aria-live="polite"
       className={cn(
-        "text-xs tabular-nums transition-colors duration-150",
+        "text-xs tabular-nums transition-colors",
         length > max
           ? "font-semibold text-danger"
           : length >= min

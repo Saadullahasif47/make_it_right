@@ -75,7 +75,7 @@ export function Toast({ tone = "success", children, duration = 6000 }: ToastProp
       }}
       className={cn(
         "fixed inset-x-4 bottom-4 z-50 flex animate-toast-in items-start gap-3 rounded-lg border border-line bg-surface py-3 pr-2 pl-4 text-sm text-ink shadow-lift",
-        "transition-[opacity,transform] duration-150 ease-(--ease-out-soft) sm:inset-x-auto sm:right-6 sm:bottom-6 sm:w-96",
+        "transition-[opacity,translate] duration-(--motion-fast) ease-(--ease-exit) sm:inset-x-auto sm:right-6 sm:bottom-6 sm:w-96",
         phase === "leaving" && "translate-y-2 opacity-0",
       )}
     >
@@ -85,7 +85,7 @@ export function Toast({ tone = "success", children, duration = 6000 }: ToastProp
         type="button"
         onClick={dismiss}
         aria-label="Dismiss"
-        className="-my-1 flex size-7 shrink-0 items-center justify-center rounded-md text-ink-subtle transition-colors duration-150 hover:bg-surface-muted hover:text-ink"
+        className="-my-1 flex size-7 shrink-0 items-center justify-center rounded-md text-ink-subtle transition-colors hover:bg-surface-muted hover:text-ink"
       >
         <X aria-hidden="true" className="size-4" />
       </button>

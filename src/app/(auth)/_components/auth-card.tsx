@@ -29,11 +29,11 @@ export function FormSkeleton({ fields }: { readonly fields: number }) {
     <div aria-hidden="true" className="space-y-5">
       {Array.from({ length: fields }, (_, index) => (
         <div key={index} className="space-y-2">
-          <div className="h-4 w-24 animate-pulse rounded bg-line" />
-          <div className="h-10 animate-pulse rounded-md bg-line" />
+          <div className="h-4 w-24 animate-skeleton rounded bg-line" />
+          <div className="h-10 animate-skeleton rounded-md bg-line" />
         </div>
       ))}
-      <div className="h-11 animate-pulse rounded-lg bg-line" />
+      <div className="h-11 animate-skeleton rounded-lg bg-line" />
     </div>
   );
 }
