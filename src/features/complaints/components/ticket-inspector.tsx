@@ -10,7 +10,7 @@ import { PriorityBadge, locationOf } from "./ticket-parts";
 import { Timeline } from "./timeline";
 
 const iconLink =
-  "inline-flex size-8 items-center justify-center rounded-md text-ink-muted transition-colors duration-150 hover:bg-surface-muted hover:text-ink";
+  "inline-flex size-8 items-center justify-center rounded-md text-ink-muted transition-colors hover:bg-surface-muted hover:text-ink";
 
 /**
  * A queue's inspection panel: the selected ticket beside the table on wide screens, with its
@@ -22,11 +22,14 @@ export function TicketInspector({
   closeHref,
   fullHref,
   actions,
+  justChanged = false,
 }: {
   readonly complaint: ComplaintDetail;
   readonly closeHref: string;
   readonly fullHref: string;
   readonly actions?: ReactNode;
+  /** An action from the panel just added the newest history entry. */
+  readonly justChanged?: boolean;
 }) {
   return (
     <section
@@ -77,7 +80,7 @@ export function TicketInspector({
         <h3 id="inspector-history-title" className="text-sm font-semibold text-ink">
           History
         </h3>
-        <Timeline events={complaint.events} />
+        <Timeline events={complaint.events} highlightLatest={justChanged} />
       </section>
     </section>
   );

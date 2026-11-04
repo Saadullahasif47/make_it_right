@@ -38,7 +38,7 @@ export function AccountMenu({ user }: { readonly user: SessionUser }) {
           type="submit"
           aria-label="Sign out"
           title="Sign out"
-          className="flex size-9 items-center justify-center rounded-md text-ink-muted transition-colors duration-150 hover:bg-surface-muted hover:text-ink lg:size-8 lg:text-band-muted lg:hover:bg-band-hover lg:hover:text-band-fg"
+          className="flex size-9 items-center justify-center rounded-md text-ink-muted transition-colors hover:bg-surface-muted hover:text-ink lg:size-8 lg:text-band-muted lg:hover:bg-band-hover lg:hover:text-band-fg"
         >
           <LogOut aria-hidden="true" className="size-4" strokeWidth={1.75} />
         </button>

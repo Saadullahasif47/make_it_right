@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils/cn";
  */
 export const inputClassName =
   "h-10 w-full rounded-md border border-line-strong bg-surface px-3 text-base text-ink sm:text-sm " +
-  "placeholder:text-ink-subtle transition-[border-color,box-shadow] duration-150 " +
+  "placeholder:text-ink-subtle transition-[border-color,box-shadow] " +
   "hover:border-ink-subtle focus:border-brand focus:ring-3 focus:ring-brand/15 focus:outline-none " +
   "aria-invalid:border-danger aria-invalid:focus:ring-danger/15 disabled:opacity-60";
 

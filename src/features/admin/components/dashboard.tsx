@@ -91,7 +91,7 @@ function KpiTile({
         <p className="text-sm font-semibold text-ink-muted">{label}</p>
         <span
           className={cn(
-            "flex size-8 items-center justify-center rounded-lg transition-colors duration-150",
+            "flex size-8 items-center justify-center rounded-lg transition-colors",
             tone === "attention"
               ? "bg-accent-soft text-accent-ink"
               : "bg-brand-soft text-brand-strong",
@@ -137,7 +137,7 @@ function BarList({
           </span>
           <span className="h-2.5 overflow-hidden rounded-full bg-surface-muted" aria-hidden="true">
             <span
-              className="block h-full rounded-full bg-brand transition-[width] duration-200"
+              className="block h-full rounded-full bg-brand"
               style={{ width: `${(row.value / max) * 100}%` }}
             />
           </span>
@@ -167,7 +167,7 @@ function DailyColumns({ days }: { readonly days: AdminMetrics["createdPerDay"] }
             ) : null}
             <span
               className={cn(
-                "block rounded-t-md transition-colors duration-150 group-hover:bg-brand-strong",
+                "block rounded-t-md transition-colors group-hover:bg-brand-strong",
                 day.count === 0 ? "h-0.5 bg-line" : "bg-brand",
               )}
               style={
@@ -221,7 +221,7 @@ export function WindowFilter({ active }: { readonly active: MetricWindow }) {
               href={`/admin?window=${window}`}
               aria-current={window === active ? "page" : undefined}
               className={cn(
-                "inline-flex items-center rounded-full border px-3.5 py-1.5 text-sm font-semibold transition-colors duration-150",
+                "inline-flex items-center rounded-full border px-3.5 py-1.5 text-sm font-semibold transition-colors",
                 window === active
                   ? "border-brand bg-brand text-brand-fg"
                   : "border-line-strong bg-surface text-ink-muted hover:border-brand hover:text-ink",
@@ -352,7 +352,7 @@ export function MetricsDashboard({ metrics }: { readonly metrics: AdminMetrics }
             </thead>
             <tbody className="divide-y divide-line">
               {metrics.departments.map((department) => (
-                <tr key={department.id} className="transition-colors duration-150 hover:bg-canvas">
+                <tr key={department.id} className="transition-colors hover:bg-canvas">
                   <td className="px-6 py-3 font-medium text-ink">
                     {department.name}
                     {department.isActive ? null : (

@@ -76,7 +76,13 @@ function Description({ text }: { readonly text: string }) {
   );
 }
 
-function History({ complaint }: { readonly complaint: ComplaintDetail }) {
+function History({
+  complaint,
+  highlightLatest,
+}: {
+  readonly complaint: ComplaintDetail;
+  readonly highlightLatest: boolean;
+}) {
   return (
     <section
       aria-labelledby="history-title"
@@ -85,7 +91,7 @@ function History({ complaint }: { readonly complaint: ComplaintDetail }) {
       <h2 id="history-title" className="text-lg font-semibold text-ink">
         History
       </h2>
-      <Timeline events={complaint.events} />
+      <Timeline events={complaint.events} highlightLatest={highlightLatest} />
     </section>
   );
 }
@@ -99,6 +105,8 @@ export function ComplaintDetailView({
   actions,
   layout = "workbench",
 }: ComplaintDetailViewProps) {
+  // A confirmation on screen means an action just added the newest history entry.
+  const justChanged = notice !== undefined || toast !== undefined;
   return (
     <div className={cn("space-y-8", layout === "stacked" && "mx-auto max-w-3xl")}>
       <Link
@@ -132,14 +140,14 @@ export function ComplaintDetailView({
           {actions}
           <DetailsPanel complaint={complaint} />
           <Description text={complaint.description} />
-          <History complaint={complaint} />
+          <History complaint={complaint} highlightLatest={justChanged} />
         </>
       ) : (
         <div className="grid items-start gap-8 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
           <div className="space-y-8">
             <DetailsPanel complaint={complaint} />
             <Description text={complaint.description} />
-            <History complaint={complaint} />
+            <History complaint={complaint} highlightLatest={justChanged} />
           </div>
           {actions === undefined ? null : <div className="space-y-6">{actions}</div>}
         </div>

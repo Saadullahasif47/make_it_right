@@ -95,7 +95,9 @@ export function StatTile({
 
 /** Placeholder blocks with the shape of the real content, so nothing jumps when it arrives. */
 export function Skeleton({ className }: { readonly className?: string }) {
-  return <div aria-hidden="true" className={cn("animate-pulse rounded-md bg-line", className)} />;
+  return (
+    <div aria-hidden="true" className={cn("animate-skeleton rounded-md bg-line", className)} />
+  );
 }
 
 /** Rows shaped like a ticket list: reference, title and status. */

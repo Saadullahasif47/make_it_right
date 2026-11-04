@@ -147,6 +147,7 @@ async function DepartmentQueue({
               complaint={selected}
               closeHref={href({ ticket: undefined })}
               fullHref={`/department/${selected.id}`}
+              justChanged={workflowNotice !== undefined}
               actions={
                 <WorkflowPanel
                   ticketId={selected.id}

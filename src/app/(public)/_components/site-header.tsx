@@ -14,7 +14,7 @@ const NAV_LINKS = [
 ] as const;
 
 const navLinkClassName =
-  "rounded-md px-3 py-2 text-sm font-medium text-ink-muted transition-colors duration-150 hover:bg-surface-muted hover:text-ink";
+  "rounded-md px-3 py-2 text-sm font-medium text-ink-muted transition-colors hover:bg-surface-muted hover:text-ink";
 
 /**
  * The public header. The primary action stays visible at every width; on small screens the
@@ -57,7 +57,7 @@ export function SiteHeader() {
             aria-label="Open menu"
             aria-haspopup="dialog"
             onClick={() => drawer.current?.showModal()}
-            className="flex size-9 items-center justify-center rounded-md text-ink-muted transition-colors duration-150 hover:bg-surface-muted hover:text-ink md:hidden"
+            className="flex size-9 items-center justify-center rounded-md text-ink-muted transition-colors hover:bg-surface-muted hover:text-ink md:hidden"
           >
             <Menu aria-hidden="true" className="size-5" strokeWidth={1.75} />
           </button>
@@ -71,7 +71,7 @@ export function SiteHeader() {
           // A click on the backdrop lands on the dialog element itself.
           if (event.target === event.currentTarget) close();
         }}
-        className="fixed inset-y-0 right-0 left-auto m-0 h-dvh max-h-none w-[min(20rem,85vw)] max-w-none translate-x-4 border-l border-line bg-surface p-0 text-ink opacity-0 transition-[opacity,translate,display,overlay] transition-discrete duration-250 ease-(--ease-out-soft) backdrop:bg-ink/25 open:translate-x-0 open:opacity-100 md:hidden starting:open:translate-x-4 starting:open:opacity-0"
+        className="fixed inset-y-0 right-0 left-auto m-0 h-dvh max-h-none w-[min(20rem,85vw)] max-w-none translate-x-4 border-l border-line bg-surface p-0 text-ink opacity-0 transition-[opacity,translate,display,overlay] transition-discrete duration-(--motion-slow) ease-(--ease-exit) backdrop:bg-transparent backdrop:transition-[background-color,display,overlay] backdrop:transition-discrete backdrop:duration-(--motion-slow) open:translate-x-0 open:opacity-100 open:ease-(--ease-enter) open:backdrop:bg-ink/25 md:hidden starting:open:translate-x-4 starting:open:opacity-0 starting:open:backdrop:bg-transparent"
       >
         <div className="flex h-16 items-center justify-between border-b border-line px-4">
           <span className="text-sm font-medium text-ink-muted">Menu</span>
@@ -79,7 +79,7 @@ export function SiteHeader() {
             type="button"
             aria-label="Close menu"
             onClick={close}
-            className="flex size-9 items-center justify-center rounded-md text-ink-muted transition-colors duration-150 hover:bg-surface-muted hover:text-ink"
+            className="flex size-9 items-center justify-center rounded-md text-ink-muted transition-colors hover:bg-surface-muted hover:text-ink"
           >
             <X aria-hidden="true" className="size-5" strokeWidth={1.75} />
           </button>

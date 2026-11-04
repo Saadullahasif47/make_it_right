@@ -37,7 +37,9 @@ const focusedName = (page: Page) =>
     if (element === null) return "";
     // Form fields are named by their label; everything else by aria-label or its text.
     const label = (element as HTMLInputElement).labels?.[0];
-    return (label?.textContent ?? element.getAttribute("aria-label") ?? element.textContent).trim();
+    // innerText skips visibility-hidden text, as assistive technology does (the idle or
+    // pending layer of a submit button).
+    return (label?.textContent ?? element.getAttribute("aria-label") ?? element.innerText).trim();
   });
 
 /**

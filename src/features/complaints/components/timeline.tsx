@@ -119,8 +119,17 @@ function classification(event: TimelineEvent): string | null {
   return parts.length === 0 ? null : parts.join(" · ");
 }
 
-/** Append-only history of a ticket, oldest first (plan §6, BR-04). */
-export function Timeline({ events }: { readonly events: readonly TimelineEvent[] }) {
+/**
+ * Append-only history of a ticket, oldest first (plan §6, BR-04). `highlightLatest` marks the
+ * entry an action just added: a single tint that settles away, so the eye finds what changed.
+ */
+export function Timeline({
+  events,
+  highlightLatest = false,
+}: {
+  readonly events: readonly TimelineEvent[];
+  readonly highlightLatest?: boolean;
+}) {
   return (
     <ol aria-label="Ticket history" className="relative space-y-6">
       {events.map((event, index) => {
@@ -144,7 +153,13 @@ export function Timeline({ events }: { readonly events: readonly TimelineEvent[]
             >
               <Icon aria-hidden="true" className="size-4" />
             </span>
-            <div className="min-w-0 pt-1">
+            <div
+              className={cn(
+                "min-w-0 pt-1",
+                // Margin and padding cancel out, so the tint never moves the text.
+                highlightLatest && isLast && "-mx-2 animate-settle rounded-md px-2 pb-1",
+              )}
+            >
               <p className="font-semibold text-ink">{title}</p>
               <p className="mt-0.5 text-sm text-ink-muted">
                 {actor === null ? null : `${actor} · `}
