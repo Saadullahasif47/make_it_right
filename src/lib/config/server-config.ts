@@ -5,6 +5,26 @@ export type LogLevel = (typeof LOG_LEVELS)[number];
 
 export type DeploymentEnvironment = "development" | "preview" | "production";
 
+/**
+ * The six advanced features (plan v2 §01, A0.02), each behind its own switch. Every switch is
+ * OFF unless its variable says otherwise, so a deployment shows none of them by default and an
+ * unfinished feature stays hidden. A switch only exposes a feature; the AI steps inside F1-F4
+ * still need `ai.enabled`, so turning AI off never breaks a feature that is switched on.
+ */
+export const FEATURE_ENV = {
+  visualInspection: "FEATURE_VISUAL_INSPECTION",
+  duplicateDetection: "FEATURE_DUPLICATE_DETECTION",
+  maintenanceCoordinator: "FEATURE_MAINTENANCE_COORDINATOR",
+  repairVerification: "FEATURE_REPAIR_VERIFICATION",
+  campusHeatmap: "FEATURE_CAMPUS_HEATMAP",
+  maintenanceInsights: "FEATURE_MAINTENANCE_INSIGHTS",
+} as const;
+
+export type FeatureFlag = keyof typeof FEATURE_ENV;
+export type FeatureFlags = Readonly<Record<FeatureFlag, boolean>>;
+
+const featureSwitch = z.stringbool().default(false);
+
 /** Reads the `role` claim of a legacy Supabase JWT key without verifying it. */
 function legacyJwtRole(key: string): string | undefined {
   const payload = key.split(".")[1];
@@ -70,6 +90,16 @@ const serverEnvSchema = z
     // means "not set" here, like every other variable, so it keeps the default.)
     GEMINI_FALLBACK_MODEL: z.string().trim().default("gemini-3.5-flash"),
     GEMINI_API_KEY: z.string().trim().min(1).optional(),
+    // Photo analysis (F1, F4); unset means GEMINI_MODEL, which accepts images.
+    GEMINI_VISION_MODEL: z.string().trim().min(1).optional(),
+    // Duplicate detection (F2). Vectors from different models are never compared.
+    GEMINI_EMBEDDING_MODEL: z.string().trim().min(1).default("gemini-embedding-2"),
+    FEATURE_VISUAL_INSPECTION: featureSwitch,
+    FEATURE_DUPLICATE_DETECTION: featureSwitch,
+    FEATURE_MAINTENANCE_COORDINATOR: featureSwitch,
+    FEATURE_REPAIR_VERIFICATION: featureSwitch,
+    FEATURE_CAMPUS_HEATMAP: featureSwitch,
+    FEATURE_MAINTENANCE_INSIGHTS: featureSwitch,
     AI_TIMEOUT_MS: z.coerce.number().int().min(1_000).max(30_000).default(10_000),
     // Test stub only (tests/support/gemini-stub): a loopback address, never on a deployment.
     GEMINI_BASE_URL: z
@@ -111,7 +141,12 @@ export interface ServerConfig {
     /** Deadline for a whole triage attempt, every model call and tool exchange included. */
     readonly timeoutMs: number;
     readonly baseUrl: string | undefined;
+    /** Model for image understanding (F1 visual inspection, F4 repair comparison). */
+    readonly visionModel: string;
+    /** Model for complaint embeddings (F2); recorded with every stored vector. */
+    readonly embeddingModel: string;
   };
+  readonly features: FeatureFlags;
   readonly deployment: {
     readonly environment: DeploymentEnvironment;
     readonly commitSha: string | undefined;
@@ -173,6 +208,16 @@ export function parseServerConfig(source: EnvSource): ServerConfig {
       apiKey: env.GEMINI_API_KEY,
       timeoutMs: env.AI_TIMEOUT_MS,
       baseUrl: env.GEMINI_BASE_URL,
+      visionModel: env.GEMINI_VISION_MODEL ?? env.GEMINI_MODEL,
+      embeddingModel: env.GEMINI_EMBEDDING_MODEL,
+    },
+    features: {
+      visualInspection: env.FEATURE_VISUAL_INSPECTION,
+      duplicateDetection: env.FEATURE_DUPLICATE_DETECTION,
+      maintenanceCoordinator: env.FEATURE_MAINTENANCE_COORDINATOR,
+      repairVerification: env.FEATURE_REPAIR_VERIFICATION,
+      campusHeatmap: env.FEATURE_CAMPUS_HEATMAP,
+      maintenanceInsights: env.FEATURE_MAINTENANCE_INSIGHTS,
     },
     deployment: {
       environment: env.VERCEL_ENV ?? "development",
