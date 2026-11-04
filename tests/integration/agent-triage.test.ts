@@ -296,7 +296,8 @@ describe("provider failure leaves the ticket stored (Gate P4, P4.08)", () => {
     ["network", new TypeError("fetch failed"), "PROVIDER_UNAVAILABLE"],
   ])("%s → needs review with a stable code", async (_label, error, failureCode) => {
     const ticketId = await newTicket();
-    const { model } = scriptedModel([error]);
+    // A sustained failure: a brief outage is retried once, so it has to fail twice to count.
+    const { model } = scriptedModel([error, error]);
 
     expect(await triageTicket(deps(model), submission(ticketId))).toMatchObject({
       outcome: "needs_review",
@@ -310,6 +311,26 @@ describe("provider failure leaves the ticket stored (Gate P4, P4.08)", () => {
       outcome: "needs_review",
       failure_code: failureCode,
     });
+  });
+
+  it("a brief outage is retried once and the ticket still routes (MIR-1017)", async () => {
+    const ticketId = await newTicket();
+    const { model } = scriptedModel([
+      new ApiError({ message: "The model is overloaded.", status: 503 }),
+      [lookup("electrical")],
+      [proposal()],
+    ]);
+
+    expect(await triageTicket(deps(model), submission(ticketId))).toMatchObject({
+      ok: true,
+      outcome: "routed",
+      status: "assigned",
+    });
+    expect(await ticketRow(ticketId)).toMatchObject({
+      status: "assigned",
+      assigned_department_id: electrical,
+    });
+    expect((await runs(ticketId))[0]).toMatchObject({ outcome: "routed", failure_code: null });
   });
 
   it("a timeout is enforced by the deadline, not by the provider", async () => {

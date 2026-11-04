@@ -104,8 +104,77 @@ describe("runAgent", () => {
     [new ApiError({ message: "no such model", status: 404 }), "PROVIDER_REJECTED"],
     [new TypeError("fetch failed"), "PROVIDER_UNAVAILABLE"],
   ])("maps a provider failure (%s) to %s", async (error, failureCode) => {
-    const { model } = scriptedModel([error]);
+    // Twice, because a transient outage is retried once before it counts.
+    const { model } = scriptedModel([error, error]);
     expect((await run(model)).decision).toEqual({ kind: "review", failureCode });
+  });
+
+  describe("one retry for a brief provider outage", () => {
+    const overloaded = () => new ApiError({ message: "overloaded", status: 503 });
+
+    it("retries a 503 once with the same tool results, then routes", async () => {
+      const { model, log } = scriptedModel([[ROUTE_ELECTRICAL], overloaded(), [propose()]]);
+      const result = await run(model);
+
+      expect(result.decision.kind).toBe("route");
+      expect(result.providerRetried).toBe(true);
+      expect(log.resultsPerTurn).toHaveLength(3);
+      expect(log.resultsPerTurn[2]).toEqual(log.resultsPerTurn[1]);
+    });
+
+    it("retries a network failure too", async () => {
+      const { model } = scriptedModel([
+        new TypeError("fetch failed"),
+        [ROUTE_ELECTRICAL],
+        [propose()],
+      ]);
+      expect((await run(model)).decision.kind).toBe("route");
+    });
+
+    it("still goes to review if the retry fails, after exactly two calls", async () => {
+      const { model, log } = scriptedModel([overloaded(), overloaded(), [ROUTE_ELECTRICAL]]);
+      const result = await run(model);
+
+      expect(result.decision).toEqual({ kind: "review", failureCode: "PROVIDER_UNAVAILABLE" });
+      expect(log.resultsPerTurn).toHaveLength(2);
+    });
+
+    it("retries only once per attempt", async () => {
+      const { model, log } = scriptedModel([
+        overloaded(),
+        [ROUTE_ELECTRICAL],
+        overloaded(),
+        [propose()],
+      ]);
+      const result = await run(model);
+
+      expect(result.decision).toEqual({ kind: "review", failureCode: "PROVIDER_UNAVAILABLE" });
+      expect(log.resultsPerTurn).toHaveLength(3);
+    });
+
+    it.each([
+      [new ApiError({ message: "quota", status: 429 }), "RATE_LIMITED"],
+      [new ApiError({ message: "bad key", status: 400 }), "PROVIDER_REJECTED"],
+    ])("does not retry %s", async (error, failureCode) => {
+      const { model, log } = scriptedModel([error, [ROUTE_ELECTRICAL]]);
+      const result = await run(model);
+
+      expect(result.decision).toEqual({ kind: "review", failureCode });
+      expect(result.providerRetried).toBe(false);
+      expect(log.resultsPerTurn).toHaveLength(1);
+    });
+
+    it("gives up as a timeout if the deadline fires during the pause", async () => {
+      const controller = new AbortController();
+      const { model, log } = scriptedModel([overloaded(), [ROUTE_ELECTRICAL]]);
+      setTimeout(() => {
+        controller.abort();
+      }, 50);
+      const result = await run(model, REPORT, controller.signal);
+
+      expect(result.decision).toEqual({ kind: "review", failureCode: "TIMEOUT" });
+      expect(log.resultsPerTurn).toHaveLength(1);
+    });
   });
 
   it("reports a timeout when the deadline fires during a model call", async () => {
