@@ -127,3 +127,22 @@ exactly once, after `PROVIDER_RETRY_DELAY_MS` (750 ms), and only:
 Rate limits (`RATE_LIMITED`) and refusals (`PROVIDER_REJECTED`) are never retried. Re-running a whole attempt that
 went to review stays an administrator's decision (P4.08). The Gemini adapter now extends the conversation only after
 a call succeeds, so a retry repeats the identical request. `agent.run_finished` logs `providerRetried`.
+
+## Amendment 2 (2026-11-04): keyword fallback when the AI cannot route
+
+Goal: a clear report reaches its department even when the AI attempt cannot route it, without weakening the safety
+guarantee. After an attempt ends in review, `triage.ts` asks `classifyByKeywords` (`keyword-router.ts`) only when:
+
+- the reason says nothing about the report itself: `TIMEOUT`, `RATE_LIMITED`, `PROVIDER_UNAVAILABLE`,
+  `PROVIDER_REJECTED`, `INVALID_OUTPUT`, `STEP_LIMIT` or `MODEL_REQUESTED_REVIEW`;
+- the safety screen found nothing (`SAFETY_REVIEW` and `HIGH_PRIORITY_REVIEW` always stay with a person, as does any
+  report with a safety signal);
+- one category clearly leads (it matches more keyword groups than any other; "other" never routes by keywords), and
+  that category has an enabled default department.
+
+The route is an ordinary decision (priority `medium`) that goes through `agent_finish_run`, so the database applies
+the same policy as to an AI route. The ticket's history note reads "Routed by keyword rules because the AI assistant
+was unavailable" (or "could not decide"), the run's trace records `keyword_router accepted` with the original failure
+code, and `agent.run_finished` logs `keywordFallback`. On the labelled evaluation set (120 reports) it routes 65, all
+to the correct department, holds the 6 safety reports, and leaves 49 to a person; it was tuned on that set, so the
+unit tests also check wordings it was not tuned on.

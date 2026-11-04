@@ -30,6 +30,8 @@ import {
 
 const created: string[] = [];
 let student: TestUser;
+/** A second reporter, so no one student passes the 20-reports-per-10-minutes limit. */
+let otherStudent: TestUser;
 let electrician: TestUser;
 let admin: TestUser;
 let electrical: string;
@@ -37,12 +39,13 @@ let plumbing: string;
 const logLines: string[] = [];
 
 beforeAll(async () => {
-  [student, electrician, admin] = await Promise.all([
+  [student, otherStudent, electrician, admin] = await Promise.all([
+    createTestUser("student"),
     createTestUser("student"),
     createTestUser("department", "electrical"),
     createTestUser("admin"),
   ]);
-  created.push(student.id, electrician.id, admin.id);
+  created.push(student.id, otherStudent.id, electrician.id, admin.id);
   [electrical, plumbing] = await Promise.all([
     departmentId("electrical"),
     departmentId("plumbing"),
@@ -68,8 +71,9 @@ function deps(model: TriageDependencies["model"], timeoutMs = 5_000): TriageDepe
 async function newTicket(
   title = "Corridor lights out",
   description = "All ceiling lights in the Block C corridor are off since this morning.",
+  reporter: TestUser = student,
 ): Promise<string> {
-  const { data, error } = await student.client
+  const { data, error } = await reporter.client
     .rpc("create_ticket", {
       p_title: title,
       p_description: description,
@@ -82,10 +86,21 @@ async function newTicket(
   return data.id;
 }
 
-const submission = (ticketId: string): TriageRequest => ({
+/**
+ * A report that names no clear kind of fault, so the keyword fallback leaves it to a person:
+ * for tests about what happens when the AI cannot route.
+ */
+const newUnclearTicket = (reporter: TestUser = student) =>
+  newTicket(
+    "Problem in room 2F",
+    "Something in room 2F needs looking at; please send someone.",
+    reporter,
+  );
+
+const submission = (ticketId: string, reporter: TestUser = student): TriageRequest => ({
   ticketId,
   trigger: "submission",
-  requestedBy: student.id,
+  requestedBy: reporter.id,
 });
 
 async function ticketRow(ticketId: string) {
@@ -219,7 +234,7 @@ describe("a normal complaint routes to its approved department (Gate P4)", () =>
 
 describe("invalid tool actions never modify the database (Gate P4)", () => {
   it("a model that insists on a fabricated department leaves the ticket unrouted", async () => {
-    const ticketId = await newTicket();
+    const ticketId = await newUnclearTicket();
     const fabricated = proposal({ department_id: randomUUID() });
     const { model } = scriptedModel([[fabricated], [fabricated], [fabricated]]);
 
@@ -295,7 +310,7 @@ describe("provider failure leaves the ticket stored (Gate P4, P4.08)", () => {
     ["outage", new ApiError({ message: "unavailable", status: 503 }), "PROVIDER_UNAVAILABLE"],
     ["network", new TypeError("fetch failed"), "PROVIDER_UNAVAILABLE"],
   ])("%s → needs review with a stable code", async (_label, error, failureCode) => {
-    const ticketId = await newTicket();
+    const ticketId = await newUnclearTicket();
     // A sustained failure: a brief outage is retried once, so it has to fail twice to count.
     const { model } = scriptedModel([error, error]);
 
@@ -334,7 +349,7 @@ describe("provider failure leaves the ticket stored (Gate P4, P4.08)", () => {
   });
 
   it("a timeout is enforced by the deadline, not by the provider", async () => {
-    const ticketId = await newTicket();
+    const ticketId = await newUnclearTicket();
     const { model } = scriptedModel([
       (deadline) =>
         new Promise<ModelTurn>((_resolve, reject) => {
@@ -358,6 +373,80 @@ describe("provider failure leaves the ticket stored (Gate P4, P4.08)", () => {
       failureCode: "PROVIDER_NOT_CONFIGURED",
     });
     expect((await ticketRow(ticketId))?.status).toBe("needs_review");
+  });
+});
+
+describe("keyword fallback when the AI cannot route (ADR 0005, amendment 2)", () => {
+  const outage = () => new ApiError({ message: "The model is overloaded.", status: 503 });
+
+  it("a clear report still reaches its department, and the record says how", async () => {
+    const ticketId = await newTicket(undefined, undefined, otherStudent);
+    const { model } = scriptedModel([outage(), outage()]);
+
+    expect(await triageTicket(deps(model), submission(ticketId, otherStudent))).toMatchObject({
+      ok: true,
+      outcome: "routed",
+      status: "assigned",
+    });
+    expect(await ticketRow(ticketId)).toMatchObject({
+      status: "assigned",
+      category: "electrical",
+      priority: "medium",
+      assigned_department_id: electrical,
+    });
+    // The timeline tells the student and staff it was the keyword rules, not the AI.
+    expect((await events(ticketId)).at(-1)).toMatchObject({
+      event_type: "assigned",
+      note: "Routed by keyword rules because the AI assistant was unavailable.",
+    });
+    expect((await runs(ticketId))[0]).toMatchObject({
+      outcome: "routed",
+      tool_calls: [
+        expect.objectContaining({
+          tool: "keyword_router",
+          verdict: "accepted",
+          code: "PROVIDER_UNAVAILABLE",
+          category: "electrical",
+        }),
+      ],
+    });
+  });
+
+  it("routes when the model asks for a person but the report is clear", async () => {
+    const ticketId = await newTicket(undefined, undefined, otherStudent);
+    const { model } = scriptedModel([[call("request_human_review", { reason: "Not sure." })]]);
+
+    expect(await triageTicket(deps(model), submission(ticketId, otherStudent))).toMatchObject({
+      outcome: "routed",
+    });
+    expect((await events(ticketId)).at(-1)?.note).toBe(
+      "Routed by keyword rules because the AI assistant could not decide.",
+    );
+  });
+
+  it("never routes a report the safety screen flagged", async () => {
+    const ticketId = await newTicket(
+      "Socket sparking",
+      "The wall socket by desk 4 is sparking when anything is plugged in.",
+      otherStudent,
+    );
+    const { model } = scriptedModel([outage(), outage()]);
+
+    expect(await triageTicket(deps(model), submission(ticketId, otherStudent))).toMatchObject({
+      outcome: "needs_review",
+      failureCode: "PROVIDER_UNAVAILABLE",
+    });
+    expect((await ticketRow(ticketId))?.status).toBe("needs_review");
+  });
+
+  it("leaves an unclear report to a person", async () => {
+    const ticketId = await newUnclearTicket(otherStudent);
+    const { model } = scriptedModel([outage(), outage()]);
+
+    expect(await triageTicket(deps(model), submission(ticketId, otherStudent))).toMatchObject({
+      outcome: "needs_review",
+      failureCode: "PROVIDER_UNAVAILABLE",
+    });
   });
 });
 
@@ -441,7 +530,7 @@ describe("bounded admin retry (P4.08)", () => {
   });
 
   it("an admin can retry a ticket the AI sent for review, and it routes", async () => {
-    const ticketId = await newTicket();
+    const ticketId = await newUnclearTicket();
     await triageTicket(
       deps(scriptedModel([new ApiError({ message: "quota", status: 429 })]).model),
       submission(ticketId),
@@ -466,7 +555,7 @@ describe("bounded admin retry (P4.08)", () => {
   });
 
   it("refuses students, routed tickets and exhausted tickets", async () => {
-    const ticketId = await newTicket();
+    const ticketId = await newUnclearTicket();
     const failing = (request: TriageRequest) =>
       triageTicket(
         deps(scriptedModel([new ApiError({ message: "quota", status: 429 })]).model),
