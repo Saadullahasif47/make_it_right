@@ -19,23 +19,28 @@ for example `duration-(--motion-base)` or `ease-(--ease-exit)`.
 
 ## What moves, and why
 
-| Interaction                | Motion                                                                            | What it tells the person                  |
-| -------------------------- | --------------------------------------------------------------------------------- | ----------------------------------------- |
-| Button, link, row, field   | colour, background and border cross-fade, 150 ms                                  | this is interactive; this has focus       |
-| Tab and sidebar navigation | the active indicator eases in (opacity and horizontal scale), 200 ms              | where you are now                         |
-| Slow navigation            | a small dot fades in on the destination after 150 ms (`useLinkStatus`)            | your click registered; the page is coming |
-| Drawer (landing, phones)   | panel slides 16 px and fades; backdrop fades; 250 ms; closes on the exit curve    | a layer opened over the page              |
-| Toast                      | enters by rising 8 px and fading in, 200 ms; leaves by fading and sinking, 150 ms | an action finished                        |
-| Submit button              | label changes at once; spinner fades in only after 150 ms; width never changes    | your request is being handled             |
-| Newest history entry       | after an action, one brand tint that settles away over 1.2 s                      | this is what just changed                 |
-| Skeleton placeholder       | static at first; dims gently only if loading passes 600 ms                        | still loading                             |
+| Interaction                 | Motion                                                                                         | What it tells the person                  |
+| --------------------------- | ---------------------------------------------------------------------------------------------- | ----------------------------------------- |
+| Link, row, field            | colour, background and border cross-fade, 150 ms                                               | this is interactive; this has focus       |
+| Button (primary, secondary) | lifts 1 px with a soft shadow, arrow nudges 2 px forward, 150–200 ms; settles on press         | this can be pressed; it responded         |
+| Homepage hero               | badge, headline, text, buttons and demo rise 16 px into place, staggered, 640 ms, once on load | the page has arrived                      |
+| Homepage sections           | each section below the fold rises into view once when reached                                  | here is the next part of the story        |
+| Tab and sidebar navigation  | the active indicator eases in (opacity and horizontal scale), 200 ms                           | where you are now                         |
+| Slow navigation             | a small dot fades in on the destination after 150 ms (`useLinkStatus`)                         | your click registered; the page is coming |
+| Drawer (landing, phones)    | panel slides 16 px and fades; backdrop fades; 250 ms; closes on the exit curve                 | a layer opened over the page              |
+| Toast                       | enters by rising 8 px and fading in, 200 ms; leaves by fading and sinking, 150 ms              | an action finished                        |
+| Submit button               | label changes at once; spinner fades in only after 150 ms; width never changes                 | your request is being handled             |
+| Newest history entry        | after an action, one brand tint that settles away over 1.2 s                                   | this is what just changed                 |
+| Skeleton placeholder        | static at first; dims gently only if loading passes 600 ms                                     | still loading                             |
 
 ## What never moves
 
-- No entrance animations on sections, cards, icons or text, and no scroll-triggered reveals. Content is there at once.
+- Entrances are limited to the homepage (hero on load, each section once on arrival). Signed-in pages never animate
+  content in: their content is there at once. Without JavaScript or with reduced motion, nothing is ever hidden.
 - No bounce, float, sheen, pulse rings, perpetual movement (other than a skeleton or spinner for a real wait), or
   page transitions.
-- No movement on hover: no lift, no scale, no shadow growth. Buttons darken when pressed and do nothing else.
+- Hover movement is limited to buttons: a 1 px lift and a soft shadow, no scaling. Ghost buttons, links, rows and
+  panels change colour only. With reduced motion, buttons do not lift.
 - Static panels, such as the dashboard's number tiles, do not react to hover: reacting would suggest they can be
   clicked.
 - No animated layout properties (`width`, `height`, `margin`, `top`, …). Only `opacity`, `transform`, `translate`,

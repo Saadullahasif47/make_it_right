@@ -7,20 +7,26 @@ export type ButtonVariant = "primary" | "secondary" | "ghost" | "inverse";
 export type ButtonSize = "sm" | "md" | "lg";
 
 /*
- * Feedback is colour only: 150 ms on hover, a darker shade on press. Buttons never move, scale or
- * shimmer, so a busy screen stays calm.
+ * Hover feedback: the button lifts 1 px with a soft shadow and its arrow nudges forward; a press
+ * settles it back down and darkens it. Only transform and shadow move (cheap on any laptop), and
+ * with reduced motion it changes colour without lifting.
  */
 const base =
   "group inline-flex shrink-0 items-center justify-center gap-2 rounded-lg font-medium whitespace-nowrap select-none " +
-  "transition-colors " +
+  "transition-[color,background-color,border-color,box-shadow,translate] " +
+  "active:translate-y-0 active:shadow-none " +
+  "[&_.lucide-arrow-right]:transition-[translate] [&_.lucide-arrow-right]:duration-(--motion-base) " +
+  "hover:[&_.lucide-arrow-right]:translate-x-0.5 " +
   "disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50";
 
+/** The lift, for buttons that sit on a surface (not the borderless ghost style). */
+const lift = "motion-safe:hover:-translate-y-px";
+
 const variants: Record<ButtonVariant, string> = {
-  primary: "bg-brand text-brand-fg shadow-soft hover:bg-brand-hover active:bg-brand-strong",
-  secondary:
-    "border border-line-strong bg-surface text-ink shadow-soft hover:border-ink-subtle hover:bg-surface-muted active:bg-line",
+  primary: `${lift} bg-brand text-brand-fg shadow-soft hover:bg-brand-hover hover:shadow-[0_6px_16px_-6px_rgb(24_115_93/0.5)] active:bg-brand-strong`,
+  secondary: `${lift} border border-line-strong bg-surface text-ink shadow-soft hover:border-ink-subtle hover:bg-surface-muted hover:shadow-[0_6px_14px_-8px_rgb(24_45_43/0.3)] active:bg-line`,
   ghost: "text-ink-muted hover:bg-surface-muted hover:text-ink active:bg-line",
-  inverse: "bg-band-fg text-band hover:bg-white active:bg-band-muted",
+  inverse: `${lift} bg-band-fg text-band hover:bg-white active:bg-band-muted`,
 };
 
 const sizes: Record<ButtonSize, string> = {
