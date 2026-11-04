@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 
-import { PageSkeleton } from "@/components/layout/page-parts";
+import { TicketSkeleton } from "@/components/layout/page-parts";
 import { AccessDenied } from "@/features/auth/components/access-denied";
 import { requirePageAccess } from "@/features/auth/session";
 import { ComplaintDetailView } from "@/features/complaints/components/complaint-detail-view";
@@ -63,7 +63,7 @@ export default function DepartmentTicketPage({
   searchParams,
 }: PageProps<"/department/[id]">) {
   return (
-    <Suspense fallback={<PageSkeleton />}>
+    <Suspense fallback={<TicketSkeleton />}>
       <DepartmentTicket params={params} searchParams={searchParams} />
     </Suspense>
   );

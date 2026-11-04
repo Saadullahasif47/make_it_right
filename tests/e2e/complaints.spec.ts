@@ -363,6 +363,12 @@ test.describe("list pagination and filters (P2.06)", () => {
     await signInAs(page, student);
     await page.goto("/student/complaints?cursor=forged&status=nonsense");
     await expect(page.getByRole("heading", { name: "No complaints yet" })).toBeVisible();
+    // An empty list is never a dead end: it offers the one thing to do next.
+    await expect(
+      page.getByRole("region", { name: "No complaints yet" }).getByRole("link", {
+        name: "Report your first issue",
+      }),
+    ).toHaveAttribute("href", "/student/complaints/new");
   });
 });
 

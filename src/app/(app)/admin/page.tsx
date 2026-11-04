@@ -2,7 +2,7 @@ import { ArrowRight, Building2, GraduationCap, ShieldCheck } from "lucide-react"
 import type { Metadata } from "next";
 import { Suspense } from "react";
 
-import { PageHeader, PageSkeleton, StatTile } from "@/components/layout/page-parts";
+import { OverviewSkeleton, PageHeader, StatTile } from "@/components/layout/page-parts";
 import { ButtonLink, buttonIcon } from "@/components/ui/button";
 import { MetricsDashboard, WindowFilter } from "@/features/admin/components/dashboard";
 import { DEFAULT_WINDOW, getAdminMetrics, parseWindow } from "@/features/admin/metrics";
@@ -80,7 +80,7 @@ async function AdminOverview({
 
 export default function AdminPage({ searchParams }: PageProps<"/admin">) {
   return (
-    <Suspense fallback={<PageSkeleton />}>
+    <Suspense fallback={<OverviewSkeleton />}>
       <AdminOverview searchParams={searchParams} />
     </Suspense>
   );

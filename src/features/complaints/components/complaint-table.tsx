@@ -149,10 +149,16 @@ export function ComplaintTable({
   selectedId,
 }: ComplaintTableProps) {
   const columns = columnsFor(variant, now, departmentNames, selectedId !== undefined);
+  // Four reporter columns fit a tablet; the staff and admin column sets need a laptop's width,
+  // so below 1024 px those lists use the compact rows instead of truncating every title.
+  const wide = variant === "reporter";
 
   return (
     <div className="overflow-hidden rounded-xl border border-line bg-surface">
-      <table aria-label="Complaints" className="hidden w-full text-sm md:table">
+      <table
+        aria-label="Complaints"
+        className={cn("hidden w-full text-sm", wide ? "md:table" : "lg:table")}
+      >
         <thead className="border-b border-line bg-surface-muted">
           <tr>
             <th scope="col" className={`${headerCell} w-28`}>
@@ -212,7 +218,10 @@ export function ComplaintTable({
         </tbody>
       </table>
 
-      <ul aria-label="Complaints" className="divide-y divide-line md:hidden">
+      <ul
+        aria-label="Complaints"
+        className={cn("divide-y divide-line", wide ? "md:hidden" : "lg:hidden")}
+      >
         {complaints.map((complaint) => (
           <li key={complaint.id}>
             <Link

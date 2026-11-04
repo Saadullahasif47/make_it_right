@@ -33,14 +33,9 @@ export const ROLE_NAVIGATION: Readonly<Record<AppRole, readonly NavItem[]>> = {
   department: [{ href: "/department", label: "Department queue", icon: Inbox }],
   admin: [
     { href: "/admin", label: "Overview", icon: LayoutDashboard },
-    { href: "/admin/tickets", label: "Tickets", icon: Ticket },
-    {
-      href: "/admin/review",
-      label: "Review queue",
-      shortLabel: "Review",
-      icon: ListChecks,
-      also: ["/admin/complaints"],
-    },
+    // Every ticket is in the full list, so a ticket page belongs to Tickets wherever it was opened.
+    { href: "/admin/tickets", label: "Tickets", icon: Ticket, also: ["/admin/complaints"] },
+    { href: "/admin/review", label: "Review queue", shortLabel: "Review", icon: ListChecks },
     { href: "/admin/departments", label: "Departments", icon: Building2 },
   ],
 };

@@ -31,7 +31,7 @@ async function NewComplaint() {
         title="Report an issue"
         description="Tell us what is broken and where. Your report is saved straight away, then routed to the right department."
       />
-      <div className="rounded-xl border border-line bg-surface p-6 shadow-soft sm:p-8">
+      <div className="rounded-xl border border-line bg-surface p-6 sm:p-8">
         {/* One key per rendered form: retries and double submits can never create two tickets. */}
         <ComplaintForm idempotencyKey={randomUUID()} />
       </div>

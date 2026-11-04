@@ -24,8 +24,9 @@ describe("activeHref for areas reached from a queue", () => {
     ["/admin", "/admin"],
     ["/admin/review", "/admin/review"],
     ["/admin/departments", "/admin/departments"],
-    // A ticket opened from the review queue keeps the queue highlighted, not the overview.
-    ["/admin/complaints/0b7a6e00-0000-4000-8000-000000000001", "/admin/review"],
+    // A ticket page belongs to the full ticket list, wherever it was opened from.
+    ["/admin/complaints/0b7a6e00-0000-4000-8000-000000000001", "/admin/tickets"],
+    ["/admin/tickets", "/admin/tickets"],
     ["/admin/complaintsx", "/admin"],
   ])("on %s the current item is %s", (pathname, expected) => {
     expect(activeHref(pathname, admin)).toBe(expected);

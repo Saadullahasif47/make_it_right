@@ -45,7 +45,15 @@ async function ReviewQueue({
       />
 
       {page.items.length === 0 ? (
-        <EmptyState icon={ListChecks} title="All caught up">
+        <EmptyState
+          icon={ListChecks}
+          title="All caught up"
+          action={
+            <ButtonLink href="/admin/tickets" variant="secondary" size="sm">
+              View all tickets
+            </ButtonLink>
+          }
+        >
           No tickets are waiting for routing. New reports will appear here.
         </EmptyState>
       ) : (

@@ -143,7 +143,7 @@ export function AgentRunsPanel({
   return (
     <section
       aria-label="AI routing"
-      className="space-y-4 rounded-xl border border-line bg-surface p-6 shadow-soft"
+      className="space-y-4 rounded-xl border border-line bg-surface p-6"
     >
       <h2 className="flex items-center gap-2 text-lg font-semibold text-ink">
         <Sparkles aria-hidden="true" className="size-5 text-brand" />

@@ -142,7 +142,7 @@ function Section({ title, children }: { readonly title: string; readonly childre
   return (
     <section
       aria-label={title}
-      className="space-y-4 rounded-xl border border-brand/30 bg-surface p-6 shadow-soft"
+      className="space-y-4 rounded-xl border border-brand/30 bg-surface p-6"
     >
       <h2 className="text-lg font-semibold text-ink">{title}</h2>
       {children}

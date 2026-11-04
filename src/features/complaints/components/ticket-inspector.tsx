@@ -35,7 +35,7 @@ export function TicketInspector({
     <section
       aria-labelledby="inspector-title"
       tabIndex={-1}
-      className="space-y-6 rounded-xl border border-line bg-surface p-5 shadow-soft xl:sticky xl:top-6"
+      className="space-y-6 rounded-xl border border-line bg-surface p-5 xl:sticky xl:top-6"
     >
       <header className="space-y-2">
         <div className="flex items-start justify-between gap-3">

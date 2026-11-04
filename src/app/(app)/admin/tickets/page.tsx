@@ -111,7 +111,21 @@ async function AllTickets({
           departmentNames={departmentNames}
         />
       ) : state.query === undefined ? (
-        <EmptyState icon={Ticket} title="No tickets in this view">
+        <EmptyState
+          icon={Ticket}
+          title="No tickets in this view"
+          action={
+            state.filter === DEFAULTS.filter ? undefined : (
+              <ButtonLink
+                href={href({ filter: DEFAULTS.filter, cursor: undefined })}
+                variant="secondary"
+                size="sm"
+              >
+                Show all tickets
+              </ButtonLink>
+            )
+          }
+        >
           Tickets appear here as soon as students report them.
         </EmptyState>
       ) : (
