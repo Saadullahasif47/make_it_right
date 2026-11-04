@@ -37,6 +37,110 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"ai_jobs": {
+                  Row: {
+                    "attempts": number,"created_at": string,"dedupe_key": string,"id": string,"job_type": Database["public"]['Enums']["ai_job_type"],"last_error_code": string | null,"next_retry_at": string | null,"status": Database["public"]['Enums']["ai_job_status"],"target_id": string,"updated_at": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "attempts"?: number,"created_at"?: string,"dedupe_key": string,"id"?: string,"job_type": Database["public"]['Enums']["ai_job_type"],"last_error_code"?: string | null,"next_retry_at"?: string | null,"status"?: Database["public"]['Enums']["ai_job_status"],"target_id": string,"updated_at"?: string
+                  }
+                  Update: {
+                    "attempts"?: number,"created_at"?: string,"dedupe_key"?: string,"id"?: string,"job_type"?: Database["public"]['Enums']["ai_job_type"],"last_error_code"?: string | null,"next_retry_at"?: string | null,"status"?: Database["public"]['Enums']["ai_job_status"],"target_id"?: string,"updated_at"?: string
+                  }
+                  Relationships: [
+                    
+                  ]
+                },"asset_registry": {
+                  Row: {
+                    "asset_code": string,"asset_type": string,"created_at": string,"id": string,"is_active": boolean,"label": string,"location_id": string,"serial_number": string | null
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "asset_code": string,"asset_type": string,"created_at"?: string,"id"?: string,"is_active"?: boolean,"label": string,"location_id": string,"serial_number"?: string | null
+                  }
+                  Update: {
+                    "asset_code"?: string,"asset_type"?: string,"created_at"?: string,"id"?: string,"is_active"?: boolean,"label"?: string,"location_id"?: string,"serial_number"?: string | null
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "asset_registry_location_id_fkey"
+      columns: ["location_id"]
+isOneToOne: false
+      referencedRelation: "maintenance_locations"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"case_events": {
+                  Row: {
+                    "actor_id": string | null,"actor_kind": Database["public"]['Enums']["ticket_actor_kind"],"case_id": string,"complaint_id": string | null,"created_at": string,"department_id": string | null,"event_type": Database["public"]['Enums']["case_event_type"],"id": number,"new_status": Database["public"]['Enums']["maintenance_case_status"] | null,"note": string | null,"previous_status": Database["public"]['Enums']["maintenance_case_status"] | null
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "actor_id"?: string | null,"actor_kind": Database["public"]['Enums']["ticket_actor_kind"],"case_id": string,"complaint_id"?: string | null,"created_at"?: string,"department_id"?: string | null,"event_type": Database["public"]['Enums']["case_event_type"],"id"?: never,"new_status"?: Database["public"]['Enums']["maintenance_case_status"] | null,"note"?: string | null,"previous_status"?: Database["public"]['Enums']["maintenance_case_status"] | null
+                  }
+                  Update: {
+                    "actor_id"?: string | null,"actor_kind"?: Database["public"]['Enums']["ticket_actor_kind"],"case_id"?: string,"complaint_id"?: string | null,"created_at"?: string,"department_id"?: string | null,"event_type"?: Database["public"]['Enums']["case_event_type"],"id"?: never,"new_status"?: Database["public"]['Enums']["maintenance_case_status"] | null,"note"?: string | null,"previous_status"?: Database["public"]['Enums']["maintenance_case_status"] | null
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "case_events_actor_id_fkey"
+      columns: ["actor_id"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "case_events_case_id_fkey"
+      columns: ["case_id"]
+isOneToOne: false
+      referencedRelation: "maintenance_cases"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "case_events_complaint_id_fkey"
+      columns: ["complaint_id"]
+isOneToOne: false
+      referencedRelation: "complaints"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "case_events_department_id_fkey"
+      columns: ["department_id"]
+isOneToOne: false
+      referencedRelation: "departments"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"case_reports": {
+                  Row: {
+                    "case_id": string,"complaint_id": string,"linked_at": string,"linked_by": string | null
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "case_id": string,"complaint_id": string,"linked_at"?: string,"linked_by"?: string | null
+                  }
+                  Update: {
+                    "case_id"?: string,"complaint_id"?: string,"linked_at"?: string,"linked_by"?: string | null
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "case_reports_case_id_fkey"
+      columns: ["case_id"]
+isOneToOne: false
+      referencedRelation: "maintenance_cases"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "case_reports_complaint_id_fkey"
+      columns: ["complaint_id"]
+isOneToOne: true
+      referencedRelation: "complaints"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "case_reports_linked_by_fkey"
+      columns: ["linked_by"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"complaints": {
                   Row: {
                     "acknowledged_at": string | null,"assigned_department_id": string | null,"building": string,"category": Database["public"]['Enums']["complaint_category"],"created_at": string,"created_by": string,"description": string,"id": string,"priority": Database["public"]['Enums']["ticket_priority"],"reference_no": number,"room": string | null,"status": Database["public"]['Enums']["ticket_state"],"title": string,"updated_at": string,"version": number
@@ -87,6 +191,84 @@ isOneToOne: false
                   }
                   Update: {
                     "code"?: string,"created_at"?: string,"id"?: string,"is_active"?: boolean,"name"?: string
+                  }
+                  Relationships: [
+                    
+                  ]
+                },"evidence_attachments": {
+                  Row: {
+                    "bucket": string,"byte_size": number,"case_id": string | null,"complaint_id": string | null,"created_at": string,"finalized_at": string | null,"id": string,"mime_type": string,"object_path": string,"sha256": string | null,"state": Database["public"]['Enums']["attachment_state"],"uploaded_by": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "bucket"?: string,"byte_size": number,"case_id"?: string | null,"complaint_id"?: string | null,"created_at"?: string,"finalized_at"?: string | null,"id"?: string,"mime_type": string,"object_path": string,"sha256"?: string | null,"state"?: Database["public"]['Enums']["attachment_state"],"uploaded_by": string
+                  }
+                  Update: {
+                    "bucket"?: string,"byte_size"?: number,"case_id"?: string | null,"complaint_id"?: string | null,"created_at"?: string,"finalized_at"?: string | null,"id"?: string,"mime_type"?: string,"object_path"?: string,"sha256"?: string | null,"state"?: Database["public"]['Enums']["attachment_state"],"uploaded_by"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "evidence_attachments_case_id_fkey"
+      columns: ["case_id"]
+isOneToOne: false
+      referencedRelation: "maintenance_cases"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "evidence_attachments_complaint_id_fkey"
+      columns: ["complaint_id"]
+isOneToOne: false
+      referencedRelation: "complaints"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "evidence_attachments_uploaded_by_fkey"
+      columns: ["uploaded_by"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"maintenance_cases": {
+                  Row: {
+                    "asset_id": string | null,"assigned_department_id": string | null,"category": Database["public"]['Enums']["complaint_category"],"closed_at": string | null,"created_at": string,"id": string,"is_synthetic": boolean,"location_id": string | null,"opened_at": string,"priority": Database["public"]['Enums']["ticket_priority"],"reference_no": number,"resolved_at": string | null,"status": Database["public"]['Enums']["maintenance_case_status"],"updated_at": string,"version": number
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "asset_id"?: string | null,"assigned_department_id"?: string | null,"category"?: Database["public"]['Enums']["complaint_category"],"closed_at"?: string | null,"created_at"?: string,"id"?: string,"is_synthetic"?: boolean,"location_id"?: string | null,"opened_at"?: string,"priority"?: Database["public"]['Enums']["ticket_priority"],"reference_no"?: never,"resolved_at"?: string | null,"status"?: Database["public"]['Enums']["maintenance_case_status"],"updated_at"?: string,"version"?: number
+                  }
+                  Update: {
+                    "asset_id"?: string | null,"assigned_department_id"?: string | null,"category"?: Database["public"]['Enums']["complaint_category"],"closed_at"?: string | null,"created_at"?: string,"id"?: string,"is_synthetic"?: boolean,"location_id"?: string | null,"opened_at"?: string,"priority"?: Database["public"]['Enums']["ticket_priority"],"reference_no"?: never,"resolved_at"?: string | null,"status"?: Database["public"]['Enums']["maintenance_case_status"],"updated_at"?: string,"version"?: number
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "maintenance_cases_asset_in_location"
+      columns: ["asset_id","location_id"]
+isOneToOne: false
+      referencedRelation: "asset_registry"
+      referencedColumns: ["id","location_id"]
+    },{
+      foreignKeyName: "maintenance_cases_assigned_department_id_fkey"
+      columns: ["assigned_department_id"]
+isOneToOne: false
+      referencedRelation: "departments"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "maintenance_cases_location_id_fkey"
+      columns: ["location_id"]
+isOneToOne: false
+      referencedRelation: "maintenance_locations"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"maintenance_locations": {
+                  Row: {
+                    "building_code": string,"building_name": string,"created_at": string,"display_name": string,"floor": number,"id": string,"is_active": boolean,"map_x": number | null,"map_y": number | null,"room_code": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "building_code": string,"building_name": string,"created_at"?: string,"display_name": string,"floor": number,"id"?: string,"is_active"?: boolean,"map_x"?: number | null,"map_y"?: number | null,"room_code": string
+                  }
+                  Update: {
+                    "building_code"?: string,"building_name"?: string,"created_at"?: string,"display_name"?: string,"floor"?: number,"id"?: string,"is_active"?: boolean,"map_x"?: number | null,"map_y"?: number | null,"room_code"?: string
                   }
                   Relationships: [
                     
@@ -274,7 +456,7 @@ isOneToOne: false
                            }
           }
           Enums: {
-            "agent_run_outcome": "running"|"routed"|"needs_review"|"superseded","agent_run_trigger": "submission"|"admin_retry","app_role": "student"|"department"|"admin","complaint_category": "unclassified"|"electrical"|"it_equipment"|"plumbing"|"furniture"|"sanitation"|"other","ticket_actor_kind": "user"|"agent"|"rule"|"system","ticket_event_type": "created"|"assigned"|"acknowledged"|"status_changed"|"note_added"|"triage_started"|"review_requested","ticket_priority": "unassessed"|"low"|"medium"|"high","ticket_state": "submitted"|"triaging"|"needs_review"|"assigned"|"in_progress"|"resolved"|"reopened"|"closed"
+            "agent_run_outcome": "running"|"routed"|"needs_review"|"superseded","agent_run_trigger": "submission"|"admin_retry","ai_job_status": "queued"|"running"|"succeeded"|"retry_wait"|"needs_review","ai_job_type": "visual_analysis"|"embedding"|"duplicate_match"|"coordination"|"repair_verify"|"insights_refresh","app_role": "student"|"department"|"admin","attachment_state": "pending"|"finalized"|"rejected","case_event_type": "opened"|"assigned"|"status_changed"|"updated","complaint_category": "unclassified"|"electrical"|"it_equipment"|"plumbing"|"furniture"|"sanitation"|"other","maintenance_case_status": "open"|"needs_review"|"assigned"|"in_progress"|"resolved"|"reopened"|"closed","ticket_actor_kind": "user"|"agent"|"rule"|"system","ticket_event_type": "created"|"assigned"|"acknowledged"|"status_changed"|"note_added"|"triage_started"|"review_requested","ticket_priority": "unassessed"|"low"|"medium"|"high","ticket_state": "submitted"|"triaging"|"needs_review"|"assigned"|"in_progress"|"resolved"|"reopened"|"closed"
           }
           CompositeTypes: {
             [_ in never]: never
@@ -390,7 +572,7 @@ export type CompositeTypes<
 export const Constants = {
   "public": {
           Enums: {
-            "agent_run_outcome": ["running", "routed", "needs_review", "superseded"],"agent_run_trigger": ["submission", "admin_retry"],"app_role": ["student", "department", "admin"],"complaint_category": ["unclassified", "electrical", "it_equipment", "plumbing", "furniture", "sanitation", "other"],"ticket_actor_kind": ["user", "agent", "rule", "system"],"ticket_event_type": ["created", "assigned", "acknowledged", "status_changed", "note_added", "triage_started", "review_requested"],"ticket_priority": ["unassessed", "low", "medium", "high"],"ticket_state": ["submitted", "triaging", "needs_review", "assigned", "in_progress", "resolved", "reopened", "closed"]
+            "agent_run_outcome": ["running", "routed", "needs_review", "superseded"],"agent_run_trigger": ["submission", "admin_retry"],"ai_job_status": ["queued", "running", "succeeded", "retry_wait", "needs_review"],"ai_job_type": ["visual_analysis", "embedding", "duplicate_match", "coordination", "repair_verify", "insights_refresh"],"app_role": ["student", "department", "admin"],"attachment_state": ["pending", "finalized", "rejected"],"case_event_type": ["opened", "assigned", "status_changed", "updated"],"complaint_category": ["unclassified", "electrical", "it_equipment", "plumbing", "furniture", "sanitation", "other"],"maintenance_case_status": ["open", "needs_review", "assigned", "in_progress", "resolved", "reopened", "closed"],"ticket_actor_kind": ["user", "agent", "rule", "system"],"ticket_event_type": ["created", "assigned", "acknowledged", "status_changed", "note_added", "triage_started", "review_requested"],"ticket_priority": ["unassessed", "low", "medium", "high"],"ticket_state": ["submitted", "triaging", "needs_review", "assigned", "in_progress", "resolved", "reopened", "closed"]
           }
         }
 } as const

@@ -58,6 +58,8 @@ pnpm exec supabase db query --linked "select count(*) from public.routing_rules"
 | `GEMINI_MODEL`                         | Production, Preview | `gemini-3.1-flash-lite`                    |
 | `GEMINI_API_KEY`                       | Production, Preview | Google AI Studio key, **Sensitive**        |
 | `SUPABASE_SECRET_KEY`                  | Production, Preview | the `sb_secret_…` key, **Sensitive**       |
+| `FEATURE_*` (six add-on switches)      | Preview first       | unset (OFF) until a phase is verified      |
+| `GEMINI_EMBEDDING_MODEL`               | Production, Preview | `gemini-embedding-2` (default)             |
 
 `SUPABASE_SECRET_KEY` is read only by the agent's privileged routing adapter (ADR 0005). Mark it
 Sensitive, never prefix it with `NEXT_PUBLIC_`, and rotate it in the Supabase dashboard if it is
@@ -65,6 +67,16 @@ ever exposed. Never set `GEMINI_BASE_URL` on Vercel: the app refuses to start wi
 
 To switch AI off quickly, set `AI_ENABLED=false` and redeploy. Tickets are still accepted and
 wait in the admin review queue.
+
+The add-on features (plan v2, ADR 0008) each have their own switch: `FEATURE_VISUAL_INSPECTION`,
+`FEATURE_DUPLICATE_DETECTION`, `FEATURE_MAINTENANCE_COORDINATOR`, `FEATURE_REPAIR_VERIFICATION`,
+`FEATURE_CAMPUS_HEATMAP` and `FEATURE_MAINTENANCE_INSIGHTS`. They are OFF unless set to `true`.
+Turn them on in Preview first, one at a time, and only after the phase's gate is verified.
+Switching one off and redeploying is the first rollback step.
+
+After the add-on A0 migration is pushed, apply the changed seed (campus rooms, assets and the 60
+synthetic cases) with `supabase db query --linked -f supabase/seed.sql`. It is safe to re-run:
+it only replaces the synthetic cases.
 
 ## Demo accounts on the cloud project
 

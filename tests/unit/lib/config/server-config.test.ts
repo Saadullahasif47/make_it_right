@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vitest";
 
-import { ConfigError, parseServerConfig } from "@/lib/config/server-config";
+import {
+  ConfigError,
+  FEATURE_ENV,
+  parseServerConfig,
+  type FeatureFlag,
+} from "@/lib/config/server-config";
 
 import { REQUIRED_ENV, configWith, legacyJwtKey } from "../../../support/env";
 
@@ -48,9 +53,49 @@ describe("parseServerConfig", () => {
         apiKey: undefined,
         timeoutMs: 10_000,
         baseUrl: undefined,
+        visionModel: "gemini-3.1-flash-lite",
+        embeddingModel: "gemini-embedding-2",
+      },
+      features: {
+        visualInspection: false,
+        duplicateDetection: false,
+        maintenanceCoordinator: false,
+        repairVerification: false,
+        campusHeatmap: false,
+        maintenanceInsights: false,
       },
       deployment: { environment: "development", commitSha: undefined },
     });
+  });
+
+  it("turns on exactly the feature whose switch is set", () => {
+    const flags = Object.keys(FEATURE_ENV) as FeatureFlag[];
+    for (const flag of flags) {
+      const { features } = configWith({ [FEATURE_ENV[flag]]: "true" });
+      expect(Object.entries(features).filter(([, on]) => on)).toEqual([[flag, true]]);
+    }
+  });
+
+  it("keeps a feature off for an explicit false or an empty value, and refuses a vague one", () => {
+    expect(configWith({ FEATURE_CAMPUS_HEATMAP: "false" }).features.campusHeatmap).toBe(false);
+    expect(configWith({ FEATURE_CAMPUS_HEATMAP: "" }).features.campusHeatmap).toBe(false);
+    expect(() => configWith({ FEATURE_CAMPUS_HEATMAP: "maybe" })).toThrow(ConfigError);
+  });
+
+  it("switching a feature on does not switch AI on", () => {
+    const config = configWith({ FEATURE_VISUAL_INSPECTION: "true", GEMINI_API_KEY: "k" });
+    expect(config.features.visualInspection).toBe(true);
+    expect(config.ai.enabled).toBe(false);
+  });
+
+  it("uses the triage model for images unless a vision model is set", () => {
+    expect(configWith({ GEMINI_MODEL: "gemini-3.5-flash" }).ai.visionModel).toBe(
+      "gemini-3.5-flash",
+    );
+    expect(configWith({ GEMINI_VISION_MODEL: "gemini-3-pro" }).ai.visionModel).toBe("gemini-3-pro");
+    expect(configWith({ GEMINI_EMBEDDING_MODEL: "gemini-embedding-001" }).ai.embeddingModel).toBe(
+      "gemini-embedding-001",
+    );
   });
 
   it("requires the Supabase URL and publishable key", () => {
