@@ -133,12 +133,36 @@ the Gemini stub (primary model, backup model, keyword fallback), auth, submissio
 queues, admin, accessibility (axe), motion and keyboard checks. None of them changed, and all
 pass with the new triggers in place.
 
+## Cloud deployment (2026-11-05, owner-approved)
+
+The cloud project serves both preview and production (ADR 0007). With the owner's approval in chat:
+
+1. `supabase db push --linked --dry-run` listed exactly one migration,
+   `20261104210000_maintenance_foundation.sql`. It was then pushed, and `supabase migration list
+--linked` shows local and remote in step.
+2. The changed seed was applied with `supabase db query --linked -f supabase/seed.sql` (it
+   returned `synthetic_cases = 60`).
+3. Read-only checks afterwards:
+
+| Check                                    | Cloud result                 |
+| ---------------------------------------- | ---------------------------- |
+| Extensions                               | `pgmq 1.5.1`, `vector 0.8.2` |
+| Locations / assets                       | 36 / 12                      |
+| Synthetic cases                          | 60                           |
+| Open tickets (of 18) / backfilled cases  | 15 / 15                      |
+| Open tickets without a case              | 0                            |
+| Cases whose status or department differs | 0                            |
+| Real cases matched to a room             | 0 (see below)                |
+| `ai_jobs` rows                           | 0                            |
+| `pnpm smoke`, production (`957ae0e`)     | 27 / 27                      |
+| `pnpm smoke`, PR preview (`58e4b34`)     | 27 / 27                      |
+
+The 15 real demo tickets use free-text rooms such as "Room 204" or "Lab 3". Those are not the
+campus room codes (`LAB-204`), so the conservative matcher leaves them UNKNOWN rather than guess.
+Mapping legacy room text to locations is the admin picker in plan F5.01 (phase A6).
+
 ## Not yet verified
 
-- **Preview deployment of the schema.** The gate needs the migration on the cloud project, which
-  serves both preview and production (ADR 0007). Pushing it needs the owner's approval. A
-  read-only check (2026-11-05) confirmed that the project offers `vector` 0.8.2, `pgmq` 1.5.1,
-  `pg_cron` 1.6.4 and `pg_net` 0.20.4, the same versions as local.
 - No user-visible change exists in A0, so there is no new Playwright journey. The full existing
   suite runs with every flag unset, which is the "disabled features do not change normal
   submission" check.
