@@ -239,7 +239,7 @@ isOneToOne: false
             }[]
                            },
 "list_complaints":
-{ Args: { "p_cursor_created_at"?: string,"p_cursor_id"?: string,"p_cursor_priority"?: Database["public"]['Enums']["ticket_priority"],"p_limit"?: number,"p_sort"?: string,"p_statuses"?: (Database["public"]['Enums']["ticket_state"])[] }; Returns: {
+{ Args: { "p_cursor_created_at"?: string,"p_cursor_id"?: string,"p_cursor_priority"?: Database["public"]['Enums']["ticket_priority"],"p_limit"?: number,"p_query"?: string,"p_sort"?: string,"p_statuses"?: (Database["public"]['Enums']["ticket_state"])[] }; Returns: {
               "acknowledged_at": string | null,
 "assigned_department_id": string | null,
 "building": string,

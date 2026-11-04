@@ -7,7 +7,7 @@ import type { Database } from "@/lib/supabase/database.types";
 import { encodeCursor, type PageCursor } from "./cursor";
 import { complaintErrorFromDatabase } from "./errors";
 import type { AssignInput, ComplaintInput, TransitionInput } from "./schemas";
-import { formatReference, type TicketPriority, type TicketState } from "./statuses";
+import { STATUS_FILTERS, formatReference, type TicketPriority, type TicketState } from "./statuses";
 import type { TransitionRule } from "./workflow";
 
 type ComplaintRow = Database["public"]["Tables"]["complaints"]["Row"];
@@ -147,12 +147,14 @@ export interface ListOptions {
   readonly cursor?: PageCursor | undefined;
   readonly statuses?: readonly TicketState[] | null | undefined;
   readonly sort?: ListSort | undefined;
+  /** Matches title, building, room or a reference such as MIR-1004 (see list_complaints). */
+  readonly query?: string | undefined;
 }
 
 /** Keyset-paginated list of the tickets the caller may see (RLS decides which). */
 export async function listComplaints(
   client: AppSupabaseClient,
-  { limit, cursor, statuses, sort = "newest" }: ListOptions,
+  { limit, cursor, statuses, sort = "newest", query }: ListOptions,
 ): Promise<ComplaintPage> {
   // One extra row tells us whether another page exists without a COUNT query.
   const { data, error } = await client.rpc("list_complaints", {
@@ -166,6 +168,7 @@ export async function listComplaints(
           ...(cursor.priority === undefined ? {} : { p_cursor_priority: cursor.priority }),
         }),
     ...(statuses === null || statuses === undefined ? {} : { p_statuses: [...statuses] }),
+    ...(query === undefined ? {} : { p_query: query }),
   });
 
   if (error !== null) {
@@ -185,6 +188,32 @@ export async function listComplaints(
           })
         : null,
   };
+}
+
+export interface ComplaintCounts {
+  readonly open: number;
+  readonly resolved: number;
+  readonly closed: number;
+}
+
+/** How many visible tickets fall in each student filter. RLS decides which tickets count. */
+export async function countComplaints(client: AppSupabaseClient): Promise<ComplaintCounts> {
+  const count = async (states: readonly TicketState[]) => {
+    const { count: total, error } = await client
+      .from("complaints")
+      .select("id", { count: "exact", head: true })
+      .in("status", [...states]);
+    if (error !== null) {
+      throw complaintErrorFromDatabase(error);
+    }
+    return total ?? 0;
+  };
+  const [open, resolved, closed] = await Promise.all([
+    count(STATUS_FILTERS.open.states),
+    count(STATUS_FILTERS.resolved.states),
+    count(STATUS_FILTERS.closed.states),
+  ]);
+  return { open, resolved, closed };
 }
 
 /** One ticket with its timeline, or null when it does not exist or the caller may not see it. */

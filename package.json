@@ -31,6 +31,7 @@
     "latency:cloud": "node scripts/cloud-latency.mts",
     "smoke": "node scripts/smoke.mts",
     "design:audit": "node scripts/design-audit.mts",
+    "design:audit:student": "node scripts/design-audit-student.mts",
     "check": "pnpm lint && pnpm typecheck && pnpm format:check && pnpm test && pnpm build"
   },
   "dependencies": {

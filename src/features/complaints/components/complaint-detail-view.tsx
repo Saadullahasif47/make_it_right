@@ -5,6 +5,7 @@ import type { ReactNode } from "react";
 import { LocalTime } from "@/components/ui/local-time";
 import { Notice } from "@/components/ui/notice";
 import { Toast } from "@/components/ui/toast";
+import { cn } from "@/lib/utils/cn";
 
 import { CATEGORY_LABELS, isComplaintCategory } from "../categories";
 import type { ComplaintDetail } from "../repository";
@@ -31,6 +32,62 @@ interface ComplaintDetailViewProps {
   readonly toast?: string | undefined;
   /** Role-specific controls; rendered above the timeline. */
   readonly actions?: ReactNode;
+  /**
+   * "split" puts the history beside the details (staff and admin work from it). "stacked" is
+   * the reporter's reading order: the decision they owe first, then details, then a full-width
+   * history.
+   */
+  readonly layout?: "split" | "stacked";
+}
+
+function DetailsPanel({ complaint }: { readonly complaint: ComplaintDetail }) {
+  return (
+    <section
+      aria-labelledby="details-title"
+      className="rounded-xl border border-line bg-surface p-6 shadow-soft"
+    >
+      <h2 id="details-title" className="sr-only">
+        Details
+      </h2>
+      <dl className="grid gap-5 sm:grid-cols-2">
+        <Detail label="Location">{locationOf(complaint)}</Detail>
+        <Detail label="Reported">
+          <LocalTime value={complaint.createdAt} />
+        </Detail>
+        <Detail label="Category">
+          {isComplaintCategory(complaint.category)
+            ? CATEGORY_LABELS[complaint.category]
+            : "Awaiting classification"}
+        </Detail>
+        <Detail label="Assigned to">{complaint.departmentName ?? "Not yet assigned"}</Detail>
+      </dl>
+    </section>
+  );
+}
+
+function Description({ text }: { readonly text: string }) {
+  return (
+    <section aria-labelledby="description-title" className="space-y-3">
+      <h2 id="description-title" className="text-lg font-semibold text-ink">
+        Description
+      </h2>
+      <p className="text-pretty whitespace-pre-wrap text-ink-muted">{text}</p>
+    </section>
+  );
+}
+
+function History({ complaint }: { readonly complaint: ComplaintDetail }) {
+  return (
+    <section
+      aria-labelledby="history-title"
+      className="space-y-5 rounded-xl border border-line bg-surface p-6 shadow-soft"
+    >
+      <h2 id="history-title" className="text-lg font-semibold text-ink">
+        History
+      </h2>
+      <Timeline events={complaint.events} />
+    </section>
+  );
 }
 
 /** The ticket page shared by reporters, department staff and administrators. */
@@ -40,9 +97,10 @@ export function ComplaintDetailView({
   notice,
   toast,
   actions,
+  layout = "split",
 }: ComplaintDetailViewProps) {
   return (
-    <div className="space-y-8">
+    <div className={cn("space-y-8", layout === "stacked" && "mx-auto max-w-3xl")}>
       <Link
         href={back.href}
         className="group inline-flex items-center gap-1.5 text-sm font-semibold text-ink-muted transition-colors hover:text-ink"
@@ -69,52 +127,25 @@ export function ComplaintDetailView({
         </h1>
       </header>
 
-      <div className="grid gap-8 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
-        <div className="space-y-8">
-          <section
-            aria-labelledby="details-title"
-            className="rounded-xl border border-line bg-surface p-6 shadow-soft"
-          >
-            <h2 id="details-title" className="sr-only">
-              Details
-            </h2>
-            <dl className="grid gap-5 sm:grid-cols-2">
-              <Detail label="Location">{locationOf(complaint)}</Detail>
-              <Detail label="Reported">
-                <LocalTime value={complaint.createdAt} />
-              </Detail>
-              <Detail label="Category">
-                {isComplaintCategory(complaint.category)
-                  ? CATEGORY_LABELS[complaint.category]
-                  : "Awaiting classification"}
-              </Detail>
-              <Detail label="Assigned to">{complaint.departmentName ?? "Not yet assigned"}</Detail>
-            </dl>
-          </section>
-
-          <section aria-labelledby="description-title" className="space-y-3">
-            <h2 id="description-title" className="text-lg font-semibold text-ink">
-              Description
-            </h2>
-            <p className="text-pretty whitespace-pre-wrap text-ink-muted">
-              {complaint.description}
-            </p>
-          </section>
-        </div>
-
-        <div className="space-y-6">
+      {layout === "stacked" ? (
+        <>
           {actions}
-          <section
-            aria-labelledby="history-title"
-            className="space-y-5 rounded-xl border border-line bg-surface p-6 shadow-soft"
-          >
-            <h2 id="history-title" className="text-lg font-semibold text-ink">
-              History
-            </h2>
-            <Timeline events={complaint.events} />
-          </section>
+          <DetailsPanel complaint={complaint} />
+          <Description text={complaint.description} />
+          <History complaint={complaint} />
+        </>
+      ) : (
+        <div className="grid gap-8 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
+          <div className="space-y-8">
+            <DetailsPanel complaint={complaint} />
+            <Description text={complaint.description} />
+          </div>
+          <div className="space-y-6">
+            {actions}
+            <History complaint={complaint} />
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

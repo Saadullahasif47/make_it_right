@@ -32,6 +32,15 @@ async function signInAs(page: Page, user: TestUser): Promise<void> {
   await expect(page).toHaveURL(/\/student\/complaints$/);
 }
 
+/** The student's ticket rows: table body rows on desktop, list items on phones. */
+function ticketRows(page: Page) {
+  return page
+    .getByRole("table", { name: "Complaints" })
+    .locator("tbody")
+    .getByRole("row")
+    .or(page.getByRole("list", { name: "Complaints" }).getByRole("listitem"));
+}
+
 async function complaintCount(userId: string): Promise<number> {
   const { count } = await adminClient()
     .from("complaints")
@@ -87,9 +96,9 @@ test.describe("reporting an issue", () => {
     await expect(page.getByRole("heading", { level: 1 })).toHaveText("Ceiling fan not working");
 
     await page.getByRole("link", { name: "My complaints" }).first().click();
-    const list = page.getByRole("list", { name: "Complaints" });
-    await expect(list.getByText(reference)).toBeVisible();
-    await expect(list.getByText("Submitted")).toBeVisible();
+    const row = ticketRows(page).filter({ hasText: reference });
+    await expect(row).toBeVisible();
+    await expect(row.getByText("Submitted")).toBeVisible();
     expect(await complaintCount(student.id)).toBe(1);
   });
 
@@ -331,17 +340,17 @@ test.describe("list pagination and filters (P2.06)", () => {
     expect(error).toBeNull();
 
     await signInAs(page, student);
-    const list = page.getByRole("list", { name: "Complaints" });
-    await expect(list.getByRole("listitem")).toHaveCount(20);
-    await expect(list.getByRole("listitem").first()).toContainText("Seeded report 25");
+    const tickets = ticketRows(page);
+    await expect(tickets).toHaveCount(20);
+    await expect(tickets.first()).toContainText("Seeded report 25");
 
     await page.getByRole("link", { name: "Older reports" }).click();
-    await expect(list.getByRole("listitem")).toHaveCount(5);
-    await expect(list.getByRole("listitem").last()).toContainText("Seeded report 01");
+    await expect(tickets).toHaveCount(5);
+    await expect(tickets.last()).toContainText("Seeded report 01");
     await expect(page.getByRole("link", { name: "Older reports" })).toHaveCount(0);
 
     await page.getByRole("link", { name: "Back to newest" }).click();
-    await expect(list.getByRole("listitem")).toHaveCount(20);
+    await expect(tickets).toHaveCount(20);
 
     const filters = page.getByRole("navigation", { name: "Filter by status" });
     await filters.getByRole("link", { name: "Resolved" }).click();
@@ -349,8 +358,8 @@ test.describe("list pagination and filters (P2.06)", () => {
       "aria-current",
       "page",
     );
-    await expect(list.getByRole("listitem")).toHaveCount(1);
-    await expect(list).toContainText("Seeded report 01");
+    await expect(tickets).toHaveCount(1);
+    await expect(tickets.first()).toContainText("Seeded report 01");
 
     await filters.getByRole("link", { name: "Closed" }).click();
     await expect(page.getByRole("heading", { name: "Nothing to show" })).toBeVisible();
@@ -363,6 +372,82 @@ test.describe("list pagination and filters (P2.06)", () => {
     await signInAs(page, student);
     await page.goto("/student/complaints?cursor=forged&status=nonsense");
     await expect(page.getByRole("heading", { name: "No complaints yet" })).toBeVisible();
+  });
+});
+
+test.describe("search and summary (UI redesign Stage 3)", () => {
+  test("a student searches by text and reference, combines it with a filter, and clears it", async ({
+    page,
+  }) => {
+    const student = await newStudent();
+    const base = Date.UTC(2026, 10, 1, 8, 0, 0);
+    const { data: seeded, error } = await adminClient()
+      .from("complaints")
+      .insert(
+        [
+          ["Ceiling fan not working", "Block C", "214", "assigned"],
+          ["Leaking tap", "Chemistry Lab", null, "resolved"],
+          ["Projector flickers", "Library", "Seminar 3", "submitted"],
+        ].map(([title, building, room, status], index) => ({
+          created_by: student.id,
+          title: title as string,
+          description: "Seeded to exercise search in the student list.",
+          building: building as string,
+          room,
+          status: status as "assigned" | "resolved" | "submitted",
+          created_at: new Date(base + index * 60_000).toISOString(),
+        })),
+      )
+      .select("title, reference_no");
+    expect(error).toBeNull();
+    const referenceOf = (title: string) =>
+      seeded?.find((row) => row.title === title)?.reference_no ?? 0;
+
+    await signInAs(page, student);
+    const summary = page.getByRole("definition");
+    await expect(summary).toHaveText(["2", "1", "0"]);
+
+    const rows = ticketRows(page);
+    const searchBox = page.getByRole("searchbox", { name: "Search your reports" });
+    const submitSearch = async (text: string) => {
+      await searchBox.fill(text);
+      await page.getByRole("search").getByRole("button", { name: "Search" }).click();
+    };
+
+    await submitSearch("PROJECTOR");
+    await expect(page).toHaveURL(/[?&]q=PROJECTOR/);
+    await expect(rows).toHaveCount(1);
+    await expect(rows.first()).toContainText("Projector flickers");
+    await expect(searchBox).toHaveValue("PROJECTOR");
+
+    await submitSearch(`MIR-${referenceOf("Ceiling fan not working")}`);
+    await expect(rows).toHaveCount(1);
+    await expect(rows.first()).toContainText("Ceiling fan not working");
+
+    // The filter keeps the search; an empty result explains itself and offers a way out.
+    await submitSearch("block c");
+    const filters = page.getByRole("navigation", { name: "Filter by status" });
+    await filters.getByRole("link", { name: "Resolved" }).click();
+    await expect(page.getByRole("heading", { name: "No matching reports" })).toBeVisible();
+    await page.getByRole("link", { name: "Clear search" }).click();
+    await expect(page).toHaveURL(/\/student\/complaints\?status=resolved$/);
+    await expect(rows).toHaveCount(1);
+    await expect(rows.first()).toContainText("Leaking tap");
+
+    // Typed wildcards are plain text.
+    await submitSearch("%");
+    await expect(page.getByRole("heading", { name: "No matching reports" })).toBeVisible();
+
+    // The API applies the same search, inside the caller's own tickets only.
+    const own = await page.request.get("/api/complaints?q=projector");
+    expect(((await own.json()) as { items: unknown[] }).items).toHaveLength(1);
+    expect((await page.request.get(`/api/complaints?q=${"a".repeat(101)}`)).status()).toBe(400);
+
+    const other = await newStudent();
+    await page.context().clearCookies();
+    await signInAs(page, other);
+    const theirs = await page.request.get("/api/complaints?q=projector");
+    expect(((await theirs.json()) as { items: unknown[] }).items).toEqual([]);
   });
 });
 

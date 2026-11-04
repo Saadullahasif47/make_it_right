@@ -98,6 +98,24 @@ export function Skeleton({ className }: { readonly className?: string }) {
   return <div aria-hidden="true" className={cn("animate-pulse rounded-md bg-line", className)} />;
 }
 
+/** Rows shaped like a ticket list: reference, title and status. */
+export function SkeletonRows() {
+  return (
+    <div
+      aria-hidden="true"
+      className="space-y-px overflow-hidden rounded-xl border border-line bg-surface"
+    >
+      {[0, 1, 2, 3].map((row) => (
+        <div key={row} className="flex items-center gap-4 px-5 py-4">
+          <Skeleton className="h-4 w-16" />
+          <Skeleton className="h-4 flex-1" />
+          <Skeleton className="h-6 w-20" />
+        </div>
+      ))}
+    </div>
+  );
+}
+
 export function PageSkeleton() {
   return (
     <div aria-hidden="true" className="space-y-8">
@@ -105,15 +123,7 @@ export function PageSkeleton() {
         <Skeleton className="h-7 w-64" />
         <Skeleton className="h-4 w-96 max-w-full" />
       </div>
-      <div className="space-y-px overflow-hidden rounded-xl border border-line bg-surface">
-        {[0, 1, 2, 3].map((row) => (
-          <div key={row} className="flex items-center gap-4 px-5 py-4">
-            <Skeleton className="h-4 w-16" />
-            <Skeleton className="h-4 flex-1" />
-            <Skeleton className="h-6 w-20" />
-          </div>
-        ))}
-      </div>
+      <SkeletonRows />
     </div>
   );
 }
