@@ -114,3 +114,16 @@ ticket stored, and invalid tool actions never modify the database.
 - **Retries use the same codes.** The admin retry endpoint (`POST /api/complaints/[id]/retry-ai`)
   and its button map each failure to `AI_DISABLED`, `AI_IN_PROGRESS`, `AI_RETRY_LIMIT` or
   `INVALID_TRANSITION`.
+
+## Amendment (2026-11-04): one retry for a brief provider outage
+
+MIR-1017 went to review because a single Gemini call failed with `PROVIDER_UNAVAILABLE` after 755 ms, before the model
+saw the report. A one-off like this should not cost a manual routing, so the agent loop (`run-agent.ts`) now retries
+exactly once, after `PROVIDER_RETRY_DELAY_MS` (750 ms), and only:
+
+- for `PROVIDER_UNAVAILABLE` (a 5xx such as "model overloaded", or the network);
+- while the attempt's deadline (`AI_TIMEOUT_MS`) has not fired. If it fires during the pause, the result is `TIMEOUT`.
+
+Rate limits (`RATE_LIMITED`) and refusals (`PROVIDER_REJECTED`) are never retried. Re-running a whole attempt that
+went to review stays an administrator's decision (P4.08). The Gemini adapter now extends the conversation only after
+a call succeeds, so a retry repeats the identical request. `agent.run_finished` logs `providerRetried`.

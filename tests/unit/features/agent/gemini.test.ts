@@ -173,6 +173,32 @@ describe("Gemini adapter", () => {
     expect(requests).toHaveLength(1);
   });
 
+  it("retries a brief 503 once with the identical request, then routes", async () => {
+    const { fetchFn, requests } = fakeGemini([
+      LOOKUP_TURN,
+      { status: 503, body: { error: { code: 503, message: "The model is overloaded." } } },
+      PROPOSE_TURN,
+    ]);
+    const model = createGeminiModelClient({ apiKey: "k", model: "m", fetch: fetchFn });
+    const result = await runAgent({
+      model,
+      snapshot: SNAPSHOT,
+      report: REPORT,
+      deadline: liveDeadline(),
+    });
+
+    expect(result.decision).toMatchObject({
+      kind: "route",
+      departmentId: DEPARTMENTS.electrical.id,
+    });
+    expect(result.providerRetried).toBe(true);
+    expect(requests).toHaveLength(3);
+    // The failed call left the conversation untouched: the retry is the same request, and the
+    // tool result is sent once (report, model turn, tool result), not twice.
+    expect(requests[2]?.body.contents).toEqual(requests[1]?.body.contents);
+    expect(requests[2]?.body.contents).toHaveLength(3);
+  });
+
   it.each([
     [503, "PROVIDER_UNAVAILABLE"],
     [400, "PROVIDER_REJECTED"],

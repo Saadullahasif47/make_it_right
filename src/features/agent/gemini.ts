@@ -25,8 +25,9 @@ const OUTPUT_TOKEN_BUDGET = 1024;
 
 /**
  * Gemini adapter for the agent (plan §3, §8): manual function calling, so every call is
- * validated by our code before anything runs. The SDK's own retries are off: a failed attempt
- * goes to review, and bounded retries are an admin decision (P4.08).
+ * validated by our code before anything runs. The SDK's own retries are off: the agent loop
+ * retries one brief outage itself, inside the attempt's deadline (run-agent.ts), and re-running a
+ * whole attempt that went to review stays an admin decision (P4.08).
  */
 export function createGeminiModelClient(options: GeminiOptions): ModelClient {
   const ai = new GoogleGenAI({
@@ -70,25 +71,30 @@ export function createGeminiModelClient(options: GeminiOptions): ModelClient {
 
       return {
         async send(results: readonly ToolResult[], deadline: AbortSignal) {
-          if (results.length > 0) {
-            contents.push({
-              role: "user",
-              parts: results.map(({ call, response }) => ({
-                functionResponse: {
-                  ...(call.id === undefined ? {} : { id: call.id }),
-                  name: call.name,
-                  response: { ...response },
-                },
-              })),
-            });
-          }
+          const userTurn: Content | undefined =
+            results.length === 0
+              ? undefined
+              : {
+                  role: "user",
+                  parts: results.map(({ call, response }) => ({
+                    functionResponse: {
+                      ...(call.id === undefined ? {} : { id: call.id }),
+                      name: call.name,
+                      response: { ...response },
+                    },
+                  })),
+                };
 
           const reply = await ai.models.generateContent({
             model: options.model,
-            contents,
+            contents: userTurn === undefined ? contents : [...contents, userTurn],
             config: { ...baseConfig, abortSignal: deadline },
           });
 
+          // Only a successful call extends the conversation, so a retry repeats the same request.
+          if (userTurn !== undefined) {
+            contents.push(userTurn);
+          }
           // Keep the model's turn exactly as returned: Gemini 3 needs its thought signatures back.
           const content = reply.candidates?.[0]?.content;
           if (content !== undefined) {

@@ -44,7 +44,13 @@ export type TriageResult =
   | { readonly ok: false; readonly code: AgentStoreErrorCode };
 
 function review(failureCode: AgentFailureCode): AgentResult {
-  return { decision: { kind: "review", failureCode }, trace: [], exchanges: 0, safetySignals: [] };
+  return {
+    decision: { kind: "review", failureCode },
+    trace: [],
+    exchanges: 0,
+    safetySignals: [],
+    providerRetried: false,
+  };
 }
 
 /**
@@ -152,6 +158,7 @@ export async function triageTicket(
       exchanges: result.exchanges,
       tools: trace.map((entry) => `${entry.tool}:${entry.verdict}`),
       safetySignals: result.safetySignals,
+      providerRetried: result.providerRetried,
     });
     return { ok: true, runId: run.runId, outcome, status: finished.status, failureCode };
   } catch (error) {
