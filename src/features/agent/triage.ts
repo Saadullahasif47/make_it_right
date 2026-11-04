@@ -4,8 +4,10 @@ import type { TicketState } from "@/features/complaints/statuses";
 import type { Logger } from "@/lib/logging/logger";
 
 import type { AgentFailureCode } from "./failures";
+import { classifyByKeywords } from "./keyword-router";
 import type { ModelClient } from "./model";
 import { PROMPT_VERSION } from "./prompt";
+import { approvedRoute, type RoutingSnapshot } from "./routing";
 import { runAgent, type AgentResult } from "./run-agent";
 import {
   AgentStoreError,
@@ -13,7 +15,7 @@ import {
   type AgentStoreErrorCode,
   type RunTrigger,
 } from "./store";
-import type { ToolTraceEntry } from "./tools";
+import type { AgentDecision, ToolTraceEntry } from "./tools";
 
 export interface TriageDependencies {
   readonly store: AgentStore;
@@ -54,6 +56,60 @@ function review(failureCode: AgentFailureCode): AgentResult {
 }
 
 /**
+ * Reasons the AI attempt ended without a route that say nothing about the report itself, so the
+ * keyword rules may still route it (ADR 0005, amendment 2). Safety and high-priority reviews,
+ * refused routes and missing default departments always stay with a person.
+ */
+const KEYWORD_FALLBACK: Readonly<Partial<Record<AgentFailureCode, string>>> = {
+  TIMEOUT: "the AI assistant was unavailable",
+  RATE_LIMITED: "the AI assistant was unavailable",
+  PROVIDER_UNAVAILABLE: "the AI assistant was unavailable",
+  PROVIDER_REJECTED: "the AI assistant was unavailable",
+  INVALID_OUTPUT: "the AI assistant could not decide",
+  STEP_LIMIT: "the AI assistant could not decide",
+  MODEL_REQUESTED_REVIEW: "the AI assistant could not decide",
+};
+
+/**
+ * Routes a report the AI could not, when its text clearly names one kind of fault with an
+ * enabled default department. Returns undefined to leave it with a person. The route still goes
+ * through agent_finish_run, so the database applies the same policy as to an AI decision.
+ */
+function keywordFallback(
+  result: AgentResult,
+  snapshot: RoutingSnapshot | undefined,
+  report: { readonly title: string; readonly description: string },
+): { decision: AgentDecision; entry: ToolTraceEntry } | undefined {
+  const { decision } = result;
+  if (decision.kind !== "review" || snapshot === undefined) return undefined;
+  const because = KEYWORD_FALLBACK[decision.failureCode];
+  // A report the safety screen flagged always waits for a person, whatever its words.
+  if (because === undefined || result.safetySignals.length > 0) return undefined;
+  const match = classifyByKeywords(`${report.title}
+${report.description}`);
+  const department = match === undefined ? undefined : approvedRoute(snapshot, match.category);
+  if (match === undefined || department === undefined) return undefined;
+  return {
+    decision: {
+      kind: "route",
+      category: match.category,
+      departmentId: department.id,
+      priority: "medium",
+      reason: `Routed by keyword rules because ${because}.`,
+    },
+    entry: {
+      step: result.exchanges,
+      tool: "keyword_router",
+      verdict: "accepted",
+      code: decision.failureCode,
+      category: match.category,
+      departmentId: department.id,
+      priority: "medium",
+    },
+  };
+}
+
+/**
  * One best-effort triage attempt after a ticket is durably stored (plan §4 steps 3-5):
  * claim the ticket, ask the model under one deadline, then apply the validated decision or
  * hand the ticket to a human. It never throws. If the process dies midway, the ticket stays
@@ -81,11 +137,12 @@ export async function triageTicket(
 
   const started = now();
   let result: AgentResult;
+  let snapshot: RoutingSnapshot | undefined;
   if (deps.model === undefined) {
     result = review("PROVIDER_NOT_CONFIGURED");
   } else {
     try {
-      const snapshot = await deps.store.loadRoutingSnapshot();
+      snapshot = await deps.store.loadRoutingSnapshot();
       result = await runAgent({
         model: deps.model,
         snapshot,
@@ -100,6 +157,11 @@ export async function triageTicket(
 
   let decision = result.decision;
   let trace: readonly ToolTraceEntry[] = result.trace;
+  const fallback = keywordFallback(result, snapshot, run.report);
+  if (fallback !== undefined) {
+    decision = fallback.decision;
+    trace = [...trace, fallback.entry];
+  }
   try {
     let finished;
     try {
@@ -159,6 +221,7 @@ export async function triageTicket(
       tools: trace.map((entry) => `${entry.tool}:${entry.verdict}`),
       safetySignals: result.safetySignals,
       providerRetried: result.providerRetried,
+      keywordFallback: fallback !== undefined,
     });
     return { ok: true, runId: run.runId, outcome, status: finished.status, failureCode };
   } catch (error) {

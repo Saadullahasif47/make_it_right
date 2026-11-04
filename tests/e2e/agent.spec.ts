@@ -155,12 +155,13 @@ test("provider failure: the ticket is saved, explained to the reporter, and reco
   browser,
 }) => {
   test.setTimeout(90_000);
-  const title = `Projector ${randomUUID().slice(0, 8)}`;
+  // Words the keyword fallback cannot place (the stub still reads "screen" as IT on retry).
+  const title = `Blank screen ${randomUUID().slice(0, 8)}`;
   const studentPage = await signedIn(browser, student, /\/student\/complaints$/);
   const ticketId = await report(
     studentPage,
     title,
-    "The projector in room 101 shows no picture. STUB:FAIL-ONCE",
+    "The screen in room 101 stays blank. STUB:FAIL-ONCE",
   );
 
   await expect(studentPage).toHaveURL(/notice=created$/);
@@ -196,8 +197,8 @@ test("a slow provider hits the deadline; the ticket is saved and waits for revie
   const started = Date.now();
   const ticketId = await report(
     studentPage,
-    `Fan ${randomUUID().slice(0, 8)}`,
-    "The ceiling fan in room 12 makes a grinding noise. STUB:SLOW",
+    `Grinding noise ${randomUUID().slice(0, 8)}`,
+    "Something in room 12 makes a grinding noise. STUB:SLOW",
   );
 
   expect(Date.now() - started).toBeLessThan(15_000);
@@ -231,13 +232,33 @@ test("a dangerous report is never routed automatically; the admin form starts fr
   await expect(routing.getByText("starts from the AI assistant's suggestion")).toBeVisible();
 });
 
+test("with the AI down, a clear report still reaches its department by keyword rules", async ({
+  browser,
+}) => {
+  test.setTimeout(90_000);
+  const studentPage = await signedIn(browser, student, /\/student\/complaints$/);
+  await report(
+    studentPage,
+    `Tap leaking ${randomUUID().slice(0, 8)}`,
+    "The tap in room 5 is leaking all day. STUB:429",
+  );
+
+  await expect(studentPage).toHaveURL(/notice=created-routed$/);
+  await expect(history(studentPage).getByText("Assigned to Plumbing")).toBeVisible();
+  await expect(
+    history(studentPage).getByText(
+      "Routed by keyword rules because the AI assistant was unavailable.",
+    ),
+  ).toBeVisible();
+});
+
 test("a model that keeps inventing a department changes nothing", async ({ browser }) => {
   test.setTimeout(90_000);
   const studentPage = await signedIn(browser, student, /\/student\/complaints$/);
   const ticketId = await report(
     studentPage,
-    `Desk ${randomUUID().slice(0, 8)}`,
-    "The desk drawer is jammed. STUB:FABRICATE",
+    `Jammed ${randomUUID().slice(0, 8)}`,
+    "Something in room 3 is jammed. STUB:FABRICATE",
   );
 
   await expect(studentPage.getByText("Awaiting review").first()).toBeVisible();
