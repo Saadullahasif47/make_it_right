@@ -73,24 +73,27 @@ const HERO_FACTS: readonly { icon: LucideIcon; text: string }[] = [
 
 export function Hero() {
   return (
-    <section aria-labelledby="hero-title" className="border-b border-line">
-      <Container className="grid items-center gap-12 py-14 sm:py-20 lg:grid-cols-[minmax(0,1fr)_minmax(0,27rem)] lg:gap-16 lg:py-24">
+    <section
+      aria-labelledby="hero-title"
+      className="border-b border-line lg:flex lg:min-h-[calc(100svh-var(--public-chrome))] lg:flex-col lg:justify-center"
+    >
+      <Container className="grid items-center gap-12 py-14 sm:py-20 lg:grid-cols-[minmax(0,1fr)_minmax(0,27rem)] lg:gap-16 lg:py-8">
         <div>
-          <p className="inline-flex items-center gap-2 rounded-full border border-line bg-surface px-3 py-1 text-xs font-medium text-ink-muted">
+          <p className="inline-flex animate-rise items-center gap-2 rounded-full border border-line bg-surface px-3 py-1 text-xs font-medium text-ink-muted">
             <span aria-hidden="true" className="size-1.5 rounded-full bg-brand" />
             Campus maintenance, from report to fix
           </p>
           <h1
             id="hero-title"
-            className="mt-6 text-[2.5rem] leading-[1.05] font-semibold tracking-[-0.025em] text-balance text-ink sm:text-5xl lg:text-[3.5rem]"
+            className="mt-6 animate-rise text-[2.5rem] leading-[1.05] font-semibold tracking-[-0.025em] text-balance text-ink [animation-delay:70ms] sm:text-5xl lg:text-[3.5rem]"
           >
             A better way to get campus problems fixed.
           </h1>
-          <p className="mt-5 max-w-xl text-lg text-pretty text-ink-muted">
+          <p className="mt-5 max-w-xl animate-rise text-lg text-pretty text-ink-muted [animation-delay:140ms]">
             Report a broken light, a leaking tap or a dead projector in a minute. MakeItRight sends
             it to the department that fixes it, and you can follow every step until it is done.
           </p>
-          <div className="mt-8 flex flex-wrap gap-3">
+          <div className="mt-8 flex animate-rise flex-wrap gap-3 [animation-delay:210ms]">
             <ButtonLink href={REPORT_HREF} size="lg">
               Report an issue
               <ArrowRight aria-hidden="true" className={buttonIcon} />
@@ -99,7 +102,8 @@ export function Hero() {
               See how it works
             </ButtonLink>
           </div>
-          <ul className="mt-10 flex flex-col gap-3 text-sm text-ink-muted sm:flex-row sm:flex-wrap sm:gap-x-6">
+          {/* On short laptop screens the hero drops these facts so it still fits one screen. */}
+          <ul className="mt-10 flex animate-rise flex-col gap-3 text-sm text-ink-muted [animation-delay:280ms] sm:flex-row sm:flex-wrap sm:gap-x-6 lg:[@media(max-height:760px)]:hidden">
             {HERO_FACTS.map(({ icon: Icon, text }) => (
               <li key={text} className="flex items-center gap-2">
                 <Icon aria-hidden="true" className="size-4 text-brand" strokeWidth={1.75} />
@@ -108,7 +112,9 @@ export function Hero() {
             ))}
           </ul>
         </div>
-        <TicketPreview />
+        <div className="animate-rise [animation-delay:200ms]">
+          <TicketPreview />
+        </div>
       </Container>
     </section>
   );
@@ -131,7 +137,11 @@ const CATEGORY_DETAILS: Readonly<
 
 export function Categories() {
   return (
-    <section aria-labelledby="categories-title" className="py-20 sm:py-24">
+    <section
+      aria-labelledby="categories-title"
+      data-reveal
+      className="py-20 sm:py-24 lg:flex lg:min-h-[calc(100svh-4rem)] lg:snap-start lg:flex-col lg:justify-center lg:py-12"
+    >
       <Container className="grid gap-10 lg:grid-cols-[minmax(0,19rem)_minmax(0,1fr)] lg:gap-16">
         <SectionHeading id="categories-title" title="What you can report">
           Six categories cover everyday faults in classrooms, labs, hostels and offices. Not sure
@@ -192,7 +202,8 @@ export function HowItWorks() {
     <section
       id="how-it-works"
       aria-labelledby="how-title"
-      className="border-y border-line bg-surface py-20 sm:py-24"
+      data-reveal
+      className="border-y border-line bg-surface py-20 sm:py-24 lg:flex lg:min-h-[calc(100svh-4rem)] lg:snap-start lg:flex-col lg:justify-center lg:py-12"
     >
       <Container>
         <SectionHeading id="how-title" title="How a report gets resolved">
@@ -329,7 +340,11 @@ const PRODUCT_POINTS: readonly { icon: LucideIcon; title: string; body: string }
 
 export function ProductPreview() {
   return (
-    <section aria-labelledby="product-title" className="py-20 sm:py-24">
+    <section
+      aria-labelledby="product-title"
+      data-reveal
+      className="py-20 sm:py-24 lg:flex lg:min-h-[calc(100svh-4rem)] lg:snap-start lg:flex-col lg:justify-center lg:py-12"
+    >
       <Container className="grid items-center gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,32rem)] lg:gap-16">
         <div>
           <SectionHeading id="product-title" title="Built for the people who fix things">
@@ -403,7 +418,8 @@ export function AiSafety() {
     <section
       id="ai-safety"
       aria-labelledby="ai-title"
-      className="border-y border-line bg-surface py-20 sm:py-24"
+      data-reveal
+      className="border-y border-line bg-surface py-20 sm:py-24 lg:flex lg:min-h-[calc(100svh-4rem)] lg:snap-start lg:flex-col lg:justify-center lg:py-12"
     >
       <Container className="grid gap-12 lg:grid-cols-2 lg:gap-16">
         <div>
@@ -478,7 +494,12 @@ const AUDIENCES: readonly { icon: LucideIcon; title: string; points: readonly st
 
 export function Audiences() {
   return (
-    <section id="roles" aria-labelledby="roles-title" className="py-20 sm:py-24">
+    <section
+      id="roles"
+      aria-labelledby="roles-title"
+      data-reveal
+      className="py-20 sm:py-24 lg:flex lg:min-h-[calc(100svh-4rem)] lg:snap-start lg:flex-col lg:justify-center lg:py-12"
+    >
       <Container>
         <SectionHeading id="roles-title" title="One platform, three clear roles">
           Each person sees exactly what their role allows, and the database enforces it, not just
@@ -517,7 +538,7 @@ export function Audiences() {
 
 export function FinalCallToAction() {
   return (
-    <section aria-labelledby="cta-title" className="pb-20 sm:pb-24">
+    <section aria-labelledby="cta-title" data-reveal className="pb-20 sm:pb-24">
       <Container>
         <div className="flex flex-col gap-6 rounded-xl border border-line bg-surface p-8 sm:p-10 lg:flex-row lg:items-center lg:justify-between">
           <div>

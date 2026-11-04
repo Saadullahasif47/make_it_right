@@ -5,7 +5,7 @@
 import { expect, test, type Page } from "@playwright/test";
 
 const ALLOWED_CURVES = ["cubic-bezier(0.2, 0, 0, 1)", "cubic-bezier(0.4, 0, 1, 1)"];
-const ALLOWED_ANIMATIONS = ["toast-in", "skeleton", "reveal", "settle", "spin"];
+const ALLOWED_ANIMATIONS = ["toast-in", "skeleton", "reveal", "settle", "spin", "rise"];
 /** Properties whose change forces layout; animating them is slow on ordinary hardware. */
 const LAYOUT_PROPERTIES =
   /^(all|width|height|min-|max-|margin|padding|top|right|bottom|left|inset)/;

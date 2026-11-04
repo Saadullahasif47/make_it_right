@@ -53,7 +53,7 @@ export default function AppLayout({ children }: { readonly children: ReactNode }
       </a>
       <header className="sticky top-0 z-40 flex flex-wrap items-center border-b border-line bg-surface lg:fixed lg:inset-y-0 lg:left-0 lg:w-60 lg:flex-col lg:flex-nowrap lg:items-stretch lg:border-r lg:border-b-0 lg:border-band-line lg:bg-band">
         <div className="order-1 flex h-14 items-center px-4 lg:order-none lg:h-16 lg:px-5">
-          <Logo tone="sidebar" />
+          <Logo tone="sidebar" priority />
         </div>
         <Suspense fallback={<ChromeSkeleton />}>
           <SessionChrome />

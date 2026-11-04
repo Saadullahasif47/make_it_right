@@ -30,7 +30,7 @@ export function SiteHeader() {
   return (
     <header className="sticky top-0 z-40 border-b border-line bg-canvas">
       <Container className="flex h-16 items-center justify-between gap-4">
-        <Logo />
+        <Logo priority />
 
         <nav aria-label="Main" className="hidden md:block">
           <ul className="flex items-center gap-0.5">

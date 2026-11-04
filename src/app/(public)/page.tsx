@@ -7,6 +7,7 @@ import {
   HowItWorks,
   ProductPreview,
 } from "./_components/landing-sections";
+import { ScrollReveal } from "./_components/scroll-reveal";
 
 export default function HomePage() {
   return (
@@ -18,6 +19,7 @@ export default function HomePage() {
       <AiSafety />
       <Audiences />
       <FinalCallToAction />
+      <ScrollReveal />
     </>
   );
 }
