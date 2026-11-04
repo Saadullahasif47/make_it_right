@@ -86,7 +86,7 @@ function KpiTile({
   readonly tone?: "neutral" | "attention";
 }) {
   return (
-    <div className="group rounded-xl border border-line bg-surface p-5 shadow-soft transition-[transform,box-shadow,border-color] duration-150 hover:border-brand/40">
+    <div className="rounded-xl border border-line bg-surface p-5">
       <div className="flex items-center justify-between">
         <p className="text-sm font-semibold text-ink-muted">{label}</p>
         <span
