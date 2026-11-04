@@ -17,6 +17,20 @@ function captureConfigError(source: Record<string, string | undefined>): ConfigE
 }
 
 describe("parseServerConfig", () => {
+  it('has a fallback model by default, which "off" or the same model switches off', () => {
+    expect(configWith().ai.fallbackModel).toBe("gemini-3.5-flash");
+    expect(configWith({ GEMINI_FALLBACK_MODEL: "off" }).ai.fallbackModel).toBeUndefined();
+    // Dashboards store unset variables as "": that keeps the default, like every other variable.
+    expect(configWith({ GEMINI_FALLBACK_MODEL: "" }).ai.fallbackModel).toBe("gemini-3.5-flash");
+    expect(
+      configWith({ GEMINI_MODEL: "gemini-3.5-flash", GEMINI_FALLBACK_MODEL: "gemini-3.5-flash" }).ai
+        .fallbackModel,
+    ).toBeUndefined();
+    expect(configWith({ GEMINI_FALLBACK_MODEL: "gemini-3-flash-preview" }).ai.fallbackModel).toBe(
+      "gemini-3-flash-preview",
+    );
+  });
+
   it("applies safe defaults for everything optional", () => {
     expect(configWith()).toEqual({
       nodeEnv: "development",
@@ -30,6 +44,7 @@ describe("parseServerConfig", () => {
       ai: {
         enabled: false,
         model: "gemini-3.1-flash-lite",
+        fallbackModel: "gemini-3.5-flash",
         apiKey: undefined,
         timeoutMs: 10_000,
         baseUrl: undefined,

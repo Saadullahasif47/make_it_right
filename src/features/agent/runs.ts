@@ -20,6 +20,7 @@ const traceSchema = z.array(
     category: z.string().max(40).optional(),
     departmentId: z.string().max(64).optional(),
     priority: z.string().max(20).optional(),
+    model: z.string().max(100).optional(),
   }),
 );
 

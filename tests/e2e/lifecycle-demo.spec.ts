@@ -43,8 +43,9 @@ test("with reduced motion it does not play, and shows the finished ticket", asyn
 test("the hero keeps its height while the example plays", async ({ page }) => {
   await page.goto("/");
   await demo(page).scrollIntoViewIfNeeded();
+  // Layout height: offsetHeight ignores the scroll-reveal transform, which may still be running.
   const heightAt = async () =>
-    demo(page).evaluate((element) => element.getBoundingClientRect().height);
+    demo(page).evaluate((element) => (element as HTMLElement).offsetHeight);
   await expect(currentStep(page)).toHaveAccessibleName("Show step 1: Reported");
   const start = await heightAt();
   await expect(currentStep(page)).toHaveAccessibleName("Show step 5: Closed", { timeout: 15_000 });

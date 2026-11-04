@@ -48,6 +48,8 @@ function TraceLine({
       ? null
       : (departments.get(entry.departmentId) ?? "unknown department id"),
     entry.priority === undefined ? null : `${entry.priority} priority`,
+    // A switch_model entry names the model the attempt continued on.
+    entry.model === undefined ? null : `continued on ${entry.model}`,
   ].filter((part) => part !== null);
   return (
     <li className="flex items-start gap-2 text-sm">

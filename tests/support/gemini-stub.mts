@@ -6,7 +6,9 @@
  * It keeps no conversation state: like the real API, each request carries the full history,
  * and the stub derives the turn from it. Markers in the report text script failures:
  *   STUB:429            always answers 429 RESOURCE_EXHAUSTED
- *   STUB:FAIL-ONCE      429 on the first request for that report, normal afterwards
+ *   STUB:FAIL-ONCE      429 for the whole first attempt at that report (its first two requests:
+ *                       the primary model and the fallback), normal afterwards
+ *   STUB:PRIMARY-DOWN   503 "high demand" from the primary model only; the fallback answers
  *   STUB:SLOW           answers after 20 seconds (beyond the app's AI deadline)
  *   STUB:TEXT           answers in text instead of calling a tool
  *   STUB:FABRICATE      keeps proposing a department id that does not exist
@@ -19,7 +21,10 @@ import { createServer, type IncomingMessage, type ServerResponse } from "node:ht
 
 const port = Number(process.argv[2] ?? 3199);
 const FABRICATED = "9f9f9f9f-1111-4222-8333-444455556666";
-const failedOnce = new Set<string>();
+/** Requests seen per report, for STUB:FAIL-ONCE. */
+const failures = new Map<string, number>();
+/** The app's default primary model (server-config.ts); the fallback is any other model. */
+const PRIMARY_MODEL = "gemini-3.1-flash-lite";
 
 interface Part {
   text?: string;
@@ -109,13 +114,21 @@ const server = createServer((req, res) => {
     const turn = contents.filter((content) => content.role === "model").length + 1;
     const category = classify(report);
 
-    if (
-      report.includes("STUB:429") ||
-      (report.includes("STUB:FAIL-ONCE") && !failedOnce.has(report))
-    ) {
-      failedOnce.add(report);
+    const seen = failures.get(report) ?? 0;
+    if (report.includes("STUB:429") || (report.includes("STUB:FAIL-ONCE") && seen < 2)) {
+      failures.set(report, seen + 1);
       send(res, 429, {
         error: { code: 429, message: "Resource has been exhausted", status: "RESOURCE_EXHAUSTED" },
+      });
+      return;
+    }
+    if (report.includes("STUB:PRIMARY-DOWN") && (req.url ?? "").includes(`/${PRIMARY_MODEL}:`)) {
+      send(res, 503, {
+        error: {
+          code: 503,
+          message: "This model is currently experiencing high demand.",
+          status: "UNAVAILABLE",
+        },
       });
       return;
     }

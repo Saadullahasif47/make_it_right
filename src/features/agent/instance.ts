@@ -13,6 +13,7 @@ import { triageTicket, type TriageRequest, type TriageResult } from "./triage";
 export type TriageRunner = (request: TriageRequest, logger: Logger) => Promise<TriageResult>;
 
 let cachedModel: ModelClient | undefined;
+let cachedFallback: ModelClient | undefined;
 
 /**
  * The production wiring of the agent, or undefined while AI_ENABLED is off (tickets then wait
@@ -38,10 +39,18 @@ export function getTriageRunner(): TriageRunner | undefined {
       model: ai.model,
       baseUrl: ai.baseUrl,
     });
+    if (ai.fallbackModel !== undefined) {
+      cachedFallback ??= createGeminiModelClient({
+        apiKey: ai.apiKey,
+        model: ai.fallbackModel,
+        baseUrl: ai.baseUrl,
+      });
+    }
   }
   const deps = {
     store: createAgentStore(client),
     model: ai.apiKey === undefined ? undefined : cachedModel,
+    fallbackModel: ai.apiKey === undefined ? undefined : cachedFallback,
     modelName: ai.model,
     timeoutMs: ai.timeoutMs,
   };
