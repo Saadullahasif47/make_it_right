@@ -104,6 +104,11 @@ owner, as part of plan A7.03:
 4. Check the result in **Admin → AI jobs** (shown when a queue feature flag is on), or in
    `public.ai_jobs`.
 
+The worker's own secrets for AI work (set with `supabase secrets set --env-file`, never typed on
+a command line): `AI_ENABLED=true`, `GEMINI_API_KEY`, and optionally `GEMINI_VISION_MODEL` and
+`GEMINI_EMBEDDING_MODEL` (default `gemini-embedding-2`). Without `AI_ENABLED=true` every AI job
+goes to review as `AI_DISABLED`; the stored photos and reports are unaffected.
+
 To pause the worker, delete the two Vault secrets; Cron then sends nothing. Never set
 `AI_WORKER_FAULTS` on a hosted project: the worker ignores it there anyway, but it exists for
 local drills only.

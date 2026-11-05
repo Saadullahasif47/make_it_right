@@ -70,6 +70,7 @@ export default defineConfig({
               // Add-on features under test run here; the first server keeps every flag OFF, so
               // its journeys also prove that switched-off features stay invisible (plan v2 A0.02).
               FEATURE_VISUAL_INSPECTION: "true",
+              FEATURE_DUPLICATE_DETECTION: "true",
             },
           },
         ]

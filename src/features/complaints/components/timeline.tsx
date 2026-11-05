@@ -2,6 +2,7 @@ import {
   CircleCheck,
   CirclePlus,
   Eye,
+  Link2,
   Lock,
   MessageSquareText,
   RotateCcw,
@@ -70,6 +71,14 @@ function present(event: TimelineEvent): Presentation {
       };
     case "acknowledged":
       return { icon: Eye, title: "Acknowledged by the department", tone: "neutral" };
+    case "case_linked":
+      return {
+        icon: Link2,
+        title: "Linked with other reports",
+        tone: "brand",
+        explanation:
+          "Staff are handling this together with other reports of the same problem. Your report stays as you wrote it.",
+      };
     case "note_added":
       return { icon: MessageSquareText, title: "Work note", tone: "neutral" };
     case "status_changed":

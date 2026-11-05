@@ -18,6 +18,7 @@ import {
 } from "@/features/complaints/repository";
 import { complaintIdSchema } from "@/features/complaints/schemas";
 import { canAssign, isStalledTriage } from "@/features/complaints/workflow";
+import { DuplicatesPanel } from "@/features/duplicate-detection/components/duplicates-panel";
 import { PhotoEvidence } from "@/features/evidence/components/photo-evidence";
 import { getServerConfig, isFeatureEnabled } from "@/lib/config";
 import { requestTime } from "@/lib/request-time";
@@ -73,6 +74,15 @@ async function AdminTicket({
       toast={notice}
       actions={
         <>
+          {/* Same problem or not is decided before routing: linking can carry the routing over. */}
+          {isFeatureEnabled("duplicateDetection") ? (
+            <DuplicatesPanel
+              client={supabase}
+              complaintId={complaint.id}
+              viewer="admin"
+              hrefFor={(id) => `/admin/complaints/${id}`}
+            />
+          ) : null}
           {canAssign(complaint.status, access.user.role) ? (
             <AssignForm
               ticketId={complaint.id}

@@ -33,4 +33,7 @@ export const WORKFLOW_NOTICES: Readonly<Record<string, string>> = {
   assigned: "Ticket assigned. The department will see it in their queue.",
   "ai-routed": "The AI assistant routed this ticket. Its reason is on the timeline.",
   "ai-review": "The AI attempt finished without a route, so this ticket still needs you.",
+  "duplicate-linked": "Linked. This report now follows the shared case.",
+  "duplicate-rejected": "Marked as a different problem.",
+  "duplicate-separate": "Kept as a separate case.",
 };

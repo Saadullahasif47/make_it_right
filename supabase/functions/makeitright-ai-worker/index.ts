@@ -11,6 +11,10 @@ import {
   type WorkerSettings,
 } from "../_shared/jobs/worker.ts";
 import { createRestRpc, createRestWorkerDatabase } from "../_shared/jobs/worker-db.ts";
+import {
+  createDuplicateMatchHandler,
+  createEmbeddingHandler,
+} from "../_shared/duplicates/handlers.ts";
 import { createVisualAnalysisHandler } from "../_shared/visual-inspection/handler.ts";
 
 interface DenoRuntime {
@@ -35,22 +39,30 @@ const runtimeFetch: typeof fetch = (input, init) => fetch(input, init);
 /** One handler per feature that has shipped; the rest send their jobs to review. */
 function handlersFor(settings: WorkerSettings) {
   const { ai } = settings;
+  const rpc = createRestRpc({
+    supabaseUrl: settings.supabaseUrl,
+    serviceKey: settings.serviceKey,
+    fetch: runtimeFetch,
+  });
+  // The same switch and key serve every AI call; each feature has its own model.
+  const provider = (model: string) =>
+    !ai.enabled
+      ? ({ unavailable: "AI_DISABLED" } as const)
+      : ai.apiKey === undefined
+        ? ({ unavailable: "PROVIDER_NOT_CONFIGURED" } as const)
+        : { apiKey: ai.apiKey, model, baseUrl: ai.baseUrl, fetch: runtimeFetch };
+  const duplicates = { rpc, embedding: provider(ai.embeddingModel), model: ai.embeddingModel };
+
   return createJobHandlers({
     visual_analysis: createVisualAnalysisHandler({
-      rpc: createRestRpc({
-        supabaseUrl: settings.supabaseUrl,
-        serviceKey: settings.serviceKey,
-        fetch: runtimeFetch,
-      }),
+      rpc,
       supabaseUrl: settings.supabaseUrl,
       serviceKey: settings.serviceKey,
       fetch: runtimeFetch,
-      vision: !ai.enabled
-        ? { unavailable: "AI_DISABLED" }
-        : ai.apiKey === undefined
-          ? { unavailable: "PROVIDER_NOT_CONFIGURED" }
-          : { apiKey: ai.apiKey, model: ai.visionModel, baseUrl: ai.baseUrl, fetch: runtimeFetch },
+      vision: provider(ai.visionModel),
     }),
+    embedding: createEmbeddingHandler(duplicates),
+    duplicate_match: createDuplicateMatchHandler(duplicates),
   });
 }
 

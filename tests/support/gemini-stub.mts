@@ -24,6 +24,11 @@
  *   STUB:VISION-INVALID    malformed JSON (INVALID_OUTPUT)
  *   STUB:429               rate limited, as above
  *
+ * Embeddings (plan v2 F2): embedContent answers a deterministic 768-dimension vector, a hashed
+ * bag of words, so reports with similar wording are similar. Markers in the embedded text:
+ *   STUB:EMBED-REJECT      400 (PROVIDER_REJECTED)
+ *   STUB:429               rate limited
+ *
  * Usage: node tests/support/gemini-stub.mts [port] [host]
  *   host defaults to 127.0.0.1. CI passes 0.0.0.0: on Linux Docker the local Edge worker reaches
  *   the host through the bridge gateway, which cannot connect to a loopback-only server.
@@ -93,6 +98,29 @@ function visionAnswer(report: string): unknown {
   };
 }
 
+const STOPWORDS = new Set(
+  "the and for with from that this there have has was were are not but can our its into all any very".split(
+    " ",
+  ),
+);
+
+/** A hashed bag of words: the same words land in the same dimensions, so similar texts align. */
+function stubEmbedding(text: string): number[] {
+  const values: number[] = Array.from({ length: 768 }, () => 0);
+  const words = text.toLowerCase().match(/[a-z]{3,}/g) ?? [];
+  for (const word of words) {
+    if (STOPWORDS.has(word)) continue;
+    let hash = 2166136261;
+    for (const char of word) {
+      hash = Math.imul(hash ^ char.charCodeAt(0), 16777619) >>> 0;
+    }
+    values[hash % 768] = (values[hash % 768] ?? 0) + ((hash >>> 16) & 1 ? 1 : -1);
+  }
+  if (!values.some((value) => value !== 0)) values[0] = 1;
+  const norm = Math.sqrt(values.reduce((sum, value) => sum + value * value, 0));
+  return values.map((value) => value / norm);
+}
+
 function send(res: ServerResponse, status: number, body: unknown): void {
   res.writeHead(status, { "content-type": "application/json" });
   res.end(JSON.stringify(body));
@@ -144,6 +172,22 @@ const server = createServer((req, res) => {
   void (async () => {
     if (req.method === "GET" && req.url === "/health") {
       send(res, 200, { ok: true });
+      return;
+    }
+    if (req.method === "POST" && /:embedContent$/.test(req.url ?? "")) {
+      const embed = (await readJson(req)) as { content?: { parts?: Part[] } };
+      const text = embed.content?.parts?.[0]?.text ?? "";
+      if (text.includes("STUB:EMBED-REJECT")) {
+        send(res, 400, { error: { code: 400, message: "Invalid", status: "INVALID_ARGUMENT" } });
+        return;
+      }
+      if (text.includes("STUB:429")) {
+        send(res, 429, {
+          error: { code: 429, message: "Exhausted", status: "RESOURCE_EXHAUSTED" },
+        });
+        return;
+      }
+      send(res, 200, { embedding: { values: stubEmbedding(text) } });
       return;
     }
     if (req.method !== "POST" || !/:generateContent$/.test(req.url ?? "")) {

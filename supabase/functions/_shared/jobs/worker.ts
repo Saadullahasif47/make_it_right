@@ -16,6 +16,8 @@ export interface WorkerAiSettings {
   readonly visionModel: string;
   /** The local Gemini stub; honoured on the local stack only. */
   readonly baseUrl: string | undefined;
+  /** GEMINI_EMBEDDING_MODEL (duplicate detection); vectors of different models never mix. */
+  readonly embeddingModel: string;
 }
 
 export interface WorkerSettings {
@@ -76,6 +78,7 @@ export function readWorkerSettings(env: (name: string) => string | undefined): S
         visionModel:
           nonEmpty("GEMINI_VISION_MODEL") ?? nonEmpty("GEMINI_MODEL") ?? "gemini-3.1-flash-lite",
         baseUrl: nonEmpty("GEMINI_BASE_URL"),
+        embeddingModel: nonEmpty("GEMINI_EMBEDDING_MODEL") ?? "gemini-embedding-2",
       },
       simulationEnabled: local && env("AI_WORKER_FAULTS") === "true",
     },

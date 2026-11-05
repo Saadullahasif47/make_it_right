@@ -12,6 +12,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 import { FAILURE_MESSAGES } from "./messages";
 import { submitComplaint } from "./service";
+import { duplicateCheckAfterSubmit } from "@/features/duplicate-detection/enqueue";
 
 const COMPLAINT_FIELDS = ["title", "description", "building", "room"] as const;
 export type ComplaintField = (typeof COMPLAINT_FIELDS)[number];
@@ -52,11 +53,13 @@ export async function submitComplaintAction(
     requestId: createRequestId(),
     route: "action submitComplaint",
   });
+  const client = await createSupabaseServerClient();
   const result = await submitComplaint(
     {
-      client: await createSupabaseServerClient(),
+      client,
       logger,
       triage: submissionTriage(user.id, logger),
+      afterCreate: duplicateCheckAfterSubmit(client, logger),
     },
     {
       title: values.title ?? "",

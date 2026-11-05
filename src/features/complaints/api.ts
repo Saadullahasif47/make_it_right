@@ -29,6 +29,11 @@ export interface ComplaintsApiDependencies {
   readonly getLogger: () => Logger;
   /** The AI step for a new ticket, or undefined while AI is off (see submitComplaint). */
   readonly getTriage?: (actorId: string, logger: Logger) => SubmitDependencies["triage"];
+  /** Best-effort work after a ticket is created (the duplicate check), or undefined. */
+  readonly getAfterCreate?: (
+    client: AppSupabaseClient,
+    logger: Logger,
+  ) => SubmitDependencies["afterCreate"];
   /** The admin's bounded AI retry (POST /api/complaints/[id]/retry-ai). */
   readonly retryAi?: (
     actor: SessionUser,
@@ -145,8 +150,14 @@ export function createComplaintsApi(deps: ComplaintsApiDependencies) {
       }
       const { requestId, logger, body, actor } = guarded;
 
+      const client = await deps.getClient();
       const result = await submitComplaint(
-        { client: await deps.getClient(), logger, triage: deps.getTriage?.(actor.id, logger) },
+        {
+          client,
+          logger,
+          triage: deps.getTriage?.(actor.id, logger),
+          afterCreate: deps.getAfterCreate?.(client, logger),
+        },
         body,
         request.headers.get(IDEMPOTENCY_KEY_HEADER),
       );

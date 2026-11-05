@@ -10,6 +10,7 @@ import { WorkflowPanel } from "@/features/complaints/components/workflow-panel";
 import { WORKFLOW_NOTICES } from "@/features/complaints/paths";
 import { getComplaint } from "@/features/complaints/repository";
 import { complaintIdSchema } from "@/features/complaints/schemas";
+import { DuplicatesPanel } from "@/features/duplicate-detection/components/duplicates-panel";
 import { PhotoEvidence } from "@/features/evidence/components/photo-evidence";
 import { isFeatureEnabled } from "@/lib/config";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -55,6 +56,14 @@ async function DepartmentTicket({
             acknowledgedAt={complaint.acknowledgedAt}
             role={access.user.role}
           />
+          {isFeatureEnabled("duplicateDetection") ? (
+            <DuplicatesPanel
+              client={client}
+              complaintId={complaint.id}
+              viewer="staff"
+              hrefFor={(id) => `/department/${id}`}
+            />
+          ) : null}
           {isFeatureEnabled("visualInspection") ? (
             <PhotoEvidence client={client} complaintId={complaint.id} viewer="staff" open={false} />
           ) : null}

@@ -20,6 +20,7 @@
     "test:integration": "vitest run --project integration",
     "eval:agent": "vitest run --project eval tests/eval/agent.eval.ts",
     "eval:visual": "vitest run --project eval tests/eval/visual.eval.ts",
+    "eval:duplicates": "vitest run --project eval tests/eval/duplicates.eval.ts",
     "dataset:visual": "node scripts/generate-visual-dataset.mts",
     "db:start": "supabase start -x vector,logflare,supavisor,imgproxy,postgres-meta,studio,realtime",
     "db:stop": "supabase stop",

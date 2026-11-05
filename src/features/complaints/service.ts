@@ -21,6 +21,11 @@ export interface SubmitDependencies {
    * newly created ticket and resolves to the ticket's status afterwards.
    */
   readonly triage?: ((ticketId: string) => Promise<TicketState | undefined>) | undefined;
+  /**
+   * Further best-effort work for a newly created ticket, after triage (so its category is
+   * known): the duplicate check while that feature is on. It can never fail the submission.
+   */
+  readonly afterCreate?: ((ticketId: string) => Promise<void>) | undefined;
 }
 
 export function firstIssuePerField(
@@ -72,15 +77,26 @@ export async function submitComplaint(
     return { ok: false, code: "SERVICE_UNAVAILABLE" };
   }
 
-  if (!ticket.created || deps.triage === undefined) {
+  if (!ticket.created) {
     return { ok: true, ticket };
   }
-  try {
-    const status = await deps.triage(ticket.id);
-    return { ok: true, ticket: status === undefined ? ticket : { ...ticket, status } };
-  } catch (error) {
-    // The triage contract is never to throw; if it does, the stored ticket still stands.
-    deps.logger.error("complaint.triage_failed", { complaintId: ticket.id, error });
-    return { ok: true, ticket };
+
+  let result = ticket;
+  if (deps.triage !== undefined) {
+    try {
+      const status = await deps.triage(ticket.id);
+      result = status === undefined ? ticket : { ...ticket, status };
+    } catch (error) {
+      // The triage contract is never to throw; if it does, the stored ticket still stands.
+      deps.logger.error("complaint.triage_failed", { complaintId: ticket.id, error });
+    }
   }
+  if (deps.afterCreate !== undefined) {
+    try {
+      await deps.afterCreate(ticket.id);
+    } catch (error) {
+      deps.logger.warn("complaint.after_create_failed", { complaintId: ticket.id, error });
+    }
+  }
+  return { ok: true, ticket: result };
 }
