@@ -244,6 +244,10 @@ const server = createServer((req, res) => {
   });
 });
 
-server.listen(port, "127.0.0.1", () => {
-  process.stdout.write(`gemini stub listening on http://127.0.0.1:${port}\n`);
+// Loopback on a developer machine. In CI (Linux Docker) the local Edge worker reaches the host
+// through the bridge gateway, which cannot reach a loopback-only server, so CI listens on all
+// interfaces of its throwaway runner.
+const host = process.env.CI === "true" ? "0.0.0.0" : "127.0.0.1";
+server.listen(port, host, () => {
+  process.stdout.write(`gemini stub listening on http://${host}:${port}\n`);
 });
