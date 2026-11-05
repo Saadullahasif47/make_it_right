@@ -22,7 +22,12 @@ export async function ensureGeminiStub(): Promise<() => void> {
   }
   const child: ChildProcess = spawn(
     process.execPath,
-    ["tests/support/gemini-stub.mts", String(STUB_PORT)],
+    // CI's Linux Docker reaches the host only through the bridge gateway (see the stub).
+    [
+      "tests/support/gemini-stub.mts",
+      String(STUB_PORT),
+      process.env.CI === "true" ? "0.0.0.0" : "127.0.0.1",
+    ],
     { stdio: "ignore" },
   );
   for (let attempt = 0; attempt < 50; attempt += 1) {

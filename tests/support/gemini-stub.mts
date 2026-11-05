@@ -24,7 +24,9 @@
  *   STUB:VISION-INVALID    malformed JSON (INVALID_OUTPUT)
  *   STUB:429               rate limited, as above
  *
- * Usage: node tests/support/gemini-stub.mts [port]
+ * Usage: node tests/support/gemini-stub.mts [port] [host]
+ *   host defaults to 127.0.0.1. CI passes 0.0.0.0: on Linux Docker the local Edge worker reaches
+ *   the host through the bridge gateway, which cannot connect to a loopback-only server.
  */
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
 
@@ -244,10 +246,7 @@ const server = createServer((req, res) => {
   });
 });
 
-// Loopback on a developer machine. In CI (Linux Docker) the local Edge worker reaches the host
-// through the bridge gateway, which cannot reach a loopback-only server, so CI listens on all
-// interfaces of its throwaway runner.
-const host = process.env.CI === "true" ? "0.0.0.0" : "127.0.0.1";
+const host = process.argv[3] ?? "127.0.0.1";
 server.listen(port, host, () => {
   process.stdout.write(`gemini stub listening on http://${host}:${port}\n`);
 });

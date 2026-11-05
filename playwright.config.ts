@@ -49,7 +49,8 @@ export default defineConfig({
             env: { APP_BASE_URL: `http://localhost:${port}`, AI_ENABLED: "false" },
           },
           {
-            command: `node tests/support/gemini-stub.mts ${GEMINI_STUB_PORT}`,
+            // CI's Linux Docker reaches the host only through the bridge gateway (see the stub).
+            command: `node tests/support/gemini-stub.mts ${GEMINI_STUB_PORT} ${isCI ? "0.0.0.0" : "127.0.0.1"}`,
             url: `http://127.0.0.1:${GEMINI_STUB_PORT}/health`,
             reuseExistingServer: !isCI,
             timeout: 30_000,
