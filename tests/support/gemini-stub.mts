@@ -15,7 +15,18 @@
  *   STUB:WRONG-FIRST    proposes a fabricated department, then looks up and corrects itself
  * Anything else is classified by keyword, looked up with find_category_route and proposed.
  *
- * Usage: node tests/support/gemini-stub.mts [port]
+ * Photo analysis (plan v2 F1): a request that carries an inline image gets a structured JSON
+ * answer (category by keyword from the report text). It answers 400 unless the image really is
+ * a JPEG, PNG or WebP. Markers in the report text:
+ *   STUB:VISION-BLURRY     the photo is blurry (goes to review)
+ *   STUB:VISION-MISMATCH   the photo contradicts the report (goes to review)
+ *   STUB:VISION-CERTAIN    an overconfident explanation (goes to review)
+ *   STUB:VISION-INVALID    malformed JSON (INVALID_OUTPUT)
+ *   STUB:429               rate limited, as above
+ *
+ * Usage: node tests/support/gemini-stub.mts [port] [host]
+ *   host defaults to 127.0.0.1. CI passes 0.0.0.0: on Linux Docker the local Edge worker reaches
+ *   the host through the bridge gateway, which cannot connect to a loopback-only server.
  */
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
 
@@ -28,6 +39,7 @@ const PRIMARY_MODEL = "gemini-3.1-flash-lite";
 
 interface Part {
   text?: string;
+  inlineData?: { mimeType?: string; data?: string };
   functionCall?: { id?: string; name: string; args?: Record<string, unknown> };
   functionResponse?: { id?: string; name: string; response?: Record<string, unknown> };
 }
@@ -46,6 +58,39 @@ const KEYWORDS: readonly (readonly [string, RegExp])[] = [
 
 function classify(text: string): string {
   return KEYWORDS.find(([, pattern]) => pattern.test(text))?.[0] ?? "other";
+}
+
+function isImage(base64: string | undefined): boolean {
+  const bytes = Buffer.from(base64 ?? "", "base64");
+  const hex = bytes.subarray(0, 12).toString("hex");
+  return (
+    hex.startsWith("ffd8ff") ||
+    hex.startsWith("89504e470d0a1a0a") ||
+    (hex.startsWith("52494646") && bytes.subarray(8, 12).toString("latin1") === "WEBP")
+  );
+}
+
+/** A structured photo analysis, as Gemini returns it with responseMimeType application/json. */
+function visionAnswer(report: string): unknown {
+  const category = classify(report);
+  const answer = {
+    visible_observations: [`Visible signs of a ${category.replace("_", " ")} problem`],
+    possible_issue: `possible ${category.replace("_", " ")} fault`,
+    suggested_category: category,
+    severity_hint: "medium",
+    not_visible_or_uncertain: ["the cause is not visible"],
+    image_quality: report.includes("STUB:VISION-BLURRY") ? "blurry" : "usable",
+    text_consistency: report.includes("STUB:VISION-MISMATCH") ? "inconsistent" : "consistent",
+    needs_human_review: false,
+    explanation: report.includes("STUB:VISION-CERTAIN")
+      ? "This is definitely a broken pipe."
+      : "The photo shows signs that match the report; the cause cannot be seen.",
+  };
+  const text = report.includes("STUB:VISION-INVALID") ? "{not json" : JSON.stringify(answer);
+  return {
+    candidates: [{ content: { role: "model", parts: [{ text }] }, finishReason: "STOP" }],
+    usageMetadata: { promptTokenCount: 300, candidatesTokenCount: 80, totalTokenCount: 380 },
+  };
 }
 
 function send(res: ServerResponse, status: number, body: unknown): void {
@@ -114,6 +159,28 @@ const server = createServer((req, res) => {
     const turn = contents.filter((content) => content.role === "model").length + 1;
     const category = classify(report);
 
+    const image = contents[0]?.parts?.find((part) => part.inlineData !== undefined)?.inlineData;
+    if (image !== undefined) {
+      if (report.includes("STUB:429")) {
+        send(res, 429, {
+          error: {
+            code: 429,
+            message: "Resource has been exhausted",
+            status: "RESOURCE_EXHAUSTED",
+          },
+        });
+        return;
+      }
+      if (!isImage(image.data)) {
+        send(res, 400, {
+          error: { code: 400, message: "Invalid image", status: "INVALID_ARGUMENT" },
+        });
+        return;
+      }
+      send(res, 200, visionAnswer(report));
+      return;
+    }
+
     const seen = failures.get(report) ?? 0;
     if (report.includes("STUB:429") || (report.includes("STUB:FAIL-ONCE") && seen < 2)) {
       failures.set(report, seen + 1);
@@ -179,6 +246,7 @@ const server = createServer((req, res) => {
   });
 });
 
-server.listen(port, "127.0.0.1", () => {
-  process.stdout.write(`gemini stub listening on http://127.0.0.1:${port}\n`);
+const host = process.argv[3] ?? "127.0.0.1";
+server.listen(port, host, () => {
+  process.stdout.write(`gemini stub listening on http://${host}:${port}\n`);
 });

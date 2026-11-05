@@ -37,6 +37,13 @@ const ERROR_LABELS: Readonly<Record<string, string>> = {
   ATTEMPTS_EXHAUSTED: "Every allowed attempt was used.",
   HANDLER_FAILED: "The worker hit an unexpected error.",
   HANDLER_UNAVAILABLE: "This kind of job is not switched on yet.",
+  INVALID_OUTPUT: "The AI's answer was not in the expected form.",
+  PROVIDER_REJECTED: "The AI provider refused the request.",
+  PROVIDER_NOT_CONFIGURED: "No AI provider key is configured for the worker.",
+  AI_DISABLED: "AI is switched off for the worker.",
+  PHOTO_NOT_FOUND: "The photo is no longer available.",
+  PHOTO_INTEGRITY: "The stored photo did not match the one that was checked.",
+  STORAGE_UNAVAILABLE: "Photo storage was unavailable.",
 };
 
 export function errorLabel(code: string | null): string | null {

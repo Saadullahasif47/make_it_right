@@ -44,11 +44,13 @@ export interface RestWorkerDatabaseOptions {
   readonly timeoutMs?: number;
 }
 
-/** Calls the worker functions through PostgREST with the service-role key. */
-export function createRestWorkerDatabase(options: RestWorkerDatabaseOptions): WorkerDatabase {
+export type Rpc = (name: string, args: Readonly<Record<string, unknown>>) => Promise<unknown>;
+
+/** Calls a service-role database function through PostgREST; failures carry the SQLSTATE. */
+export function createRestRpc(options: RestWorkerDatabaseOptions): Rpc {
   const endpoint = `${options.supabaseUrl.replace(/\/+$/, "")}/rest/v1/rpc/`;
 
-  async function rpc(name: string, args: Readonly<Record<string, unknown>>): Promise<unknown> {
+  return async function rpc(name, args) {
     const response = await options.fetch(endpoint + name, {
       method: "POST",
       headers: {
@@ -68,7 +70,12 @@ export function createRestWorkerDatabase(options: RestWorkerDatabaseOptions): Wo
       );
     }
     return body;
-  }
+  };
+}
+
+/** Calls the worker functions through PostgREST with the service-role key. */
+export function createRestWorkerDatabase(options: RestWorkerDatabaseOptions): WorkerDatabase {
+  const rpc = createRestRpc(options);
 
   return {
     async claim(batch, visibilitySeconds) {

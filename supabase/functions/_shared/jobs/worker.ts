@@ -8,10 +8,21 @@ export const LOCAL_WORKER_SECRET = "local-only-ai-worker-secret-0123456789abcdef
 
 export const WORKER_SECRET_HEADER = "x-worker-secret";
 
+export interface WorkerAiSettings {
+  /** AI_ENABLED=true; the worker's own kill switch for provider calls. */
+  readonly enabled: boolean;
+  readonly apiKey: string | undefined;
+  /** GEMINI_VISION_MODEL, else GEMINI_MODEL, else the app's default. */
+  readonly visionModel: string;
+  /** The local Gemini stub; honoured on the local stack only. */
+  readonly baseUrl: string | undefined;
+}
+
 export interface WorkerSettings {
   readonly supabaseUrl: string;
   readonly serviceKey: string;
   readonly secret: string;
+  readonly ai: WorkerAiSettings;
   /** Failure simulation for local drills; never on a hosted project. */
   readonly simulationEnabled: boolean;
 }
@@ -45,12 +56,27 @@ export function readWorkerSettings(env: (name: string) => string | undefined): S
   if (secret === LOCAL_WORKER_SECRET && !local) {
     return { ok: false, problem: "AI_WORKER_SECRET is the local development value" };
   }
+  const baseUrl = env("GEMINI_BASE_URL");
+  if (baseUrl !== undefined && baseUrl !== "" && !local) {
+    return { ok: false, problem: "GEMINI_BASE_URL is for the local stack only" };
+  }
+  const nonEmpty = (name: string): string | undefined => {
+    const value = env(name)?.trim();
+    return value === undefined || value === "" ? undefined : value;
+  };
   return {
     ok: true,
     settings: {
       supabaseUrl,
       serviceKey,
       secret,
+      ai: {
+        enabled: env("AI_ENABLED") === "true",
+        apiKey: nonEmpty("GEMINI_API_KEY"),
+        visionModel:
+          nonEmpty("GEMINI_VISION_MODEL") ?? nonEmpty("GEMINI_MODEL") ?? "gemini-3.1-flash-lite",
+        baseUrl: nonEmpty("GEMINI_BASE_URL"),
+      },
       simulationEnabled: local && env("AI_WORKER_FAULTS") === "true",
     },
   };

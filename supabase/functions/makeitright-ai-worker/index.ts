@@ -5,8 +5,13 @@
  * only wires the Deno runtime.
  */
 import { createJobHandlers } from "../_shared/jobs/handlers.ts";
-import { handleWorkerRequest, readWorkerSettings } from "../_shared/jobs/worker.ts";
-import { createRestWorkerDatabase } from "../_shared/jobs/worker-db.ts";
+import {
+  handleWorkerRequest,
+  readWorkerSettings,
+  type WorkerSettings,
+} from "../_shared/jobs/worker.ts";
+import { createRestRpc, createRestWorkerDatabase } from "../_shared/jobs/worker-db.ts";
+import { createVisualAnalysisHandler } from "../_shared/visual-inspection/handler.ts";
 
 interface DenoRuntime {
   serve(handler: (request: Request) => Response | Promise<Response>): unknown;
@@ -25,10 +30,34 @@ if (!configured.ok) {
   log("ai_worker.misconfigured", { problem: configured.problem });
 }
 
-const handlers = createJobHandlers();
+const runtimeFetch: typeof fetch = (input, init) => fetch(input, init);
+
+/** One handler per feature that has shipped; the rest send their jobs to review. */
+function handlersFor(settings: WorkerSettings) {
+  const { ai } = settings;
+  return createJobHandlers({
+    visual_analysis: createVisualAnalysisHandler({
+      rpc: createRestRpc({
+        supabaseUrl: settings.supabaseUrl,
+        serviceKey: settings.serviceKey,
+        fetch: runtimeFetch,
+      }),
+      supabaseUrl: settings.supabaseUrl,
+      serviceKey: settings.serviceKey,
+      fetch: runtimeFetch,
+      vision: !ai.enabled
+        ? { unavailable: "AI_DISABLED" }
+        : ai.apiKey === undefined
+          ? { unavailable: "PROVIDER_NOT_CONFIGURED" }
+          : { apiKey: ai.apiKey, model: ai.visionModel, baseUrl: ai.baseUrl, fetch: runtimeFetch },
+    }),
+  });
+}
+
+const handlers = configured.ok ? handlersFor(configured.settings) : undefined;
 
 runtime.serve((request) => {
-  if (!configured.ok) {
+  if (!configured.ok || handlers === undefined) {
     return Response.json({ error: "WORKER_NOT_CONFIGURED" }, { status: 503 });
   }
   const { settings } = configured;
@@ -36,7 +65,7 @@ runtime.serve((request) => {
     db: createRestWorkerDatabase({
       supabaseUrl: settings.supabaseUrl,
       serviceKey: settings.serviceKey,
-      fetch: (input, init) => fetch(input, init),
+      fetch: runtimeFetch,
     }),
     handlers,
     log,

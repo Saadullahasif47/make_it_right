@@ -4,7 +4,7 @@
  */
 import { createHash, randomUUID } from "node:crypto";
 
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 
 import { LOCAL_WORKER_SECRET } from "../../supabase/functions/_shared/jobs/worker";
 
@@ -181,6 +181,19 @@ describe("private photo storage (A1.01)", () => {
 });
 
 describe("durable AI jobs (A1.02-A1.04)", () => {
+  // Each drill claims one message at a time; finish whatever earlier tests left in the queue
+  // first, so the drill acts on this test's job.
+  beforeEach(async () => {
+    for (let run = 0; run < 10; run += 1) {
+      const response = await callWorker({
+        "x-worker-simulate": "success",
+        "x-worker-retry-delay": "0",
+      });
+      const body = (await response.json()) as { processed?: number };
+      if (body.processed === 0) return;
+    }
+  });
+
   it("queues the analysis the moment a photo is finalised, without waiting for AI", async () => {
     const { jobId } = await photoJob();
     expect(await jobRow(jobId)).toMatchObject({ status: "queued", attempts: 0 });
@@ -191,16 +204,6 @@ describe("durable AI jobs (A1.02-A1.04)", () => {
     expect(error?.code).toBe("42501");
     expect((await fetch(workerUrl(), { method: "POST" })).status).toBe(401);
     expect((await callWorker({ "x-worker-secret": "wrong-secret" })).status).toBe(401);
-  });
-
-  it("sends a job type that is not built yet to review in one attempt", async () => {
-    const { jobId } = await photoJob();
-    expect((await callWorker()).status).toBe(200);
-    expect(await jobRow(jobId)).toMatchObject({
-      status: "needs_review",
-      attempts: 1,
-      last_error_code: "HANDLER_UNAVAILABLE",
-    });
   });
 
   it("retries a simulated 429 and stops after three attempts", async () => {
@@ -238,7 +241,7 @@ describe("durable AI jobs (A1.02-A1.04)", () => {
 
   it("lets an admin queue a reviewed job again, and nobody else", async () => {
     const { jobId } = await photoJob();
-    await callWorker();
+    await callWorker({ "x-worker-simulate": "rate_limited", "x-worker-retry-delay": "0" });
     expect((await jobRow(jobId)).status).toBe("needs_review");
 
     const refused = await student.client.rpc("admin_retry_ai_job", { p_job_id: jobId });

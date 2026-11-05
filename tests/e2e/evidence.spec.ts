@@ -3,13 +3,9 @@
  * The second test server has FEATURE_VISUAL_INSPECTION on; the first has every flag off and
  * must look exactly as before.
  */
-import { join } from "node:path";
-
 import AxeBuilder from "@axe-core/playwright";
-import { expect, test, type Browser, type Page } from "@playwright/test";
+import { expect, test } from "@playwright/test";
 
-import { AI_PORT } from "../../playwright.config";
-import { LOCAL_WORKER_SECRET } from "../../supabase/functions/_shared/jobs/worker";
 import {
   adminClient,
   createTestUser,
@@ -17,12 +13,11 @@ import {
   type TestUser,
 } from "../integration/support/supabase";
 
-import { LOCAL_STACK_REASON, hasLocalStack, signIn } from "./support/local-stack";
+import { FLAGGED_URL, choosePhoto, photoJobsFor, report, signedIn } from "./support/evidence";
+import { LOCAL_STACK_REASON, hasLocalStack } from "./support/local-stack";
+import { runWorker } from "./support/worker";
 
 test.skip(!hasLocalStack(), LOCAL_STACK_REASON);
-
-const FLAGGED_URL = `http://localhost:${String(AI_PORT)}`;
-const FIXTURES = join(process.cwd(), "tests", "fixtures", "evidence");
 
 const cleanup: string[] = [];
 let student: TestUser;
@@ -36,54 +31,6 @@ test.beforeAll(async () => {
 test.afterAll(async () => {
   await deleteUsers(cleanup);
 });
-
-async function signedIn(
-  browser: Browser,
-  baseURL: string,
-  user: TestUser,
-  home: RegExp,
-): Promise<Page> {
-  const context = await browser.newContext({ baseURL });
-  const page = await context.newPage();
-  await page.goto("/login");
-  await signIn(page, user.email, user.password);
-  await expect(page).toHaveURL(home);
-  return page;
-}
-
-/** Submits a text-only report through the real form; returns the ticket id. */
-async function report(page: Page): Promise<string> {
-  await page.goto("/student/complaints/new");
-  await page.getByLabel("What is wrong?").fill("Water under the washroom sink");
-  await page.getByLabel("Building").fill("Block E");
-  await page
-    .getByLabel("Describe the problem")
-    .fill("There is a puddle of water under the sink cabinet in the ground floor washroom.");
-  await page.getByRole("button", { name: "Submit report" }).click();
-  await expect(page).toHaveURL(/\/student\/complaints\/[0-9a-f-]{36}\?notice=/, {
-    timeout: 20_000,
-  });
-  return new URL(page.url()).pathname.split("/").at(-1) ?? "";
-}
-
-async function choosePhoto(page: Page, file: string): Promise<void> {
-  const chooser = page.waitForEvent("filechooser");
-  await page.getByRole("button", { name: "Add a photo" }).click();
-  await (await chooser).setFiles(join(FIXTURES, file));
-}
-
-async function photoJobsFor(ticketId: string) {
-  const { data } = await adminClient()
-    .from("evidence_attachments")
-    .select("id, state")
-    .eq("complaint_id", ticketId);
-  const finalized = (data ?? []).filter((row) => row.state === "finalized").map((row) => row.id);
-  const { data: jobs } = await adminClient()
-    .from("ai_jobs")
-    .select("id, status, target_id")
-    .in("target_id", finalized.length === 0 ? ["00000000-0000-4000-8000-000000000000"] : finalized);
-  return { attachments: data ?? [], jobs: jobs ?? [] };
-}
 
 test.describe("with photo evidence switched on", () => {
   test.use({ baseURL: FLAGGED_URL });
@@ -145,7 +92,8 @@ test.describe("with photo evidence switched on", () => {
 
   test("an admin sees the job, its failure reason, and can retry it", async ({ browser }) => {
     const studentPage = await signedIn(browser, FLAGGED_URL, student, /\/student\/complaints$/);
-    const ticketId = await report(studentPage);
+    // The stub answers this photo with malformed output, so the job ends in review.
+    const ticketId = await report(studentPage, "STUB:VISION-INVALID");
     await choosePhoto(studentPage, "synthetic-sink.png");
     await expect(studentPage.getByText("Photo added.", { exact: false })).toBeVisible();
     await studentPage.context().close();
@@ -154,17 +102,15 @@ test.describe("with photo evidence switched on", () => {
     expect(job).toBeDefined();
     const jobId = job?.id ?? "";
 
-    // The worker runs; photo analysis itself arrives in A2, so the job goes to review.
-    const worker = await fetch(
-      `${process.env.NEXT_PUBLIC_SUPABASE_URL ?? ""}/functions/v1/makeitright-ai-worker`,
-      {
-        method: "POST",
-        headers: { "x-worker-secret": LOCAL_WORKER_SECRET },
-      },
-    );
-    expect(worker.status).toBe(200);
+    // The worker runs (as Cron would); the photo's analysis is invalid, so the job goes to review.
     await expect
-      .poll(async () => (await photoJobsFor(ticketId)).jobs[0]?.status)
+      .poll(
+        async () => {
+          await runWorker();
+          return (await photoJobsFor(ticketId)).jobs[0]?.status;
+        },
+        { timeout: 30_000 },
+      )
       .toBe("needs_review");
 
     const page = await signedIn(browser, FLAGGED_URL, admin, /\/admin$/);
@@ -177,7 +123,7 @@ test.describe("with photo evidence switched on", () => {
 
     const row = page.getByRole("row").filter({ hasText: jobId.slice(0, 8) });
     await expect(row.getByText("Photo analysis")).toBeVisible();
-    await expect(row.getByText("This kind of job is not switched on yet.")).toBeVisible();
+    await expect(row.getByText("The AI's answer was not in the expected form.")).toBeVisible();
 
     const scan = await new AxeBuilder({ page }).include("main").analyze();
     expect(scan.violations).toEqual([]);

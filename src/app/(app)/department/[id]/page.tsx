@@ -10,6 +10,8 @@ import { WorkflowPanel } from "@/features/complaints/components/workflow-panel";
 import { WORKFLOW_NOTICES } from "@/features/complaints/paths";
 import { getComplaint } from "@/features/complaints/repository";
 import { complaintIdSchema } from "@/features/complaints/schemas";
+import { PhotoEvidence } from "@/features/evidence/components/photo-evidence";
+import { isFeatureEnabled } from "@/lib/config";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export const metadata: Metadata = { title: "Ticket" };
@@ -28,10 +30,9 @@ async function DepartmentTicket({
   }
 
   const parsedId = complaintIdSchema.safeParse(id);
+  const client = await createSupabaseServerClient();
   // RLS hides tickets of other departments: indistinguishable from a missing ticket.
-  const complaint = parsedId.success
-    ? await getComplaint(await createSupabaseServerClient(), parsedId.data)
-    : null;
+  const complaint = parsedId.success ? await getComplaint(client, parsedId.data) : null;
   if (complaint === null) {
     notFound();
   }
@@ -46,13 +47,18 @@ async function DepartmentTicket({
       back={{ href: "/department", label: "Department queue" }}
       toast={notice}
       actions={
-        <WorkflowPanel
-          ticketId={complaint.id}
-          version={complaint.version}
-          status={complaint.status}
-          acknowledgedAt={complaint.acknowledgedAt}
-          role={access.user.role}
-        />
+        <>
+          <WorkflowPanel
+            ticketId={complaint.id}
+            version={complaint.version}
+            status={complaint.status}
+            acknowledgedAt={complaint.acknowledgedAt}
+            role={access.user.role}
+          />
+          {isFeatureEnabled("visualInspection") ? (
+            <PhotoEvidence client={client} complaintId={complaint.id} viewer="staff" open={false} />
+          ) : null}
+        </>
       }
     />
   );

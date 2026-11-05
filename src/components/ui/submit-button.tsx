@@ -13,6 +13,9 @@ interface SubmitButtonProps extends ButtonStyleOptions {
   readonly pendingLabel: string;
   /** For buttons whose visible text is shared by several forms on a page ("Save"). */
   readonly "aria-label"?: string;
+  /** Submitted with the form when this button is the one pressed (several choices, one form). */
+  readonly name?: string;
+  readonly value?: string;
 }
 
 const layer = "col-start-1 row-start-1 inline-flex items-center justify-center gap-2";
@@ -28,6 +31,8 @@ export function SubmitButton({
   children,
   pendingLabel,
   "aria-label": ariaLabel,
+  name,
+  value,
   ...style
 }: SubmitButtonProps) {
   const { pending } = useFormStatus();
@@ -39,6 +44,8 @@ export function SubmitButton({
         disabled={pending}
         aria-disabled={pending}
         aria-label={ariaLabel}
+        name={name}
+        value={value}
         className={buttonClassName({ size: "lg", ...style, className: style.className })}
       >
         <span className="grid">

@@ -400,6 +400,10 @@ deno_version = 2
 [edge_runtime.secrets]
 AI_WORKER_SECRET = "local-only-ai-worker-secret-0123456789abcdef"
 AI_WORKER_FAULTS = "true"
+# Photo analysis talks to the local Gemini stub (tests/support/gemini-stub.mts on the host).
+AI_ENABLED = "true"
+GEMINI_API_KEY = "stub-key-not-a-secret"
+GEMINI_BASE_URL = "http://host.docker.internal:3199"
 
 # Called by Supabase Cron with a shared secret, not with a user JWT.
 [functions.makeitright-ai-worker]
