@@ -346,7 +346,7 @@ select is((select count(*)::int from public.ai_jobs where dedupe_key = 'mf-dedup
 reset role;
 
 -- ---------------------------------------------------------------------------------------------
--- Shared cases are not driven by one ticket; deleting a report removes its empty case
+-- Deleting a report removes its empty case; a shared case follows its reports (A3)
 -- ---------------------------------------------------------------------------------------------
 delete from public.case_reports where complaint_id = (select id from t where name = 'unknown');
 select is((select count(*)::int from public.maintenance_cases where id = (select id from t where name = 'unknown_case')), 0,
@@ -355,8 +355,9 @@ insert into public.case_reports (complaint_id, case_id)
 select (select id from t where name = 'unknown'), (pg_temp.case_of(id)).id from t where name = 'main';
 
 update public.complaints set status = 'needs_review' where id = (select id from t where name = 'unknown');
-select is((pg_temp.case_of((select id from t where name = 'main'))).status, 'closed'::public.maintenance_case_status,
-  'one report of a shared case cannot change the case on its own');
+-- Since A3 a shared case is led by operational changes on any of its reports (ADR 0011).
+select is((pg_temp.case_of((select id from t where name = 'main'))).status, 'needs_review'::public.maintenance_case_status,
+  'an operational change on one report of a shared case updates the case (A3)');
 
 -- ---------------------------------------------------------------------------------------------
 -- Late locations and the synthetic campus history (A0.05)

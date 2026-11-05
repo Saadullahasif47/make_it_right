@@ -413,6 +413,7 @@ describe("worker AI settings", () => {
       apiKey: "k",
       visionModel: "gemini-3.5-flash",
       baseUrl: undefined,
+      embeddingModel: "gemini-embedding-2",
     });
   });
 

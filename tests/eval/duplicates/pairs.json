@@ -1,0 +1,1090 @@
+{
+  "version": 1,
+  "synthetic": true,
+  "note": "Fictional report pairs for plan v2 A3.04. 'duplicate' pairs describe one physical problem in different words; the rest are hard negatives. Location features are what the database would compute for the pair.",
+  "pairs": [
+    {
+      "id": "d01",
+      "duplicate": true,
+      "kind": "same problem, reworded",
+      "sameRoom": true,
+      "categoryMatch": true,
+      "sameAsset": false,
+      "a": {
+        "title": "Water leaking under the washroom sink",
+        "description": "There is water leaking from under the sink and the floor is wet.",
+        "category": "plumbing"
+      },
+      "b": {
+        "title": "Sink pipe dripping",
+        "description": "The pipe below the basin keeps dripping and a puddle is forming.",
+        "category": "plumbing"
+      }
+    },
+    {
+      "id": "d02",
+      "duplicate": true,
+      "kind": "same problem, reworded",
+      "sameRoom": true,
+      "categoryMatch": true,
+      "sameAsset": true,
+      "a": {
+        "title": "Projector shows no picture",
+        "description": "The projector in the lab turns on but nothing appears on the screen.",
+        "category": "it_equipment"
+      },
+      "b": {
+        "title": "No display from ceiling projector",
+        "description": "Lecture could not start because the ceiling projector gives a blank screen.",
+        "category": "it_equipment"
+      }
+    },
+    {
+      "id": "d03",
+      "duplicate": true,
+      "kind": "same problem, reworded",
+      "sameRoom": true,
+      "categoryMatch": true,
+      "sameAsset": false,
+      "a": {
+        "title": "Lights flickering",
+        "description": "The tube lights in the classroom flicker constantly.",
+        "category": "electrical"
+      },
+      "b": {
+        "title": "Flashing ceiling lights",
+        "description": "Ceiling lights keep flashing on and off during class, very distracting.",
+        "category": "electrical"
+      }
+    },
+    {
+      "id": "d04",
+      "duplicate": true,
+      "kind": "same problem, reworded",
+      "sameRoom": true,
+      "categoryMatch": true,
+      "sameAsset": false,
+      "a": {
+        "title": "Toilet will not flush",
+        "description": "The second toilet in the men's washroom does not flush.",
+        "category": "plumbing"
+      },
+      "b": {
+        "title": "Flush broken in cubicle two",
+        "description": "Pressing the flush in the second cubicle does nothing.",
+        "category": "plumbing"
+      }
+    },
+    {
+      "id": "d05",
+      "duplicate": true,
+      "kind": "same problem, reworded",
+      "sameRoom": true,
+      "categoryMatch": true,
+      "sameAsset": false,
+      "a": {
+        "title": "Broken chair leg",
+        "description": "A chair in the front row has a snapped leg and is dangerous to sit on.",
+        "category": "furniture"
+      },
+      "b": {
+        "title": "Chair collapsed",
+        "description": "One of the front chairs broke when I sat down, its leg is cracked.",
+        "category": "furniture"
+      }
+    },
+    {
+      "id": "d06",
+      "duplicate": true,
+      "kind": "same problem, reworded",
+      "sameRoom": true,
+      "categoryMatch": true,
+      "sameAsset": false,
+      "a": {
+        "title": "Bin overflowing",
+        "description": "The rubbish bin in the corridor is full and overflowing onto the floor.",
+        "category": "sanitation"
+      },
+      "b": {
+        "title": "Rubbish everywhere near the bin",
+        "description": "Trash is spilling out of the corridor bin, nobody has emptied it.",
+        "category": "sanitation"
+      }
+    },
+    {
+      "id": "d07",
+      "duplicate": true,
+      "kind": "same problem, reworded",
+      "sameRoom": true,
+      "categoryMatch": true,
+      "sameAsset": false,
+      "a": {
+        "title": "Air conditioner not cooling",
+        "description": "The AC in the reading room is running but the air is warm.",
+        "category": "electrical"
+      },
+      "b": {
+        "title": "Reading room too hot",
+        "description": "The air conditioning blows warm air, the reading room is very hot.",
+        "category": "electrical"
+      }
+    },
+    {
+      "id": "d08",
+      "duplicate": true,
+      "kind": "same problem, reworded",
+      "sameRoom": true,
+      "categoryMatch": true,
+      "sameAsset": false,
+      "a": {
+        "title": "Wi-Fi not working in lab",
+        "description": "None of the laptops can connect to the Wi-Fi in this lab.",
+        "category": "it_equipment"
+      },
+      "b": {
+        "title": "No internet in the computer lab",
+        "description": "The wireless network keeps failing to connect in the lab today.",
+        "category": "it_equipment"
+      }
+    },
+    {
+      "id": "d09",
+      "duplicate": true,
+      "kind": "same problem, reworded",
+      "sameRoom": true,
+      "categoryMatch": true,
+      "sameAsset": false,
+      "a": {
+        "title": "Door handle broken",
+        "description": "The handle of the classroom door came off and the door is hard to open.",
+        "category": "furniture"
+      },
+      "b": {
+        "title": "Classroom door handle fell off",
+        "description": "Cannot open the door properly, the handle is loose and fell off.",
+        "category": "furniture"
+      }
+    },
+    {
+      "id": "d10",
+      "duplicate": true,
+      "kind": "same problem, reworded",
+      "sameRoom": true,
+      "categoryMatch": true,
+      "sameAsset": false,
+      "a": {
+        "title": "Bad smell in washroom",
+        "description": "There is a strong bad smell in the ground floor washroom.",
+        "category": "sanitation"
+      },
+      "b": {
+        "title": "Washroom stinks",
+        "description": "The ground floor toilets smell terrible, they need cleaning.",
+        "category": "sanitation"
+      }
+    },
+    {
+      "id": "d11",
+      "duplicate": true,
+      "kind": "same problem, reworded",
+      "sameRoom": true,
+      "categoryMatch": true,
+      "sameAsset": false,
+      "a": {
+        "title": "Socket sparking",
+        "description": "The wall socket near the window sparked when I plugged in my charger.",
+        "category": "electrical"
+      },
+      "b": {
+        "title": "Sparks from power outlet",
+        "description": "Saw sparks coming out of the power point by the window, there is a burning smell.",
+        "category": "electrical"
+      }
+    },
+    {
+      "id": "d12",
+      "duplicate": true,
+      "kind": "same problem, reworded",
+      "sameRoom": true,
+      "categoryMatch": true,
+      "sameAsset": false,
+      "a": {
+        "title": "Printer jammed",
+        "description": "The library printer has paper stuck inside and shows a red light.",
+        "category": "it_equipment"
+      },
+      "b": {
+        "title": "Library printer not printing",
+        "description": "Paper jam in the library printer, my print job is stuck.",
+        "category": "it_equipment"
+      }
+    },
+    {
+      "id": "d13",
+      "duplicate": true,
+      "kind": "same problem, reworded",
+      "sameRoom": true,
+      "categoryMatch": true,
+      "sameAsset": false,
+      "a": {
+        "title": "Water cooler leaking",
+        "description": "The water cooler in the hall is leaking onto the floor.",
+        "category": "plumbing"
+      },
+      "b": {
+        "title": "Puddle under the water dispenser",
+        "description": "Water keeps collecting under the drinking water dispenser in the hall.",
+        "category": "plumbing"
+      }
+    },
+    {
+      "id": "d14",
+      "duplicate": true,
+      "kind": "same problem, reworded",
+      "sameRoom": true,
+      "categoryMatch": true,
+      "sameAsset": false,
+      "a": {
+        "title": "Window will not close",
+        "description": "The classroom window is stuck open and rain comes in.",
+        "category": "furniture"
+      },
+      "b": {
+        "title": "Stuck window letting rain in",
+        "description": "We cannot shut the window, it is jammed and water is coming inside.",
+        "category": "furniture"
+      }
+    },
+    {
+      "id": "d15",
+      "duplicate": true,
+      "kind": "same problem, reworded",
+      "sameRoom": true,
+      "categoryMatch": true,
+      "sameAsset": false,
+      "a": {
+        "title": "Ants in the cafeteria",
+        "description": "There are lots of ants on the tables in the cafeteria.",
+        "category": "sanitation"
+      },
+      "b": {
+        "title": "Insects on cafeteria tables",
+        "description": "Ants are crawling all over the eating area tables.",
+        "category": "sanitation"
+      }
+    },
+    {
+      "id": "d16",
+      "duplicate": true,
+      "kind": "same problem, reworded",
+      "sameRoom": true,
+      "categoryMatch": true,
+      "sameAsset": true,
+      "a": {
+        "title": "Computer will not turn on",
+        "description": "Workstation 12 in the lab does not power on at all.",
+        "category": "it_equipment"
+      },
+      "b": {
+        "title": "Lab PC 12 dead",
+        "description": "PC number 12 shows no lights when pressing the power button.",
+        "category": "it_equipment"
+      }
+    },
+    {
+      "id": "d17",
+      "duplicate": true,
+      "kind": "same problem, reworded",
+      "sameRoom": true,
+      "categoryMatch": true,
+      "sameAsset": false,
+      "a": {
+        "title": "Ceiling fan making noise",
+        "description": "The ceiling fan makes a loud grinding noise when running.",
+        "category": "electrical"
+      },
+      "b": {
+        "title": "Noisy fan",
+        "description": "The fan above the desks rattles and grinds very loudly.",
+        "category": "electrical"
+      }
+    },
+    {
+      "id": "d18",
+      "duplicate": true,
+      "kind": "same problem, reworded",
+      "sameRoom": true,
+      "categoryMatch": true,
+      "sameAsset": false,
+      "a": {
+        "title": "Whiteboard damaged",
+        "description": "The whiteboard is cracked and the markers do not wipe off.",
+        "category": "furniture"
+      },
+      "b": {
+        "title": "Cracked whiteboard",
+        "description": "Board in the classroom has a crack and old writing will not erase.",
+        "category": "furniture"
+      }
+    },
+    {
+      "id": "d19",
+      "duplicate": true,
+      "kind": "same problem, reworded",
+      "sameRoom": true,
+      "categoryMatch": true,
+      "sameAsset": false,
+      "a": {
+        "title": "Drain blocked",
+        "description": "The floor drain in the washroom is blocked and water is standing.",
+        "category": "plumbing"
+      },
+      "b": {
+        "title": "Water not draining",
+        "description": "Standing water on the washroom floor, the drain seems clogged.",
+        "category": "plumbing"
+      }
+    },
+    {
+      "id": "d20",
+      "duplicate": true,
+      "kind": "same problem, reworded",
+      "sameRoom": true,
+      "categoryMatch": true,
+      "sameAsset": false,
+      "a": {
+        "title": "Hand dryer broken",
+        "description": "The hand dryer in the washroom does not start.",
+        "category": "electrical"
+      },
+      "b": {
+        "title": "Dryer not working in toilets",
+        "description": "Hand dryer gives no air when you put your hands under it.",
+        "category": "electrical"
+      }
+    },
+    {
+      "id": "d21",
+      "duplicate": true,
+      "kind": "same problem, reworded",
+      "sameRoom": true,
+      "categoryMatch": true,
+      "sameAsset": false,
+      "a": {
+        "title": "Dirty floor in corridor",
+        "description": "The corridor floor is muddy and has not been cleaned for days.",
+        "category": "sanitation"
+      },
+      "b": {
+        "title": "Corridor needs cleaning",
+        "description": "Mud and dirt all over the corridor, please mop it.",
+        "category": "sanitation"
+      }
+    },
+    {
+      "id": "d22",
+      "duplicate": true,
+      "kind": "same problem, reworded",
+      "sameRoom": true,
+      "categoryMatch": true,
+      "sameAsset": false,
+      "a": {
+        "title": "Speaker crackling",
+        "description": "The lecture hall speakers crackle and the sound cuts out.",
+        "category": "it_equipment"
+      },
+      "b": {
+        "title": "Audio problem in lecture hall",
+        "description": "Microphone sound keeps breaking up with crackling from the speakers.",
+        "category": "it_equipment"
+      }
+    },
+    {
+      "id": "d23",
+      "duplicate": true,
+      "kind": "same problem, reworded",
+      "sameRoom": true,
+      "categoryMatch": true,
+      "sameAsset": false,
+      "a": {
+        "title": "Locker lock broken",
+        "description": "My locker lock is broken and the door will not stay shut.",
+        "category": "furniture"
+      },
+      "b": {
+        "title": "Locker cannot be locked",
+        "description": "The lock on the locker is damaged so the locker does not close.",
+        "category": "furniture"
+      }
+    },
+    {
+      "id": "d24",
+      "duplicate": true,
+      "kind": "same problem, reworded",
+      "sameRoom": true,
+      "categoryMatch": true,
+      "sameAsset": false,
+      "a": {
+        "title": "No hot water",
+        "description": "The taps in the staff washroom give only cold water.",
+        "category": "plumbing"
+      },
+      "b": {
+        "title": "Water heater not working",
+        "description": "Hot water is not coming from the washroom taps today.",
+        "category": "plumbing"
+      }
+    },
+    {
+      "id": "d25",
+      "duplicate": true,
+      "kind": "same problem, reworded",
+      "sameRoom": true,
+      "categoryMatch": true,
+      "sameAsset": false,
+      "a": {
+        "title": "Power cut in lab",
+        "description": "All sockets in the lab have no power since the morning.",
+        "category": "electrical"
+      },
+      "b": {
+        "title": "Lab sockets dead",
+        "description": "None of the power outlets in the lab are working.",
+        "category": "electrical"
+      }
+    },
+    {
+      "id": "d26",
+      "duplicate": true,
+      "kind": "same problem, room unknown",
+      "sameRoom": false,
+      "categoryMatch": true,
+      "sameAsset": false,
+      "a": {
+        "title": "Leaking roof in library",
+        "description": "Rain water is dripping from the library ceiling onto the shelves.",
+        "category": "other"
+      },
+      "b": {
+        "title": "Ceiling leak over bookshelves",
+        "description": "Water drips from the roof in the library when it rains.",
+        "category": "other"
+      }
+    },
+    {
+      "id": "d27",
+      "duplicate": true,
+      "kind": "same problem, room unknown",
+      "sameRoom": false,
+      "categoryMatch": true,
+      "sameAsset": false,
+      "a": {
+        "title": "Lift stuck",
+        "description": "The lift in the science block is stuck on the second floor.",
+        "category": "other"
+      },
+      "b": {
+        "title": "Elevator not moving",
+        "description": "Science block elevator has stopped working between floors.",
+        "category": "other"
+      }
+    },
+    {
+      "id": "d28",
+      "duplicate": true,
+      "kind": "same problem, room unknown",
+      "sameRoom": false,
+      "categoryMatch": false,
+      "sameAsset": false,
+      "a": {
+        "title": "Broken glass on stairs",
+        "description": "There is broken glass from a window on the main staircase.",
+        "category": "furniture"
+      },
+      "b": {
+        "title": "Glass shards on staircase",
+        "description": "Someone could get hurt, glass pieces are all over the stairs.",
+        "category": "sanitation"
+      }
+    },
+    {
+      "id": "d29",
+      "duplicate": true,
+      "kind": "same problem, room unknown",
+      "sameRoom": false,
+      "categoryMatch": true,
+      "sameAsset": false,
+      "a": {
+        "title": "Gate barrier stuck",
+        "description": "The car park barrier is stuck closed and cars cannot leave.",
+        "category": "other"
+      },
+      "b": {
+        "title": "Car park exit blocked",
+        "description": "Exit barrier at the car park will not open.",
+        "category": "other"
+      }
+    },
+    {
+      "id": "d30",
+      "duplicate": true,
+      "kind": "same problem, room unknown",
+      "sameRoom": false,
+      "categoryMatch": true,
+      "sameAsset": false,
+      "a": {
+        "title": "Paint peeling in hallway",
+        "description": "Large patches of paint are peeling off the hallway walls.",
+        "category": "other"
+      },
+      "b": {
+        "title": "Walls flaking in hallway",
+        "description": "Wall paint in the hallway is flaking and falling on the floor.",
+        "category": "other"
+      }
+    },
+
+    {
+      "id": "n01",
+      "duplicate": false,
+      "kind": "same room, different problem",
+      "sameRoom": true,
+      "categoryMatch": false,
+      "sameAsset": false,
+      "a": {
+        "title": "Water leaking under the washroom sink",
+        "description": "There is water leaking from under the sink and the floor is wet.",
+        "category": "plumbing"
+      },
+      "b": {
+        "title": "Washroom light not working",
+        "description": "The light in the washroom has gone out completely.",
+        "category": "electrical"
+      }
+    },
+    {
+      "id": "n02",
+      "duplicate": false,
+      "kind": "same room, different problem",
+      "sameRoom": true,
+      "categoryMatch": false,
+      "sameAsset": false,
+      "a": {
+        "title": "Projector shows no picture",
+        "description": "The projector in the lab turns on but nothing appears on the screen.",
+        "category": "it_equipment"
+      },
+      "b": {
+        "title": "Broken chair in lab",
+        "description": "A chair in the lab has a broken backrest.",
+        "category": "furniture"
+      }
+    },
+    {
+      "id": "n03",
+      "duplicate": false,
+      "kind": "same room, different problem",
+      "sameRoom": true,
+      "categoryMatch": false,
+      "sameAsset": false,
+      "a": {
+        "title": "Lights flickering",
+        "description": "The tube lights in the classroom flicker constantly.",
+        "category": "electrical"
+      },
+      "b": {
+        "title": "Classroom bin full",
+        "description": "The classroom rubbish bin has not been emptied.",
+        "category": "sanitation"
+      }
+    },
+    {
+      "id": "n04",
+      "duplicate": false,
+      "kind": "same room, different problem",
+      "sameRoom": true,
+      "categoryMatch": false,
+      "sameAsset": false,
+      "a": {
+        "title": "Toilet will not flush",
+        "description": "The second toilet in the men's washroom does not flush.",
+        "category": "plumbing"
+      },
+      "b": {
+        "title": "Washroom mirror cracked",
+        "description": "The mirror above the sinks has a large crack.",
+        "category": "furniture"
+      }
+    },
+    {
+      "id": "n05",
+      "duplicate": false,
+      "kind": "same room, different problem",
+      "sameRoom": true,
+      "categoryMatch": false,
+      "sameAsset": false,
+      "a": {
+        "title": "Air conditioner not cooling",
+        "description": "The AC in the reading room is running but the air is warm.",
+        "category": "electrical"
+      },
+      "b": {
+        "title": "Reading room carpet stained",
+        "description": "There are big coffee stains on the reading room carpet.",
+        "category": "sanitation"
+      }
+    },
+    {
+      "id": "n06",
+      "duplicate": false,
+      "kind": "same room, different problem",
+      "sameRoom": true,
+      "categoryMatch": false,
+      "sameAsset": false,
+      "a": {
+        "title": "Wi-Fi not working in lab",
+        "description": "None of the laptops can connect to the Wi-Fi in this lab.",
+        "category": "it_equipment"
+      },
+      "b": {
+        "title": "Lab door lock stuck",
+        "description": "The lab door lock is stuck and the door cannot be locked.",
+        "category": "furniture"
+      }
+    },
+    {
+      "id": "n07",
+      "duplicate": false,
+      "kind": "same room, different problem",
+      "sameRoom": true,
+      "categoryMatch": false,
+      "sameAsset": false,
+      "a": {
+        "title": "Bad smell in washroom",
+        "description": "There is a strong bad smell in the ground floor washroom.",
+        "category": "sanitation"
+      },
+      "b": {
+        "title": "Hand dryer broken",
+        "description": "The hand dryer in the washroom does not start.",
+        "category": "electrical"
+      }
+    },
+    {
+      "id": "n08",
+      "duplicate": false,
+      "kind": "same room, different problem",
+      "sameRoom": true,
+      "categoryMatch": false,
+      "sameAsset": false,
+      "a": {
+        "title": "Printer jammed",
+        "description": "The library printer has paper stuck inside and shows a red light.",
+        "category": "it_equipment"
+      },
+      "b": {
+        "title": "Library window stuck",
+        "description": "The library window near the printer will not open.",
+        "category": "furniture"
+      }
+    },
+    {
+      "id": "n09",
+      "duplicate": false,
+      "kind": "same room, different problem",
+      "sameRoom": true,
+      "categoryMatch": false,
+      "sameAsset": false,
+      "a": {
+        "title": "Ants in the cafeteria",
+        "description": "There are lots of ants on the tables in the cafeteria.",
+        "category": "sanitation"
+      },
+      "b": {
+        "title": "Cafeteria fan broken",
+        "description": "The ceiling fan in the cafeteria stopped working.",
+        "category": "electrical"
+      }
+    },
+    {
+      "id": "n10",
+      "duplicate": false,
+      "kind": "same room, different problem",
+      "sameRoom": true,
+      "categoryMatch": false,
+      "sameAsset": false,
+      "a": {
+        "title": "Whiteboard damaged",
+        "description": "The whiteboard is cracked and the markers do not wipe off.",
+        "category": "furniture"
+      },
+      "b": {
+        "title": "Classroom projector remote missing",
+        "description": "The remote for the classroom projector is missing.",
+        "category": "it_equipment"
+      }
+    },
+    {
+      "id": "n11",
+      "duplicate": false,
+      "kind": "same room, different problem",
+      "sameRoom": true,
+      "categoryMatch": false,
+      "sameAsset": false,
+      "a": {
+        "title": "No hot water",
+        "description": "The taps in the staff washroom give only cold water.",
+        "category": "plumbing"
+      },
+      "b": {
+        "title": "Staff washroom dirty",
+        "description": "The staff washroom has not been cleaned today.",
+        "category": "sanitation"
+      }
+    },
+    {
+      "id": "n12",
+      "duplicate": false,
+      "kind": "same room, different problem",
+      "sameRoom": true,
+      "categoryMatch": false,
+      "sameAsset": false,
+      "a": {
+        "title": "Power cut in lab",
+        "description": "All sockets in the lab have no power since the morning.",
+        "category": "electrical"
+      },
+      "b": {
+        "title": "Lab keyboard keys missing",
+        "description": "Several keys are missing from the keyboard at workstation 5.",
+        "category": "it_equipment"
+      }
+    },
+
+    {
+      "id": "n13",
+      "duplicate": false,
+      "kind": "same room and category, different fault",
+      "sameRoom": true,
+      "categoryMatch": true,
+      "sameAsset": false,
+      "a": {
+        "title": "Projector shows no picture",
+        "description": "The projector in the lab turns on but nothing appears on the screen.",
+        "category": "it_equipment"
+      },
+      "b": {
+        "title": "Projector remote missing",
+        "description": "The remote control for the lab projector has gone missing.",
+        "category": "it_equipment"
+      }
+    },
+    {
+      "id": "n14",
+      "duplicate": false,
+      "kind": "same room and category, different fault",
+      "sameRoom": true,
+      "categoryMatch": true,
+      "sameAsset": false,
+      "a": {
+        "title": "Water leaking under the washroom sink",
+        "description": "There is water leaking from under the sink and the floor is wet.",
+        "category": "plumbing"
+      },
+      "b": {
+        "title": "Toilet will not flush",
+        "description": "The toilet in the same washroom does not flush.",
+        "category": "plumbing"
+      }
+    },
+    {
+      "id": "n15",
+      "duplicate": false,
+      "kind": "same room and category, different fault",
+      "sameRoom": true,
+      "categoryMatch": true,
+      "sameAsset": false,
+      "a": {
+        "title": "Lights flickering",
+        "description": "The tube lights in the classroom flicker constantly.",
+        "category": "electrical"
+      },
+      "b": {
+        "title": "Socket loose",
+        "description": "A wall socket in the classroom is loose and hanging from the wall.",
+        "category": "electrical"
+      }
+    },
+    {
+      "id": "n16",
+      "duplicate": false,
+      "kind": "same room and category, different fault",
+      "sameRoom": true,
+      "categoryMatch": true,
+      "sameAsset": false,
+      "a": {
+        "title": "Broken chair leg",
+        "description": "A chair in the front row has a snapped leg and is dangerous to sit on.",
+        "category": "furniture"
+      },
+      "b": {
+        "title": "Desk drawer stuck",
+        "description": "The drawer of the teacher's desk is stuck shut.",
+        "category": "furniture"
+      }
+    },
+    {
+      "id": "n17",
+      "duplicate": false,
+      "kind": "same room and category, different fault",
+      "sameRoom": true,
+      "categoryMatch": true,
+      "sameAsset": false,
+      "a": {
+        "title": "Wi-Fi not working in lab",
+        "description": "None of the laptops can connect to the Wi-Fi in this lab.",
+        "category": "it_equipment"
+      },
+      "b": {
+        "title": "Lab printer out of toner",
+        "description": "The lab printer prints faded pages, it needs toner.",
+        "category": "it_equipment"
+      }
+    },
+    {
+      "id": "n18",
+      "duplicate": false,
+      "kind": "same room and category, different fault",
+      "sameRoom": true,
+      "categoryMatch": true,
+      "sameAsset": false,
+      "a": {
+        "title": "Air conditioner not cooling",
+        "description": "The AC in the reading room is running but the air is warm.",
+        "category": "electrical"
+      },
+      "b": {
+        "title": "Reading lamp broken",
+        "description": "The desk lamp at seat 14 in the reading room does not switch on.",
+        "category": "electrical"
+      }
+    },
+    {
+      "id": "n19",
+      "duplicate": false,
+      "kind": "same room and category, different fault",
+      "sameRoom": true,
+      "categoryMatch": true,
+      "sameAsset": false,
+      "a": {
+        "title": "Bin overflowing",
+        "description": "The rubbish bin in the corridor is full and overflowing onto the floor.",
+        "category": "sanitation"
+      },
+      "b": {
+        "title": "Spilled drink in corridor",
+        "description": "Someone spilled a sticky drink on the corridor floor.",
+        "category": "sanitation"
+      }
+    },
+    {
+      "id": "n20",
+      "duplicate": false,
+      "kind": "same room and category, different fault",
+      "sameRoom": true,
+      "categoryMatch": true,
+      "sameAsset": false,
+      "a": {
+        "title": "No hot water",
+        "description": "The taps in the staff washroom give only cold water.",
+        "category": "plumbing"
+      },
+      "b": {
+        "title": "Tap handle loose",
+        "description": "The tap handle in the staff washroom is loose and spins.",
+        "category": "plumbing"
+      }
+    },
+    {
+      "id": "n21",
+      "duplicate": false,
+      "kind": "same room and category, different fault",
+      "sameRoom": true,
+      "categoryMatch": true,
+      "sameAsset": false,
+      "a": {
+        "title": "Computer will not turn on",
+        "description": "Workstation 12 in the lab does not power on at all.",
+        "category": "it_equipment"
+      },
+      "b": {
+        "title": "Mouse broken at workstation 3",
+        "description": "The mouse at workstation 3 in the lab does not click.",
+        "category": "it_equipment"
+      }
+    },
+    {
+      "id": "n22",
+      "duplicate": false,
+      "kind": "same room and category, different fault",
+      "sameRoom": true,
+      "categoryMatch": true,
+      "sameAsset": false,
+      "a": {
+        "title": "Door handle broken",
+        "description": "The handle of the classroom door came off and the door is hard to open.",
+        "category": "furniture"
+      },
+      "b": {
+        "title": "Window blind broken",
+        "description": "The classroom window blind is torn and will not roll down.",
+        "category": "furniture"
+      }
+    },
+
+    {
+      "id": "n23",
+      "duplicate": false,
+      "kind": "same problem type, different room",
+      "sameRoom": false,
+      "categoryMatch": true,
+      "sameAsset": false,
+      "a": {
+        "title": "Water leaking under the washroom sink",
+        "description": "There is water leaking from under the sink in the ground floor washroom.",
+        "category": "plumbing"
+      },
+      "b": {
+        "title": "Sink leaking on first floor",
+        "description": "The sink in the first floor washroom is leaking water.",
+        "category": "plumbing"
+      }
+    },
+    {
+      "id": "n24",
+      "duplicate": false,
+      "kind": "same problem type, different room",
+      "sameRoom": false,
+      "categoryMatch": true,
+      "sameAsset": false,
+      "a": {
+        "title": "Projector shows no picture",
+        "description": "The projector in lab 203 turns on but nothing appears on the screen.",
+        "category": "it_equipment"
+      },
+      "b": {
+        "title": "Projector blank in lecture hall",
+        "description": "The lecture hall projector shows a blank screen.",
+        "category": "it_equipment"
+      }
+    },
+    {
+      "id": "n25",
+      "duplicate": false,
+      "kind": "same problem type, different room",
+      "sameRoom": false,
+      "categoryMatch": true,
+      "sameAsset": false,
+      "a": {
+        "title": "Lights flickering",
+        "description": "The tube lights in classroom 101 flicker constantly.",
+        "category": "electrical"
+      },
+      "b": {
+        "title": "Flickering lights in office",
+        "description": "The lights in the faculty office keep flickering.",
+        "category": "electrical"
+      }
+    },
+    {
+      "id": "n26",
+      "duplicate": false,
+      "kind": "same problem type, different room",
+      "sameRoom": false,
+      "categoryMatch": true,
+      "sameAsset": false,
+      "a": {
+        "title": "Toilet will not flush",
+        "description": "The second toilet in the men's washroom does not flush.",
+        "category": "plumbing"
+      },
+      "b": {
+        "title": "Women's toilet not flushing",
+        "description": "A toilet in the women's washroom on the first floor will not flush.",
+        "category": "plumbing"
+      }
+    },
+    {
+      "id": "n27",
+      "duplicate": false,
+      "kind": "same problem type, different room",
+      "sameRoom": false,
+      "categoryMatch": true,
+      "sameAsset": false,
+      "a": {
+        "title": "Broken chair leg",
+        "description": "A chair in classroom 102 has a snapped leg.",
+        "category": "furniture"
+      },
+      "b": {
+        "title": "Broken chair in library",
+        "description": "A library chair has a broken leg.",
+        "category": "furniture"
+      }
+    },
+    {
+      "id": "n28",
+      "duplicate": false,
+      "kind": "same problem type, different room",
+      "sameRoom": false,
+      "categoryMatch": true,
+      "sameAsset": false,
+      "a": {
+        "title": "Air conditioner not cooling",
+        "description": "The AC in the reading room is running but the air is warm.",
+        "category": "electrical"
+      },
+      "b": {
+        "title": "AC not cooling in lab",
+        "description": "The air conditioner in the computer lab blows warm air.",
+        "category": "electrical"
+      }
+    },
+    {
+      "id": "n29",
+      "duplicate": false,
+      "kind": "same problem type, different room",
+      "sameRoom": false,
+      "categoryMatch": true,
+      "sameAsset": false,
+      "a": {
+        "title": "Bin overflowing",
+        "description": "The rubbish bin in the ground floor corridor is overflowing.",
+        "category": "sanitation"
+      },
+      "b": {
+        "title": "Cafeteria bin full",
+        "description": "The bin in the cafeteria is full and overflowing.",
+        "category": "sanitation"
+      }
+    },
+    {
+      "id": "n30",
+      "duplicate": false,
+      "kind": "same problem type, different room",
+      "sameRoom": false,
+      "categoryMatch": true,
+      "sameAsset": false,
+      "a": {
+        "title": "Wi-Fi not working in lab",
+        "description": "None of the laptops can connect to the Wi-Fi in lab 204.",
+        "category": "it_equipment"
+      },
+      "b": {
+        "title": "No Wi-Fi in the library",
+        "description": "The library wireless network is down.",
+        "category": "it_equipment"
+      }
+    }
+  ]
+}

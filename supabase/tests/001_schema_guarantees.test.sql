@@ -45,8 +45,9 @@ select is(
     where n.nspname = 'public' and has_function_privilege('authenticated', p.oid, 'execute')),
   array['acknowledge_ticket', 'add_ticket_note', 'admin_metrics', 'admin_retry_ai_job',
         'admin_set_department_active', 'admin_set_routing_rule', 'assign_ticket', 'create_ticket',
-        'discard_evidence_upload', 'finalize_evidence_upload', 'list_complaints',
-        'photo_analysis_states', 'request_evidence_upload', 'review_visual_analysis',
+        'discard_evidence_upload', 'dismiss_match_candidates', 'finalize_evidence_upload',
+        'list_complaints', 'photo_analysis_states', 'request_duplicate_check',
+        'request_evidence_upload', 'review_match_candidate', 'review_visual_analysis',
         'ticket_transition_rules', 'transition_ticket'],
   'signed-in users can execute exactly the allow-listed public functions'
 );
