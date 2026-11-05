@@ -222,6 +222,7 @@ describe("handleWorkerRequest", () => {
     supabaseUrl: "http://kong:8000",
     serviceKey: "k",
     secret: "s".repeat(40),
+    ai: { enabled: false, apiKey: undefined, visionModel: "m", baseUrl: undefined },
     simulationEnabled: false,
   };
   const deps = (db: WorkerDatabase) => ({ db, handlers: createJobHandlers(), log: vi.fn() });

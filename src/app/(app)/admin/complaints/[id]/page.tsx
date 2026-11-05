@@ -18,7 +18,8 @@ import {
 } from "@/features/complaints/repository";
 import { complaintIdSchema } from "@/features/complaints/schemas";
 import { canAssign, isStalledTriage } from "@/features/complaints/workflow";
-import { getServerConfig } from "@/lib/config";
+import { PhotoEvidence } from "@/features/evidence/components/photo-evidence";
+import { getServerConfig, isFeatureEnabled } from "@/lib/config";
 import { requestTime } from "@/lib/request-time";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
@@ -100,6 +101,14 @@ async function AdminTicket({
             acknowledgedAt={complaint.acknowledgedAt}
             role={access.user.role}
           />
+          {isFeatureEnabled("visualInspection") ? (
+            <PhotoEvidence
+              client={supabase}
+              complaintId={complaint.id}
+              viewer="admin"
+              open={false}
+            />
+          ) : null}
         </>
       }
     />

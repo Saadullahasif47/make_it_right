@@ -92,7 +92,15 @@ async function AiJobs({
             >
               {label}
               {value === undefined ? null : (
-                <span className="font-mono text-xs text-ink-subtle">{counts[value]}</span>
+                <span
+                  className={cn(
+                    "font-mono text-xs",
+                    // The tinted active chip needs the darker text to keep 4.5:1 contrast.
+                    active ? "text-ink-muted" : "text-ink-subtle",
+                  )}
+                >
+                  {counts[value]}
+                </span>
               )}
             </Link>
           );

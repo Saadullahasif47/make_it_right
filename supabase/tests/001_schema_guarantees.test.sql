@@ -46,7 +46,8 @@ select is(
   array['acknowledge_ticket', 'add_ticket_note', 'admin_metrics', 'admin_retry_ai_job',
         'admin_set_department_active', 'admin_set_routing_rule', 'assign_ticket', 'create_ticket',
         'discard_evidence_upload', 'finalize_evidence_upload', 'list_complaints',
-        'request_evidence_upload', 'ticket_transition_rules', 'transition_ticket'],
+        'photo_analysis_states', 'request_evidence_upload', 'review_visual_analysis',
+        'ticket_transition_rules', 'transition_ticket'],
   'signed-in users can execute exactly the allow-listed public functions'
 );
 

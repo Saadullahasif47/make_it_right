@@ -75,7 +75,8 @@ async function ComplaintDetail({
             <PhotoEvidence
               client={client}
               complaintId={complaint.id}
-              canUpload={complaint.status !== "closed"}
+              viewer="reporter"
+              open={complaint.status !== "closed"}
             />
           ) : null}
         </>
