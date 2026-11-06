@@ -18,6 +18,8 @@ export interface WorkerAiSettings {
   readonly baseUrl: string | undefined;
   /** GEMINI_EMBEDDING_MODEL (duplicate detection); vectors of different models never mix. */
   readonly embeddingModel: string;
+  /** GEMINI_MODEL, as for triage: the coordinator's tool-calling model. */
+  readonly coordinatorModel: string;
 }
 
 export interface WorkerSettings {
@@ -79,6 +81,7 @@ export function readWorkerSettings(env: (name: string) => string | undefined): S
           nonEmpty("GEMINI_VISION_MODEL") ?? nonEmpty("GEMINI_MODEL") ?? "gemini-3.1-flash-lite",
         baseUrl: nonEmpty("GEMINI_BASE_URL"),
         embeddingModel: nonEmpty("GEMINI_EMBEDDING_MODEL") ?? "gemini-embedding-2",
+        coordinatorModel: nonEmpty("GEMINI_MODEL") ?? "gemini-3.1-flash-lite",
       },
       simulationEnabled: local && env("AI_WORKER_FAULTS") === "true",
     },

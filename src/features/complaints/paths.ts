@@ -36,4 +36,10 @@ export const WORKFLOW_NOTICES: Readonly<Record<string, string>> = {
   "duplicate-linked": "Linked. This report now follows the shared case.",
   "duplicate-rejected": "Marked as a different problem.",
   "duplicate-separate": "Kept as a separate case.",
+  "coordination-queued":
+    "The coordinator is looking at this case. Refresh in a moment to see its proposal.",
+  "coordination-approved": "Approved. The department now has the work order.",
+  "coordination-rejected": "Proposal rejected. The case is yours to route.",
+  "coordination-stale":
+    "The case changed after this proposal, so it was not used. Ask the coordinator again if you need it.",
 };

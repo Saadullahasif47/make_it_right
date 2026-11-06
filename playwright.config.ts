@@ -71,6 +71,7 @@ export default defineConfig({
               // its journeys also prove that switched-off features stay invisible (plan v2 A0.02).
               FEATURE_VISUAL_INSPECTION: "true",
               FEATURE_DUPLICATE_DETECTION: "true",
+              FEATURE_MAINTENANCE_COORDINATOR: "true",
             },
           },
         ]

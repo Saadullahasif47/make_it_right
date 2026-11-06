@@ -21,8 +21,8 @@ exit gate is demonstrated and the evidence is linked here.
 | A0 Baseline / migrations    | VERIFIED    | [a0-baseline.md](evidence/a0-baseline.md)                       |
 | A1 Storage + durable queue  | VERIFIED    | [a1-jobs-storage.md](evidence/a1-jobs-storage.md)               |
 | A2 F1 Visual inspection     | VERIFIED    | [a2-visual-inspection.md](evidence/a2-visual-inspection.md)     |
-| A3 F2 Duplicate proposals   | IN PROGRESS | [a3-duplicate-detection.md](evidence/a3-duplicate-detection.md) |
-| A4 F3 Coordination agent    | NOT STARTED |                                                                 |
+| A3 F2 Duplicate proposals   | VERIFIED    | [a3-duplicate-detection.md](evidence/a3-duplicate-detection.md) |
+| A4 F3 Coordination agent    | IN PROGRESS | [a4-coordinator.md](evidence/a4-coordinator.md)                 |
 | A5 F4 Repair verification   | NOT STARTED |                                                                 |
 | A6 F5 Heatmap + F6 insights | NOT STARTED |                                                                 |
 | A7 Expo deployment          | NOT STARTED |                                                                 |

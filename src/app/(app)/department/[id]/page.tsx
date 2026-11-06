@@ -10,6 +10,7 @@ import { WorkflowPanel } from "@/features/complaints/components/workflow-panel";
 import { WORKFLOW_NOTICES } from "@/features/complaints/paths";
 import { getComplaint } from "@/features/complaints/repository";
 import { complaintIdSchema } from "@/features/complaints/schemas";
+import { CoordinationPanel } from "@/features/coordination/components/coordination-panel";
 import { DuplicatesPanel } from "@/features/duplicate-detection/components/duplicates-panel";
 import { PhotoEvidence } from "@/features/evidence/components/photo-evidence";
 import { isFeatureEnabled } from "@/lib/config";
@@ -56,6 +57,9 @@ async function DepartmentTicket({
             acknowledgedAt={complaint.acknowledgedAt}
             role={access.user.role}
           />
+          {isFeatureEnabled("maintenanceCoordinator") ? (
+            <CoordinationPanel client={client} complaintId={complaint.id} viewer="staff" />
+          ) : null}
           {isFeatureEnabled("duplicateDetection") ? (
             <DuplicatesPanel
               client={client}
