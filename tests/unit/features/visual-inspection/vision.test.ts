@@ -414,6 +414,7 @@ describe("worker AI settings", () => {
       visionModel: "gemini-3.5-flash",
       baseUrl: undefined,
       embeddingModel: "gemini-embedding-2",
+      coordinatorModel: "gemini-3.5-flash",
     });
   });
 

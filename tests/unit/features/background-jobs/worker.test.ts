@@ -228,6 +228,7 @@ describe("handleWorkerRequest", () => {
       visionModel: "m",
       baseUrl: undefined,
       embeddingModel: "e",
+      coordinatorModel: "c",
     },
     simulationEnabled: false,
   };

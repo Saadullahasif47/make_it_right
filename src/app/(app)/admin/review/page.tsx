@@ -11,6 +11,8 @@ import { decodeCursor } from "@/features/complaints/cursor";
 import { listComplaints } from "@/features/complaints/repository";
 import { PAGE_SIZE } from "@/features/complaints/schemas";
 import { AWAITING_ROUTING_STATES } from "@/features/complaints/workflow";
+import { PendingProposals } from "@/features/coordination/components/pending-proposals";
+import { isFeatureEnabled } from "@/lib/config";
 import { requestTime } from "@/lib/request-time";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
@@ -30,7 +32,8 @@ async function ReviewQueue({
   const rawCursor = (await searchParams).cursor;
   const cursor = decodeCursor(Array.isArray(rawCursor) ? rawCursor[0] : rawCursor);
   // Oldest first: the ticket that has waited longest for a person is handled next (P3.07).
-  const page = await listComplaints(await createSupabaseServerClient(), {
+  const client = await createSupabaseServerClient();
+  const page = await listComplaints(client, {
     limit: PAGE_SIZE.default,
     cursor,
     statuses: AWAITING_ROUTING_STATES,
@@ -43,6 +46,8 @@ async function ReviewQueue({
         title="Review queue"
         description="Tickets waiting for a person to classify and route them, longest-waiting first: reports the AI assistant sent for review, attempts that stalled, and every new report while AI routing is off."
       />
+
+      {isFeatureEnabled("maintenanceCoordinator") ? <PendingProposals client={client} /> : null}
 
       {page.items.length === 0 ? (
         <EmptyState

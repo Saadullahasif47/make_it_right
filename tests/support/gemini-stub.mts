@@ -24,6 +24,15 @@
  *   STUB:VISION-INVALID    malformed JSON (INVALID_OUTPUT)
  *   STUB:429               rate limited, as above
  *
+ * Coordination (plan v2 F3): a request that declares propose_work_order is the coordinator. It
+ * reads the department's capacity, then proposes the approved route for the category it finds
+ * by keyword. Markers in the reports script the hard cases:
+ *   STUB:COORD-REVIEW      asks for admin review instead
+ *   STUB:COORD-INJECT      first calls a tool that does not exist (delete_case)
+ *   STUB:COORD-SCOPE       first reads another piece of equipment (out of scope)
+ *   STUB:COORD-WRONG       first proposes a department that is not the approved route
+ *   STUB:COORD-HIGH        proposes high priority
+ *
  * Embeddings (plan v2 F2): embedContent answers a deterministic 768-dimension vector, a hashed
  * bag of words, so reports with similar wording are similar. Markers in the embedded text:
  *   STUB:EMBED-REJECT      400 (PROVIDER_REJECTED)
@@ -160,6 +169,54 @@ function routedDepartment(contents: Content[]): string | undefined {
   return undefined;
 }
 
+/** The coordinator's next call, following the markers in its first message. */
+function coordinationTurn(message: string, turn: number) {
+  const reports = /<reports>([\s\S]*)<\/reports>/.exec(message)?.[1] ?? "";
+  const caseId = /"case_id":"([0-9a-f-]{36})"/.exec(message)?.[1] ?? "";
+  const category = classify(reports);
+  const routes = [...message.matchAll(/^- ([a-z_]+): [^,\n]+, ([0-9a-f-]{36})$/gm)].map(
+    (match) => ({
+      category: match[1] ?? "",
+      departmentId: match[2] ?? "",
+    }),
+  );
+  const route = routes.find((entry) => entry.category === category) ?? routes[0];
+  const wrong = routes.find((entry) => entry.departmentId !== route?.departmentId);
+  const propose = (departmentId: string) => ({
+    name: "propose_work_order",
+    args: {
+      case_id: caseId,
+      department_id: departmentId,
+      category: route?.category ?? category,
+      priority: reports.includes("STUB:COORD-HIGH") ? "high" : "medium",
+      rationale: `The reports describe a ${category.replace("_", " ")} fault in this room.`,
+    },
+  });
+
+  const steps: { name: string; args: Record<string, unknown> }[] = [];
+  if (reports.includes("STUB:COORD-INJECT"))
+    steps.push({ name: "delete_case", args: { case_id: caseId } });
+  if (reports.includes("STUB:COORD-SCOPE")) {
+    steps.push({
+      name: "get_asset_repair_history",
+      args: { asset_id: "9f9f9f9f-1111-4222-8333-444455556666" },
+    });
+  }
+  if (reports.includes("STUB:COORD-WRONG") && wrong !== undefined)
+    steps.push(propose(wrong.departmentId));
+  steps.push({
+    name: "get_department_capacity",
+    args: { department_id: route?.departmentId ?? "" },
+  });
+  steps.push(
+    reports.includes("STUB:COORD-REVIEW")
+      ? { name: "request_admin_review", args: { case_id: caseId, reason_code: "AMBIGUOUS" } }
+      : propose(route?.departmentId ?? ""),
+  );
+  const step = steps[Math.min(turn, steps.length) - 1] ?? steps[steps.length - 1];
+  return callTurn(step?.name ?? "request_admin_review", step?.args ?? {}, turn);
+}
+
 async function readJson(req: IncomingMessage): Promise<{ contents?: Content[] }> {
   const chunks: Buffer[] = [];
   for await (const chunk of req) {
@@ -202,6 +259,18 @@ const server = createServer((req, res) => {
     const report = /<report>([\s\S]*)<\/report>/.exec(message)?.[1] ?? message;
     const turn = contents.filter((content) => content.role === "model").length + 1;
     const category = classify(report);
+
+    const declared = JSON.stringify((body as { tools?: unknown }).tools ?? []);
+    if (declared.includes("propose_work_order")) {
+      if (message.includes("STUB:429")) {
+        send(res, 429, {
+          error: { code: 429, message: "Exhausted", status: "RESOURCE_EXHAUSTED" },
+        });
+        return;
+      }
+      send(res, 200, coordinationTurn(message, turn));
+      return;
+    }
 
     const image = contents[0]?.parts?.find((part) => part.inlineData !== undefined)?.inlineData;
     if (image !== undefined) {

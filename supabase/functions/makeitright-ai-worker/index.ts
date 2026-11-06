@@ -4,6 +4,7 @@
  * x-worker-secret. All logic lives in ../_shared/jobs so it is unit-tested in Node; this file
  * only wires the Deno runtime.
  */
+import { createCoordinationHandler } from "../_shared/coordination/handler.ts";
 import { createJobHandlers } from "../_shared/jobs/handlers.ts";
 import {
   handleWorkerRequest,
@@ -63,6 +64,7 @@ function handlersFor(settings: WorkerSettings) {
     }),
     embedding: createEmbeddingHandler(duplicates),
     duplicate_match: createDuplicateMatchHandler(duplicates),
+    coordination: createCoordinationHandler({ rpc, provider: provider(ai.coordinatorModel) }),
   });
 }
 

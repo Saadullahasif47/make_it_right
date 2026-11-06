@@ -18,6 +18,7 @@ import {
 } from "@/features/complaints/repository";
 import { complaintIdSchema } from "@/features/complaints/schemas";
 import { canAssign, isStalledTriage } from "@/features/complaints/workflow";
+import { CoordinationPanel } from "@/features/coordination/components/coordination-panel";
 import { DuplicatesPanel } from "@/features/duplicate-detection/components/duplicates-panel";
 import { PhotoEvidence } from "@/features/evidence/components/photo-evidence";
 import { getServerConfig, isFeatureEnabled } from "@/lib/config";
@@ -95,6 +96,16 @@ async function AdminTicket({
                 departmentId: complaint.assignedDepartmentId,
               }}
               {...(suggestion === undefined ? {} : { suggestion })}
+            />
+          ) : null}
+          {isFeatureEnabled("maintenanceCoordinator") ? (
+            <CoordinationPanel
+              client={supabase}
+              complaintId={complaint.id}
+              viewer="admin"
+              departments={
+                new Map(departments.map((department) => [department.id, department.name]))
+              }
             />
           ) : null}
           <AgentRunsPanel
