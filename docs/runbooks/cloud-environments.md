@@ -4,7 +4,7 @@
 | ---------------- | ----------------------------------------------------------------------- |
 | Supabase project | `makeitright-staging`, ref `ijmikxhkyrensmsnmvmb`, Free plan            |
 | Supabase URL     | `https://ijmikxhkyrensmsnmvmb.supabase.co`                              |
-| Used by          | Vercel previews **and** production until Phase 7 (ADR 0002)             |
+| Used by          | Vercel previews **and** production (ADR 0002)                           |
 | Vercel project   | `takeasy1/make_it_right`, Hobby plan, framework pinned in `vercel.json` |
 | Production URL   | <https://makeitright-takeasy1.vercel.app>                               |
 | Preview URLs     | `https://makeitright-git-<branch>-takeasy1.vercel.app`                  |
@@ -108,6 +108,20 @@ The worker's own secrets for AI work (set with `supabase secrets set --env-file`
 a command line): `AI_ENABLED=true`, `GEMINI_API_KEY`, and optionally `GEMINI_VISION_MODEL` and
 `GEMINI_EMBEDDING_MODEL` (default `gemini-embedding-2`). Without `AI_ENABLED=true` every AI job
 goes to review as `AI_DISABLED`; the stored photos and reports are unaffected.
+
+**Trap: `supabase secrets set` also uploads `[edge_runtime.secrets]` from `supabase/config.toml`.**
+Those are the local stack's values (the stub's `GEMINI_BASE_URL`, `AI_WORKER_FAULTS`, a stub key
+and the well-known local worker secret). Values in your `--env-file` win, but anything only in
+`config.toml` is added to the cloud. Always check afterwards and remove the local-only ones:
+
+```bash
+pnpm exec supabase secrets list            # names only matter; values are shown as hashes
+pnpm exec supabase secrets unset GEMINI_BASE_URL AI_WORKER_FAULTS
+```
+
+The worker protects itself: on a hosted project it refuses to start (503
+`WORKER_NOT_CONFIGURED`) while `GEMINI_BASE_URL` is set or the secret is the local value, and it
+ignores `AI_WORKER_FAULTS`. An unauthenticated call to a healthy worker answers 401.
 
 To pause the worker, delete the two Vault secrets; Cron then sends nothing. Never set
 `AI_WORKER_FAULTS` on a hosted project: the worker ignores it there anyway, but it exists for

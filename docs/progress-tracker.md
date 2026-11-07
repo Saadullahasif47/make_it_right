@@ -24,5 +24,5 @@ exit gate is demonstrated and the evidence is linked here.
 | A3 F2 Duplicate proposals   | VERIFIED    | [a3-duplicate-detection.md](evidence/a3-duplicate-detection.md) |
 | A4 F3 Coordination agent    | VERIFIED    | [a4-coordinator.md](evidence/a4-coordinator.md)                 |
 | A5 F4 Repair verification   | VERIFIED    | [a5-repair-verification.md](evidence/a5-repair-verification.md) |
-| A6 F5 Heatmap + F6 insights | IN PROGRESS | [a6-heatmap-insights.md](evidence/a6-heatmap-insights.md)       |
-| A7 Expo deployment          | NOT STARTED |                                                                 |
+| A6 F5 Heatmap + F6 insights | VERIFIED    | [a6-heatmap-insights.md](evidence/a6-heatmap-insights.md)       |
+| A7 Expo deployment          | IN PROGRESS | [a7-release.md](evidence/a7-release.md)                         |
