@@ -1,0 +1,64 @@
+{
+  "run": "3d39093a",
+  "date": "2026-11-07T14:09:48.430Z",
+  "target": "http://localhost:3102",
+  "note": "Local stack, production build, Gemini stub for photo analysis; the worker is called back to back instead of once a minute.",
+  "levels": [
+    {
+      "level": 1,
+      "samples": 10,
+      "submitted": 10,
+      "failures": [],
+      "submit_p50_ms": 181,
+      "submit_p95_ms": 273,
+      "submit_wall_ms": 5023,
+      "jobs": 10,
+      "succeeded": 10,
+      "completion_rate": 1,
+      "queue_p50_ms": 4517,
+      "queue_p95_ms": 5865,
+      "drain_wall_ms": 3015,
+      "max_attempts": 1
+    },
+    {
+      "level": 5,
+      "samples": 10,
+      "submitted": 10,
+      "failures": [],
+      "submit_p50_ms": 268,
+      "submit_p95_ms": 299,
+      "submit_wall_ms": 1186,
+      "jobs": 10,
+      "succeeded": 10,
+      "completion_rate": 1,
+      "queue_p50_ms": 3161,
+      "queue_p95_ms": 3682,
+      "drain_wall_ms": 3388,
+      "max_attempts": 1
+    },
+    {
+      "level": 20,
+      "samples": 20,
+      "submitted": 20,
+      "failures": [],
+      "submit_p50_ms": 734,
+      "submit_p95_ms": 778,
+      "submit_wall_ms": 1098,
+      "jobs": 20,
+      "succeeded": 20,
+      "completion_rate": 1,
+      "queue_p50_ms": 4680,
+      "queue_p95_ms": 5761,
+      "drain_wall_ms": 5503,
+      "max_attempts": 1
+    }
+  ],
+  "recovery": {
+    "jobs": 5,
+    "left_running_by_crash": 1,
+    "succeeded": 5,
+    "max_attempts": 2,
+    "duplicate_analyses": 0,
+    "photos_without_analysis": 0
+  }
+}

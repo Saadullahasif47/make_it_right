@@ -33,6 +33,7 @@
     "db:env": "node scripts/local-supabase-env.mts --write",
     "seed:demo": "node --env-file=.env.local scripts/seed-demo-accounts.mts",
     "load:test": "node --env-file=.env.local scripts/load-test.mts",
+    "load:queue": "node --env-file=.env.local scripts/queue-load-test.mts",
     "drills": "node --env-file=.env.local scripts/failure-drills.mts",
     "latency:cloud": "node scripts/cloud-latency.mts",
     "smoke": "node scripts/smoke.mts",
