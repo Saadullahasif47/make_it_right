@@ -112,9 +112,6 @@ function Trace({
             );
           })}
         </ol>
-        <p className="font-mono text-xs text-ink-subtle">
-          {run.model} · {run.promptVersion}
-        </p>
       </div>
     </details>
   );

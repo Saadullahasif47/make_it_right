@@ -149,7 +149,7 @@ test("an admin approves a high-priority work order the coordinator proposed", as
     calls.getByText("Checked a department's open work orders", { exact: false }),
   ).toBeVisible();
   await expect(calls.getByText("Proposed a work order", { exact: false })).toBeVisible();
-  await expect(work.getByText("coordinator-v1", { exact: false })).toBeVisible();
+  await expect(work.getByText("coordinator-v1", { exact: false })).toHaveCount(0);
 
   const scan = await new AxeBuilder({ page }).include("main").analyze();
   expect(scan.violations).toEqual([]);

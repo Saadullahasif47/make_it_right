@@ -1,6 +1,5 @@
 import type { ReactNode } from "react";
 
-import { PrototypeNotice } from "./_components/prototype-notice";
 import { SiteFooter } from "./_components/site-footer";
 import { SiteHeader } from "./_components/site-header";
 
@@ -13,7 +12,6 @@ export default function PublicLayout({ children }: { readonly children: ReactNod
       >
         Skip to content
       </a>
-      <PrototypeNotice />
       <SiteHeader />
       <main id="main" className="flex-1">
         {children}

@@ -48,8 +48,8 @@ function TraceLine({
       ? null
       : (departments.get(entry.departmentId) ?? "unknown department id"),
     entry.priority === undefined ? null : `${entry.priority} priority`,
-    // A switch_model entry names the model the attempt continued on.
-    entry.model === undefined ? null : `continued on ${entry.model}`,
+    // A switch_model entry means the attempt continued on the backup model.
+    entry.model === undefined ? null : "continued on the backup model",
   ].filter((part) => part !== null);
   return (
     <li className="flex items-start gap-2 text-sm">
@@ -79,9 +79,7 @@ function RunCard({
   readonly departments: ReadonlyMap<string, string>;
 }) {
   const outcome = OUTCOMES[run.outcome];
-  const meta = [run.model, run.promptVersion, duration(run.durationMs)].filter(
-    (part) => part !== null,
-  );
+  const meta = [duration(run.durationMs)].filter((part) => part !== null);
   const suggestion = [
     run.proposal.category !== null && isComplaintCategory(run.proposal.category)
       ? CATEGORY_LABELS[run.proposal.category]

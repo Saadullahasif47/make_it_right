@@ -425,8 +425,8 @@ export function AiSafety() {
       <Container className="grid gap-12 lg:grid-cols-2 lg:gap-16">
         <div>
           <SectionHeading id="ai-title" title="AI that helps, without taking control">
-            A Gemini model reads each report and proposes where it should go. It has three tools and
-            no write access: it can look up a route, propose one, or ask for a human.
+            An AI model reads each report and proposes where it should go. It has three tools and no
+            write access: it can look up a route, propose one, or ask for a human.
           </SectionHeading>
           <ol className="mt-8 space-y-3">
             {DECISION_FLOW.map((step, index) => (
