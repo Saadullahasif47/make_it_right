@@ -16,6 +16,7 @@ import {
   createDuplicateMatchHandler,
   createEmbeddingHandler,
 } from "../_shared/duplicates/handlers.ts";
+import { createRepairVerificationHandler } from "../_shared/repair-verification/handler.ts";
 import { createVisualAnalysisHandler } from "../_shared/visual-inspection/handler.ts";
 
 interface DenoRuntime {
@@ -65,6 +66,13 @@ function handlersFor(settings: WorkerSettings) {
     embedding: createEmbeddingHandler(duplicates),
     duplicate_match: createDuplicateMatchHandler(duplicates),
     coordination: createCoordinationHandler({ rpc, provider: provider(ai.coordinatorModel) }),
+    repair_verify: createRepairVerificationHandler({
+      rpc,
+      supabaseUrl: settings.supabaseUrl,
+      serviceKey: settings.serviceKey,
+      fetch: runtimeFetch,
+      vision: provider(ai.visionModel),
+    }),
   });
 }
 

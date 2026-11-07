@@ -1,14 +1,12 @@
 import { z } from "zod";
 
-import { MAX_EVIDENCE_BYTES, sniffImageType } from "../evidence/image.ts";
+import { downloadVerifiedPhoto } from "../evidence/download.ts";
 import { JobError, type ClaimedJob, type JobHandler } from "../jobs/types.ts";
 import { WorkerDatabaseError, type Rpc } from "../jobs/worker-db.ts";
 
 import { analyseImage, type VisionOptions } from "./gemini-vision.ts";
 import { VISUAL_SYSTEM_INSTRUCTION, buildVisualReportMessage } from "./prompt.ts";
 import { VISUAL_PROMPT_VERSION, toStoredAnalysis } from "./schema.ts";
-
-const EVIDENCE_BUCKET = "complaint-evidence";
 
 const contextSchema = z.object({
   attachment_id: z.uuid(),
@@ -33,16 +31,11 @@ export interface VisualHandlerOptions {
     VisionOptions | { readonly unavailable: "AI_DISABLED" | "PROVIDER_NOT_CONFIGURED" };
 }
 
-async function sha256Hex(bytes: Uint8Array<ArrayBuffer>): Promise<string> {
-  const digest = await crypto.subtle.digest("SHA-256", bytes);
-  return [...new Uint8Array(digest)].map((byte) => byte.toString(16).padStart(2, "0")).join("");
-}
-
 /**
- * The visual_analysis job (plan v2 F1.05): load the photo's report, fetch the private image with
- * the service key, re-check its bytes against what was finalised, ask the model, apply the
- * review policy, and store the result. Safe to run again: the database keeps the first result
- * per photo and prompt version.
+ * The visual_analysis job (plan v2 F1.05): load the photo's report, fetch the private image and
+ * re-check its bytes against what was finalised, ask the model, apply the review policy, and
+ * store the result. Safe to run again: the database keeps the first result per photo and
+ * prompt version.
  */
 export function createVisualAnalysisHandler(options: VisualHandlerOptions): JobHandler {
   return async (job: ClaimedJob, signal: AbortSignal) => {
@@ -58,37 +51,7 @@ export function createVisualAnalysisHandler(options: VisualHandlerOptions): JobH
       throw new JobError("PHOTO_NOT_FOUND", false);
     }
 
-    const objectUrl = `${options.supabaseUrl.replace(/\/+$/, "")}/storage/v1/object/${EVIDENCE_BUCKET}/${context.object_path
-      .split("/")
-      .map(encodeURIComponent)
-      .join("/")}`;
-    let download: Response;
-    try {
-      download = await options.fetch(objectUrl, {
-        headers: { apikey: options.serviceKey, authorization: `Bearer ${options.serviceKey}` },
-        signal,
-      });
-    } catch (error) {
-      throw new JobError("STORAGE_UNAVAILABLE", true, { cause: error });
-    }
-    if (download.status === 404 || download.status === 400) {
-      throw new JobError("PHOTO_NOT_FOUND", false);
-    }
-    if (!download.ok) {
-      throw new JobError("STORAGE_UNAVAILABLE", true);
-    }
-
-    const image = new Uint8Array(await download.arrayBuffer());
-    // The bytes must be exactly the photo that was checked and finalised.
-    if (
-      image.byteLength > MAX_EVIDENCE_BYTES ||
-      image.byteLength !== context.byte_size ||
-      sniffImageType(image) !== context.mime_type ||
-      (await sha256Hex(image)) !== context.sha256
-    ) {
-      throw new JobError("PHOTO_INTEGRITY", false);
-    }
-
+    const image = await downloadVerifiedPhoto(options, context, signal);
     const output = await analyseImage(
       options.vision,
       {

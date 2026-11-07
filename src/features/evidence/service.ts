@@ -41,15 +41,27 @@ export async function requestUpload(
   if (error !== null) {
     throw evidenceErrorFromDatabase(error);
   }
-  const slot = uploadSlotSchema.parse(data);
+  const slot = await signedUploadSlot(client, logger, data);
+  logger.info("evidence.upload_requested", { complaintId, attachmentId: slot.attachmentId });
+  return slot;
+}
 
+/**
+ * Turns a reservation (what a request_*_upload function returned) into a one-time signed upload
+ * URL. If Storage cannot issue one, the reservation is discarded.
+ */
+export async function signedUploadSlot(
+  client: AppSupabaseClient,
+  logger: Logger,
+  reservation: unknown,
+): Promise<UploadSlot> {
+  const slot = uploadSlotSchema.parse(reservation);
   const signed = await client.storage.from(EVIDENCE_BUCKET).createSignedUploadUrl(slot.object_path);
   if (signed.error !== null) {
     logger.error("evidence.upload_url_failed", { attachmentId: slot.attachment_id });
     await client.rpc("discard_evidence_upload", { p_attachment_id: slot.attachment_id });
     throw new EvidenceError("SERVICE_UNAVAILABLE", { cause: signed.error });
   }
-  logger.info("evidence.upload_requested", { complaintId, attachmentId: slot.attachment_id });
   return { attachmentId: slot.attachment_id, uploadUrl: signed.data.signedUrl };
 }
 
@@ -92,25 +104,45 @@ export async function finalizeUpload(
   }
 
   if (row.state === "pending") {
-    const download = await client.storage.from(EVIDENCE_BUCKET).download(row.object_path);
-    if (download.error !== null) {
-      // Nothing was uploaded (an orphaned reference), or it is not ours to read.
-      throw new EvidenceError("NOT_FOUND", { cause: download.error });
-    }
-    const bytes = new Uint8Array(await download.data.arrayBuffer());
-    if (bytes.byteLength > MAX_EVIDENCE_BYTES || bytes.byteLength !== row.byte_size) {
-      return reject(client, logger, row.id, row.object_path, "size_mismatch");
-    }
-    if (sniffImageType(bytes) !== row.mime_type) {
-      return reject(client, logger, row.id, row.object_path, "type_mismatch");
-    }
-
-    const sha256 = createHash("sha256").update(bytes).digest("hex");
-    return finalizeRow(client, logger, row, sha256, bytes.byteLength);
+    const sha256 = await checkUploadedPhoto(client, logger, row);
+    return finalizeRow(client, logger, row, sha256, row.byte_size);
   }
 
   // Already finalised (a retry): the database returns the existing job without new work.
   return finalizeRow(client, logger, row, "0".repeat(64), row.byte_size);
+}
+
+/** An upload the caller reserved and has just sent to the bucket. */
+export interface UploadedPhoto {
+  readonly id: string;
+  readonly object_path: string;
+  readonly mime_type: string;
+  readonly byte_size: number;
+}
+
+/**
+ * Downloads the uploaded object as the caller and checks it byte by byte (size, real file
+ * signature); returns its SHA-256 for the finalise call. A bad file is rejected and removed, so
+ * it never stays in the bucket. Shared by report photos and repair photos (plan v2 F1, F4).
+ */
+export async function checkUploadedPhoto(
+  client: AppSupabaseClient,
+  logger: Logger,
+  row: UploadedPhoto,
+): Promise<string> {
+  const download = await client.storage.from(EVIDENCE_BUCKET).download(row.object_path);
+  if (download.error !== null) {
+    // Nothing was uploaded (an orphaned reference), or it is not ours to read.
+    throw new EvidenceError("NOT_FOUND", { cause: download.error });
+  }
+  const bytes = new Uint8Array(await download.data.arrayBuffer());
+  if (bytes.byteLength > MAX_EVIDENCE_BYTES || bytes.byteLength !== row.byte_size) {
+    return reject(client, logger, row.id, row.object_path, "size_mismatch");
+  }
+  if (sniffImageType(bytes) !== row.mime_type) {
+    return reject(client, logger, row.id, row.object_path, "type_mismatch");
+  }
+  return createHash("sha256").update(bytes).digest("hex");
 }
 
 async function finalizeRow(
@@ -139,6 +171,22 @@ async function finalizeRow(
   return { attachmentId: finalized.attachment_id, jobId: finalized.job_id };
 }
 
+/** Five-minute signed URLs for photos the caller can see, keyed by object path. */
+export async function signPhotoUrls(
+  client: AppSupabaseClient,
+  paths: readonly string[],
+): Promise<ReadonlyMap<string, string>> {
+  if (paths.length === 0) return new Map();
+  const signed = await client.storage.from(EVIDENCE_BUCKET).createSignedUrls([...paths], 300);
+  return new Map(
+    (signed.data ?? []).flatMap((entry) =>
+      entry.error === null && entry.path !== null && entry.signedUrl !== null
+        ? [[entry.path, entry.signedUrl] as const]
+        : [],
+    ),
+  );
+}
+
 export interface EvidencePhoto {
   readonly id: string;
   readonly createdAt: string;
@@ -164,14 +212,9 @@ export async function listPhotos(
     return [];
   }
 
-  const signed = await client.storage.from(EVIDENCE_BUCKET).createSignedUrls(
+  const urls = await signPhotoUrls(
+    client,
     data.map((photo) => photo.object_path),
-    300,
-  );
-  const urls = new Map(
-    (signed.data ?? []).flatMap((entry) =>
-      entry.error === null && entry.path !== null ? [[entry.path, entry.signedUrl] as const] : [],
-    ),
   );
   return data.map((photo) => ({
     id: photo.id,

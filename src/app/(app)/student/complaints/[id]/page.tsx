@@ -11,6 +11,7 @@ import { WORKFLOW_NOTICES } from "@/features/complaints/paths";
 import { getComplaint } from "@/features/complaints/repository";
 import { complaintIdSchema } from "@/features/complaints/schemas";
 import { PhotoEvidence } from "@/features/evidence/components/photo-evidence";
+import { RepairVerificationPanel } from "@/features/repair-verification/components/repair-verification-panel";
 import { isFeatureEnabled } from "@/lib/config";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
@@ -64,6 +65,9 @@ async function ComplaintDetail({
       toast={workflow}
       actions={
         <>
+          {isFeatureEnabled("repairVerification") ? (
+            <RepairVerificationPanel client={client} complaintId={complaint.id} viewer="reporter" />
+          ) : null}
           <WorkflowPanel
             ticketId={complaint.id}
             version={complaint.version}

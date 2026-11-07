@@ -21,6 +21,7 @@ import { canAssign, isStalledTriage } from "@/features/complaints/workflow";
 import { CoordinationPanel } from "@/features/coordination/components/coordination-panel";
 import { DuplicatesPanel } from "@/features/duplicate-detection/components/duplicates-panel";
 import { PhotoEvidence } from "@/features/evidence/components/photo-evidence";
+import { RepairVerificationPanel } from "@/features/repair-verification/components/repair-verification-panel";
 import { getServerConfig, isFeatureEnabled } from "@/lib/config";
 import { requestTime } from "@/lib/request-time";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -115,6 +116,9 @@ async function AdminTicket({
             aiEnabled={getServerConfig().ai.enabled}
             canRetry={awaitingRetry && runs.length < MAX_RUNS_PER_TICKET}
           />
+          {isFeatureEnabled("repairVerification") ? (
+            <RepairVerificationPanel client={supabase} complaintId={complaint.id} viewer="staff" />
+          ) : null}
           <WorkflowPanel
             ticketId={complaint.id}
             version={complaint.version}

@@ -13,6 +13,7 @@ import { complaintIdSchema } from "@/features/complaints/schemas";
 import { CoordinationPanel } from "@/features/coordination/components/coordination-panel";
 import { DuplicatesPanel } from "@/features/duplicate-detection/components/duplicates-panel";
 import { PhotoEvidence } from "@/features/evidence/components/photo-evidence";
+import { RepairVerificationPanel } from "@/features/repair-verification/components/repair-verification-panel";
 import { isFeatureEnabled } from "@/lib/config";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
@@ -57,6 +58,9 @@ async function DepartmentTicket({
             acknowledgedAt={complaint.acknowledgedAt}
             role={access.user.role}
           />
+          {isFeatureEnabled("repairVerification") ? (
+            <RepairVerificationPanel client={client} complaintId={complaint.id} viewer="staff" />
+          ) : null}
           {isFeatureEnabled("maintenanceCoordinator") ? (
             <CoordinationPanel client={client} complaintId={complaint.id} viewer="staff" />
           ) : null}
