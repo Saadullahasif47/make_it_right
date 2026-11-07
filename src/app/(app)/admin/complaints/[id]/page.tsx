@@ -21,6 +21,7 @@ import { canAssign, isStalledTriage } from "@/features/complaints/workflow";
 import { CoordinationPanel } from "@/features/coordination/components/coordination-panel";
 import { DuplicatesPanel } from "@/features/duplicate-detection/components/duplicates-panel";
 import { PhotoEvidence } from "@/features/evidence/components/photo-evidence";
+import { CaseLocationPanel } from "@/features/heatmap/components/case-location-panel";
 import { RepairVerificationPanel } from "@/features/repair-verification/components/repair-verification-panel";
 import { getServerConfig, isFeatureEnabled } from "@/lib/config";
 import { requestTime } from "@/lib/request-time";
@@ -126,6 +127,9 @@ async function AdminTicket({
             acknowledgedAt={complaint.acknowledgedAt}
             role={access.user.role}
           />
+          {isFeatureEnabled("campusHeatmap") || isFeatureEnabled("maintenanceInsights") ? (
+            <CaseLocationPanel client={supabase} complaintId={complaint.id} />
+          ) : null}
           {isFeatureEnabled("visualInspection") ? (
             <PhotoEvidence
               client={supabase}

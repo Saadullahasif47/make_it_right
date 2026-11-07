@@ -23,6 +23,6 @@ exit gate is demonstrated and the evidence is linked here.
 | A2 F1 Visual inspection     | VERIFIED    | [a2-visual-inspection.md](evidence/a2-visual-inspection.md)     |
 | A3 F2 Duplicate proposals   | VERIFIED    | [a3-duplicate-detection.md](evidence/a3-duplicate-detection.md) |
 | A4 F3 Coordination agent    | VERIFIED    | [a4-coordinator.md](evidence/a4-coordinator.md)                 |
-| A5 F4 Repair verification   | IN PROGRESS | [a5-repair-verification.md](evidence/a5-repair-verification.md) |
-| A6 F5 Heatmap + F6 insights | NOT STARTED |                                                                 |
+| A5 F4 Repair verification   | VERIFIED    | [a5-repair-verification.md](evidence/a5-repair-verification.md) |
+| A6 F5 Heatmap + F6 insights | IN PROGRESS | [a6-heatmap-insights.md](evidence/a6-heatmap-insights.md)       |
 | A7 Expo deployment          | NOT STARTED |                                                                 |

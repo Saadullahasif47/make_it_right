@@ -70,3 +70,6 @@ select private.locate_unknown_cases() as located_cases;
 -- 60 labelled synthetic cases with their histories. Replaces earlier synthetic cases on every
 -- run; cases opened by real reports are never touched.
 select private.reset_synthetic_campus_history() as synthetic_cases;
+
+-- Insight alerts for the seeded history (A6, F6.06): the known recurring issues are flagged.
+select private.refresh_maintenance_alerts() as alerts;

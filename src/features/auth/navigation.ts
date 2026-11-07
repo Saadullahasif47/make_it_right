@@ -5,7 +5,9 @@ import {
   Cpu,
   Inbox,
   LayoutDashboard,
+  Lightbulb,
   ListChecks,
+  Map as MapIcon,
   Ticket,
   type LucideIcon,
 } from "lucide-react";
@@ -21,12 +23,14 @@ export interface NavItem {
   /** Other areas this item is the home of, e.g. the ticket pages reached from a queue. */
   readonly also?: readonly `/${string}`[];
   /** Shown only while a feature that needs this page is switched on (plan v2 A0.02). */
-  readonly requires?: "aiJobs";
+  readonly requires?: keyof NavOptions;
 }
 
 /** Which flag-dependent items the current deployment shows. */
 export interface NavOptions {
   readonly aiJobs: boolean;
+  readonly heatmap: boolean;
+  readonly insights: boolean;
 }
 
 /**
@@ -45,6 +49,14 @@ export const ROLE_NAVIGATION: Readonly<Record<AppRole, readonly NavItem[]>> = {
     { href: "/admin/tickets", label: "Tickets", icon: Ticket, also: ["/admin/complaints"] },
     { href: "/admin/review", label: "Review queue", shortLabel: "Review", icon: ListChecks },
     { href: "/admin/departments", label: "Departments", icon: Building2 },
+    {
+      href: "/admin/heatmap",
+      label: "Campus heatmap",
+      shortLabel: "Heatmap",
+      icon: MapIcon,
+      requires: "heatmap",
+    },
+    { href: "/admin/insights", label: "Insights", icon: Lightbulb, requires: "insights" },
     { href: "/admin/jobs", label: "AI jobs", shortLabel: "Jobs", icon: Cpu, requires: "aiJobs" },
   ],
 };
