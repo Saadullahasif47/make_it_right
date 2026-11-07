@@ -127,8 +127,8 @@ function Review({ review }: { readonly review: VerificationReview }) {
               ))}
             </ul>
           )}
-          <p className="font-mono text-xs text-ink-subtle">
-            {review.model ?? "no model"} · {review.promptVersion ?? "-"} · no functional test
+          <p className="text-xs text-ink-subtle">
+            Photo comparison only: no functional test was done.
           </p>
         </div>
       )}

@@ -1,7 +1,6 @@
 import { render, screen, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
-import { PrototypeNotice } from "@/app/(public)/_components/prototype-notice";
 import HomePage from "@/app/(public)/page";
 import { CATEGORY_LABELS, COMPLAINT_CATEGORIES } from "@/features/complaints/categories";
 
@@ -64,12 +63,10 @@ describe("landing page", () => {
   });
 });
 
-describe("PrototypeNotice", () => {
-  it("states this is not an official channel and asks for fictional data", () => {
-    render(<PrototypeNotice />);
+describe("public copy", () => {
+  it("names no model provider, hosting service or prototype label", () => {
+    const { container } = render(<HomePage />);
 
-    const note = screen.getByRole("note", { name: "Prototype notice" });
-    expect(note).toHaveTextContent(/not an official university reporting channel/i);
-    expect(note).toHaveTextContent(/fictional/i);
+    expect(container).not.toHaveTextContent(/gemini|vercel|supabase|prototype/i);
   });
 });

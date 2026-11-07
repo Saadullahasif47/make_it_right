@@ -18,8 +18,8 @@ export function SiteFooter() {
           <Logo />
           <p className="text-sm text-ink-muted">{PRODUCT_TAGLINE}.</p>
           <p className="text-sm text-pretty text-ink-muted">
-            A cloud computing coursework prototype. It is not an official reporting channel and does
-            not handle emergencies, harassment, medical or disciplinary matters.
+            For campus maintenance problems. It does not handle emergencies, harassment, medical or
+            disciplinary matters.
           </p>
         </div>
         <nav aria-label="Footer">
@@ -34,11 +34,6 @@ export function SiteFooter() {
           </ul>
         </nav>
       </Container>
-      <div className="border-t border-line">
-        <Container className="py-4 text-xs text-ink-subtle">
-          Runs on Vercel, Supabase and the Gemini API.
-        </Container>
-      </div>
     </footer>
   );
 }

@@ -2,7 +2,7 @@ import AxeBuilder from "@axe-core/playwright";
 import { expect, test } from "@playwright/test";
 
 test.describe("public landing page", () => {
-  test("loads with purpose, sign-in and the prototype disclaimer", async ({ page }) => {
+  test("loads with purpose and sign-in, without hosting or prototype labels", async ({ page }) => {
     const consoleErrors: string[] = [];
     page.on("console", (message) => {
       if (message.type() === "error") consoleErrors.push(message.text());
@@ -15,7 +15,7 @@ test.describe("public landing page", () => {
     await expect(page.getByRole("heading", { level: 1 })).toHaveText(
       "A better way to get campus problems fixed.",
     );
-    await expect(page.getByRole("note", { name: "Prototype notice" })).toBeVisible();
+    await expect(page.getByText(/prototype|Runs on Vercel|Gemini/i)).toHaveCount(0);
     await expect(
       page.getByRole("banner").getByRole("link", { name: /report an issue/i }),
     ).toHaveAttribute("href", "/student/complaints/new");

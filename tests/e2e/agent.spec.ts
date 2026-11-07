@@ -255,7 +255,7 @@ test("when the primary model is overloaded, the fallback model routes the report
   await expect(panel.getByText("Routed automatically")).toBeVisible();
   await expect(panel.getByText("switch_model")).toBeVisible();
   await expect(panel.getByText("PROVIDER_UNAVAILABLE")).toBeVisible();
-  await expect(panel.getByText("continued on gemini-3.5-flash")).toBeVisible();
+  await expect(panel.getByText("continued on the backup model")).toBeVisible();
 });
 
 test("with the AI down, a clear report still reaches its department by keyword rules", async ({

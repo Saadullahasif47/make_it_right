@@ -141,10 +141,6 @@ export function AnalysisCard({ complaintId, photo, viewer, canRespond }: Analysi
         </p>
       )}
 
-      <p className="font-mono text-xs text-ink-subtle">
-        {analysis.model} · {analysis.promptVersion}
-      </p>
-
       {showReview ? (
         <ReviewForm
           complaintId={complaintId}
