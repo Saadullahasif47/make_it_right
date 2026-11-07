@@ -93,7 +93,7 @@ export async function PhotoEvidence({ client, complaintId, viewer, open }: Photo
           })}
         </ul>
       )}
-      {uploadOpen ? <PhotoUploader complaintId={complaintId} /> : null}
+      {uploadOpen ? <PhotoUploader endpoint={`/api/complaints/${complaintId}/photos`} /> : null}
       {pending ? <PendingRefresh /> : null}
     </section>
   );

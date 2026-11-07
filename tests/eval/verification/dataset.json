@@ -1,0 +1,280 @@
+{
+  "version": 1,
+  "synthetic": true,
+  "pairs": [
+    {
+      "id": "r01-fixed",
+      "kind": "fixed",
+      "before": "sink_puddle",
+      "after": "sink_dry",
+      "title": "Water under the sink",
+      "description": "A puddle forms under the sink cabinet.",
+      "label": "visually_improved"
+    },
+    {
+      "id": "r02-fixed",
+      "kind": "fixed",
+      "before": "dripping_tap",
+      "after": "tap_dry",
+      "title": "Dripping tap",
+      "description": "The tap drips all day.",
+      "label": "visually_improved"
+    },
+    {
+      "id": "r03-fixed",
+      "kind": "fixed",
+      "before": "pipe_leak",
+      "after": "pipe_dry",
+      "title": "Leaking pipe",
+      "description": "Water sprays from a joint in the pipe.",
+      "label": "visually_improved"
+    },
+    {
+      "id": "r04-fixed",
+      "kind": "fixed",
+      "before": "sparking_socket",
+      "after": "socket_ok",
+      "title": "Socket sparks",
+      "description": "The wall socket sparks and is scorched.",
+      "label": "visually_improved"
+    },
+    {
+      "id": "r05-fixed",
+      "kind": "fixed",
+      "before": "broken_light",
+      "after": "light_ok",
+      "title": "Broken light fitting",
+      "description": "The light fitting is broken and hanging.",
+      "label": "visually_improved"
+    },
+    {
+      "id": "r06-fixed",
+      "kind": "fixed",
+      "before": "flickering_tube",
+      "after": "tube_ok",
+      "title": "Tube light half dark",
+      "description": "Half of the tube light is dark.",
+      "label": "visually_improved"
+    },
+    {
+      "id": "r07-fixed",
+      "kind": "fixed",
+      "before": "broken_chair",
+      "after": "chair_ok",
+      "title": "Broken chair",
+      "description": "A chair leg has snapped off.",
+      "label": "visually_improved"
+    },
+    {
+      "id": "r08-fixed",
+      "kind": "fixed",
+      "before": "cracked_desk",
+      "after": "desk_ok",
+      "title": "Cracked desk",
+      "description": "The desk top has a broken piece.",
+      "label": "visually_improved"
+    },
+    {
+      "id": "r09-fixed",
+      "kind": "fixed",
+      "before": "broken_window",
+      "after": "window_ok",
+      "title": "Cracked window",
+      "description": "The window pane is cracked.",
+      "label": "visually_improved"
+    },
+    {
+      "id": "r10-fixed",
+      "kind": "fixed",
+      "before": "overflowing_bin",
+      "after": "bin_ok",
+      "title": "Rubbish around the bin",
+      "description": "Rubbish is scattered around the bin.",
+      "label": "visually_improved"
+    },
+    {
+      "id": "r11-fixed",
+      "kind": "fixed",
+      "before": "dirty_floor",
+      "after": "floor_clean",
+      "title": "Stained floor",
+      "description": "The floor has dirty stains.",
+      "label": "visually_improved"
+    },
+    {
+      "id": "r12-fixed",
+      "kind": "fixed",
+      "before": "broken_tile",
+      "after": "tile_ok",
+      "title": "Cracked floor tile",
+      "description": "A floor tile is cracked and chipped.",
+      "label": "visually_improved"
+    },
+    {
+      "id": "r13-fixed",
+      "kind": "fixed",
+      "before": "missing_ceiling_tile",
+      "after": "ceiling_ok",
+      "title": "Missing ceiling tile",
+      "description": "A ceiling tile is missing.",
+      "label": "visually_improved"
+    },
+    {
+      "id": "r14-fixed",
+      "kind": "fixed",
+      "before": "door_off_hinge",
+      "after": "door_ok",
+      "title": "Door off its hinge",
+      "description": "The door hangs off its top hinge.",
+      "label": "visually_improved"
+    },
+    {
+      "id": "r15-unfixed",
+      "kind": "unfixed",
+      "before": "sink_puddle",
+      "after": "sink_puddle",
+      "title": "Water under the sink",
+      "description": "A puddle forms under the sink cabinet.",
+      "label": "possibly_unresolved"
+    },
+    {
+      "id": "r16-unfixed",
+      "kind": "unfixed",
+      "before": "cracked_monitor",
+      "after": "cracked_monitor",
+      "title": "Cracked monitor",
+      "description": "The monitor screen is cracked.",
+      "label": "possibly_unresolved"
+    },
+    {
+      "id": "r17-unfixed",
+      "kind": "unfixed",
+      "before": "broken_chair",
+      "after": "broken_chair",
+      "title": "Broken chair",
+      "description": "A chair leg has snapped off.",
+      "label": "possibly_unresolved"
+    },
+    {
+      "id": "r18-unfixed",
+      "kind": "unfixed",
+      "before": "peeling_paint",
+      "after": "peeling_paint",
+      "title": "Peeling paint",
+      "description": "Paint is peeling off the wall.",
+      "label": "possibly_unresolved"
+    },
+    {
+      "id": "r19-unfixed",
+      "kind": "unfixed",
+      "before": "dirty_toilet",
+      "after": "dirty_toilet",
+      "title": "Dirty toilet",
+      "description": "The toilet bowl is stained.",
+      "label": "possibly_unresolved"
+    },
+    {
+      "id": "r20-partial",
+      "kind": "partial",
+      "before": "sink_puddle",
+      "after": "sink_smaller_puddle",
+      "title": "Water under the sink",
+      "description": "A puddle forms under the sink cabinet.",
+      "label": "possibly_unresolved"
+    },
+    {
+      "id": "r21-partial",
+      "kind": "partial",
+      "before": "overflowing_bin",
+      "after": "bin_half",
+      "title": "Rubbish around the bin",
+      "description": "Rubbish is scattered around the bin.",
+      "label": "possibly_unresolved"
+    },
+    {
+      "id": "r22-partial",
+      "kind": "partial",
+      "before": "ceiling_leak_stain",
+      "after": "ceiling_stain_faded",
+      "title": "Ceiling stain",
+      "description": "A brown leak stain on the ceiling.",
+      "label": "possibly_unresolved"
+    },
+    {
+      "id": "r23-poor_after",
+      "kind": "poor_after",
+      "before": "dripping_tap",
+      "after": "tap_dry",
+      "title": "Dripping tap",
+      "description": "The tap drips all day.",
+      "label": "inconclusive",
+      "degrade": "dark"
+    },
+    {
+      "id": "r24-poor_after",
+      "kind": "poor_after",
+      "before": "broken_chair",
+      "after": "chair_ok",
+      "title": "Broken chair",
+      "description": "A chair leg has snapped off.",
+      "label": "inconclusive",
+      "degrade": "dark"
+    },
+    {
+      "id": "r25-poor_after",
+      "kind": "poor_after",
+      "before": "broken_window",
+      "after": "window_ok",
+      "title": "Cracked window",
+      "description": "The window pane is cracked.",
+      "label": "inconclusive",
+      "degrade": "blurry"
+    },
+    {
+      "id": "r26-poor_after",
+      "kind": "poor_after",
+      "before": "sparking_socket",
+      "after": "socket_ok",
+      "title": "Socket sparks",
+      "description": "The wall socket sparks and is scorched.",
+      "label": "inconclusive",
+      "degrade": "blurry"
+    },
+    {
+      "id": "r27-different",
+      "kind": "different",
+      "before": "sink_puddle",
+      "after": "chair_ok",
+      "title": "Water under the sink",
+      "description": "A puddle forms under the sink cabinet.",
+      "label": "not_comparable"
+    },
+    {
+      "id": "r28-different",
+      "kind": "different",
+      "before": "broken_light",
+      "after": "desk_ok",
+      "title": "Broken light fitting",
+      "description": "The light fitting is broken and hanging.",
+      "label": "not_comparable"
+    },
+    {
+      "id": "r29-different",
+      "kind": "different",
+      "before": "dirty_toilet",
+      "after": "window_ok",
+      "title": "Dirty toilet",
+      "description": "The toilet bowl is stained.",
+      "label": "not_comparable"
+    },
+    {
+      "id": "r30-different",
+      "kind": "different",
+      "before": "cracked_desk",
+      "after": "wall_painted",
+      "title": "Cracked desk",
+      "description": "The desk top has a broken piece.",
+      "label": "not_comparable"
+    }
+  ]
+}

@@ -415,6 +415,38 @@ isOneToOne: false
       referencedColumns: ["id"]
     }
                   ]
+                },"repair_evidence": {
+                  Row: {
+                    "attachment_id": string,"case_id": string,"created_at": string,"evidence_kind": Database["public"]['Enums']["repair_evidence_kind"],"id": string,"uploaded_by": string
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "attachment_id": string,"case_id": string,"created_at"?: string,"evidence_kind": Database["public"]['Enums']["repair_evidence_kind"],"id"?: string,"uploaded_by": string
+                  }
+                  Update: {
+                    "attachment_id"?: string,"case_id"?: string,"created_at"?: string,"evidence_kind"?: Database["public"]['Enums']["repair_evidence_kind"],"id"?: string,"uploaded_by"?: string
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "repair_evidence_attachment_id_fkey"
+      columns: ["attachment_id"]
+isOneToOne: true
+      referencedRelation: "evidence_attachments"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "repair_evidence_case_id_fkey"
+      columns: ["case_id"]
+isOneToOne: false
+      referencedRelation: "maintenance_cases"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "repair_evidence_uploaded_by_fkey"
+      columns: ["uploaded_by"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    }
+                  ]
                 },"routing_rules": {
                   Row: {
                     "category": Database["public"]['Enums']["complaint_category"],"department_id": string,"enabled": boolean,"updated_at": string
@@ -490,6 +522,50 @@ isOneToOne: false
       columns: ["department_id"]
 isOneToOne: false
       referencedRelation: "departments"
+      referencedColumns: ["id"]
+    }
+                  ]
+                },"verification_reviews": {
+                  Row: {
+                    "after_attachment_id": string,"ai_result": Json | null,"ai_status": Database["public"]['Enums']["verification_ai_status"] | null,"analysed_at": string | null,"before_attachment_id": string | null,"case_id": string,"created_at": string,"decided_at": string | null,"decided_by": string | null,"decision_note": string | null,"explanation": string | null,"id": string,"job_id": string | null,"model": string | null,"prompt_version": string | null,"state": Database["public"]['Enums']["verification_state"],"uncertainty_flags": (string)[]
+                  }
+                  ComputedFields: never
+                  Insert: {
+                    "after_attachment_id": string,"ai_result"?: Json | null,"ai_status"?: Database["public"]['Enums']["verification_ai_status"] | null,"analysed_at"?: string | null,"before_attachment_id"?: string | null,"case_id": string,"created_at"?: string,"decided_at"?: string | null,"decided_by"?: string | null,"decision_note"?: string | null,"explanation"?: string | null,"id"?: string,"job_id"?: string | null,"model"?: string | null,"prompt_version"?: string | null,"state"?: Database["public"]['Enums']["verification_state"],"uncertainty_flags"?: (string)[]
+                  }
+                  Update: {
+                    "after_attachment_id"?: string,"ai_result"?: Json | null,"ai_status"?: Database["public"]['Enums']["verification_ai_status"] | null,"analysed_at"?: string | null,"before_attachment_id"?: string | null,"case_id"?: string,"created_at"?: string,"decided_at"?: string | null,"decided_by"?: string | null,"decision_note"?: string | null,"explanation"?: string | null,"id"?: string,"job_id"?: string | null,"model"?: string | null,"prompt_version"?: string | null,"state"?: Database["public"]['Enums']["verification_state"],"uncertainty_flags"?: (string)[]
+                  }
+                  Relationships: [
+                    {
+      foreignKeyName: "verification_reviews_after_attachment_id_fkey"
+      columns: ["after_attachment_id"]
+isOneToOne: true
+      referencedRelation: "evidence_attachments"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "verification_reviews_before_attachment_id_fkey"
+      columns: ["before_attachment_id"]
+isOneToOne: false
+      referencedRelation: "evidence_attachments"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "verification_reviews_case_id_fkey"
+      columns: ["case_id"]
+isOneToOne: false
+      referencedRelation: "maintenance_cases"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "verification_reviews_decided_by_fkey"
+      columns: ["decided_by"]
+isOneToOne: false
+      referencedRelation: "profiles"
+      referencedColumns: ["id"]
+    },{
+      foreignKeyName: "verification_reviews_job_id_fkey"
+      columns: ["job_id"]
+isOneToOne: false
+      referencedRelation: "ai_jobs"
       referencedColumns: ["id"]
     }
                   ]
@@ -646,6 +722,9 @@ isOneToOne: true
               "created": boolean,"id": string,"reference_no": number,"status": Database["public"]['Enums']["ticket_state"]
             }[]
                            },
+"decide_repair_verification":
+{ Args: { "p_confirm": boolean,"p_note"?: string,"p_review_id": string }; Returns: Database["public"]['Enums']["maintenance_case_status"]
+                           },
 "discard_evidence_upload":
 { Args: { "p_attachment_id": string }; Returns: undefined
                            },
@@ -655,6 +734,11 @@ isOneToOne: true
 "finalize_evidence_upload":
 { Args: { "p_attachment_id": string,"p_byte_size": number,"p_mime_type": string,"p_sha256": string }; Returns: {
               "attachment_id": string,"job_id": string
+            }[]
+                           },
+"finalize_repair_evidence_upload":
+{ Args: { "p_attachment_id": string,"p_byte_size": number,"p_mime_type": string,"p_sha256": string }; Returns: {
+              "attachment_id": string,"job_id": string,"review_id": string
             }[]
                            },
 "list_complaints":
@@ -686,6 +770,9 @@ isOneToOne: true
               "attachment_id": string,"job_status": Database["public"]['Enums']["ai_job_status"]
             }[]
                            },
+"repair_verification_view":
+{ Args: { "p_complaint_id": string }; Returns: Json
+                           },
 "request_case_coordination":
 { Args: { "p_case_id": string }; Returns: string
                            },
@@ -694,6 +781,11 @@ isOneToOne: true
                            },
 "request_evidence_upload":
 { Args: { "p_byte_size": number,"p_complaint_id": string,"p_mime_type": string }; Returns: {
+              "attachment_id": string,"object_path": string
+            }[]
+                           },
+"request_repair_evidence_upload":
+{ Args: { "p_byte_size": number,"p_case_id": string,"p_kind": Database["public"]['Enums']["repair_evidence_kind"],"p_mime_type": string }; Returns: {
               "attachment_id": string,"object_path": string
             }[]
                            },
@@ -760,8 +852,14 @@ isOneToOne: true
 "worker_save_match_candidates":
 { Args: { "p_attempt": number,"p_candidates": Json,"p_job_id": string,"p_model": string,"p_msg_id": number }; Returns: number
                            },
+"worker_save_verification":
+{ Args: { "p_attempt": number,"p_job_id": string,"p_model": string,"p_msg_id": number,"p_prompt_version": string,"p_result": Json }; Returns: Json
+                           },
 "worker_save_visual_analysis":
 { Args: { "p_attempt": number,"p_job_id": string,"p_model": string,"p_msg_id": number,"p_prompt_version": string,"p_result": Json }; Returns: string
+                           },
+"worker_verification_context":
+{ Args: { "p_review_id": string }; Returns: Json
                            },
 "worker_visual_context":
 { Args: { "p_attachment_id": string }; Returns: {
@@ -770,7 +868,7 @@ isOneToOne: true
                            }
           }
           Enums: {
-            "agent_run_outcome": "running"|"routed"|"needs_review"|"superseded","agent_run_trigger": "submission"|"admin_retry","ai_job_status": "queued"|"running"|"succeeded"|"retry_wait"|"needs_review","ai_job_type": "visual_analysis"|"embedding"|"duplicate_match"|"coordination"|"repair_verify"|"insights_refresh","app_role": "student"|"department"|"admin","attachment_state": "pending"|"finalized"|"rejected","case_event_type": "opened"|"assigned"|"status_changed"|"updated"|"report_linked"|"merged","complaint_category": "unclassified"|"electrical"|"it_equipment"|"plumbing"|"furniture"|"sanitation"|"other","coordination_outcome": "committed"|"awaiting_approval"|"review_requested"|"superseded","image_quality": "usable"|"blurry"|"dark"|"unrelated","maintenance_case_status": "open"|"needs_review"|"assigned"|"in_progress"|"resolved"|"reopened"|"closed"|"merged","match_decision": "pending"|"accepted"|"rejected"|"superseded","proposal_status": "pending"|"committed"|"rejected"|"stale","text_image_consistency": "consistent"|"inconsistent"|"unclear","ticket_actor_kind": "user"|"agent"|"rule"|"system","ticket_event_type": "created"|"assigned"|"acknowledged"|"status_changed"|"note_added"|"triage_started"|"review_requested"|"case_linked","ticket_priority": "unassessed"|"low"|"medium"|"high","ticket_state": "submitted"|"triaging"|"needs_review"|"assigned"|"in_progress"|"resolved"|"reopened"|"closed","visual_review_decision": "confirmed"|"disputed"|"corrected","work_order_source": "ticket_routing"|"coordinator"|"admin_approved","work_order_status": "active"|"completed"|"cancelled"
+            "agent_run_outcome": "running"|"routed"|"needs_review"|"superseded","agent_run_trigger": "submission"|"admin_retry","ai_job_status": "queued"|"running"|"succeeded"|"retry_wait"|"needs_review","ai_job_type": "visual_analysis"|"embedding"|"duplicate_match"|"coordination"|"repair_verify"|"insights_refresh","app_role": "student"|"department"|"admin","attachment_state": "pending"|"finalized"|"rejected","case_event_type": "opened"|"assigned"|"status_changed"|"updated"|"report_linked"|"merged"|"repair_evidence_added"|"verification_result"|"verification_decided","complaint_category": "unclassified"|"electrical"|"it_equipment"|"plumbing"|"furniture"|"sanitation"|"other","coordination_outcome": "committed"|"awaiting_approval"|"review_requested"|"superseded","image_quality": "usable"|"blurry"|"dark"|"unrelated","maintenance_case_status": "open"|"needs_review"|"assigned"|"in_progress"|"resolved"|"reopened"|"closed"|"merged","match_decision": "pending"|"accepted"|"rejected"|"superseded","proposal_status": "pending"|"committed"|"rejected"|"stale","repair_evidence_kind": "before"|"after","text_image_consistency": "consistent"|"inconsistent"|"unclear","ticket_actor_kind": "user"|"agent"|"rule"|"system","ticket_event_type": "created"|"assigned"|"acknowledged"|"status_changed"|"note_added"|"triage_started"|"review_requested"|"case_linked","ticket_priority": "unassessed"|"low"|"medium"|"high","ticket_state": "submitted"|"triaging"|"needs_review"|"assigned"|"in_progress"|"resolved"|"reopened"|"closed","verification_ai_status": "visually_improved"|"possibly_unresolved"|"inconclusive"|"not_comparable","verification_state": "pending"|"awaiting_decision"|"confirmed"|"rework"|"superseded","visual_review_decision": "confirmed"|"disputed"|"corrected","work_order_source": "ticket_routing"|"coordinator"|"admin_approved","work_order_status": "active"|"completed"|"cancelled"
           }
           CompositeTypes: {
             [_ in never]: never
@@ -886,7 +984,7 @@ export type CompositeTypes<
 export const Constants = {
   "public": {
           Enums: {
-            "agent_run_outcome": ["running", "routed", "needs_review", "superseded"],"agent_run_trigger": ["submission", "admin_retry"],"ai_job_status": ["queued", "running", "succeeded", "retry_wait", "needs_review"],"ai_job_type": ["visual_analysis", "embedding", "duplicate_match", "coordination", "repair_verify", "insights_refresh"],"app_role": ["student", "department", "admin"],"attachment_state": ["pending", "finalized", "rejected"],"case_event_type": ["opened", "assigned", "status_changed", "updated", "report_linked", "merged"],"complaint_category": ["unclassified", "electrical", "it_equipment", "plumbing", "furniture", "sanitation", "other"],"coordination_outcome": ["committed", "awaiting_approval", "review_requested", "superseded"],"image_quality": ["usable", "blurry", "dark", "unrelated"],"maintenance_case_status": ["open", "needs_review", "assigned", "in_progress", "resolved", "reopened", "closed", "merged"],"match_decision": ["pending", "accepted", "rejected", "superseded"],"proposal_status": ["pending", "committed", "rejected", "stale"],"text_image_consistency": ["consistent", "inconsistent", "unclear"],"ticket_actor_kind": ["user", "agent", "rule", "system"],"ticket_event_type": ["created", "assigned", "acknowledged", "status_changed", "note_added", "triage_started", "review_requested", "case_linked"],"ticket_priority": ["unassessed", "low", "medium", "high"],"ticket_state": ["submitted", "triaging", "needs_review", "assigned", "in_progress", "resolved", "reopened", "closed"],"visual_review_decision": ["confirmed", "disputed", "corrected"],"work_order_source": ["ticket_routing", "coordinator", "admin_approved"],"work_order_status": ["active", "completed", "cancelled"]
+            "agent_run_outcome": ["running", "routed", "needs_review", "superseded"],"agent_run_trigger": ["submission", "admin_retry"],"ai_job_status": ["queued", "running", "succeeded", "retry_wait", "needs_review"],"ai_job_type": ["visual_analysis", "embedding", "duplicate_match", "coordination", "repair_verify", "insights_refresh"],"app_role": ["student", "department", "admin"],"attachment_state": ["pending", "finalized", "rejected"],"case_event_type": ["opened", "assigned", "status_changed", "updated", "report_linked", "merged", "repair_evidence_added", "verification_result", "verification_decided"],"complaint_category": ["unclassified", "electrical", "it_equipment", "plumbing", "furniture", "sanitation", "other"],"coordination_outcome": ["committed", "awaiting_approval", "review_requested", "superseded"],"image_quality": ["usable", "blurry", "dark", "unrelated"],"maintenance_case_status": ["open", "needs_review", "assigned", "in_progress", "resolved", "reopened", "closed", "merged"],"match_decision": ["pending", "accepted", "rejected", "superseded"],"proposal_status": ["pending", "committed", "rejected", "stale"],"repair_evidence_kind": ["before", "after"],"text_image_consistency": ["consistent", "inconsistent", "unclear"],"ticket_actor_kind": ["user", "agent", "rule", "system"],"ticket_event_type": ["created", "assigned", "acknowledged", "status_changed", "note_added", "triage_started", "review_requested", "case_linked"],"ticket_priority": ["unassessed", "low", "medium", "high"],"ticket_state": ["submitted", "triaging", "needs_review", "assigned", "in_progress", "resolved", "reopened", "closed"],"verification_ai_status": ["visually_improved", "possibly_unresolved", "inconclusive", "not_comparable"],"verification_state": ["pending", "awaiting_decision", "confirmed", "rework", "superseded"],"visual_review_decision": ["confirmed", "disputed", "corrected"],"work_order_source": ["ticket_routing", "coordinator", "admin_approved"],"work_order_status": ["active", "completed", "cancelled"]
           }
         }
 } as const

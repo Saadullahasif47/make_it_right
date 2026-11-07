@@ -33,6 +33,16 @@
  *   STUB:COORD-WRONG       first proposes a department that is not the approved route
  *   STUB:COORD-HIGH        proposes high priority
  *
+ * Repair verification (plan v2 F4): a request whose answer schema has
+ * functional_test_not_performed is a before/after comparison (two inline images, both checked).
+ * Markers in the case's report text:
+ *   STUB:VERIFY-UNRESOLVED  visible signs remain (possibly_unresolved)
+ *   STUB:VERIFY-SCENE       the photos show different places (policy: not_comparable)
+ *   STUB:VERIFY-DARK        the after photo is too dark (policy: inconclusive)
+ *   STUB:VERIFY-OVERCLAIM   says "fully repaired" (policy: inconclusive, wording replaced)
+ *   STUB:429                rate limited
+ * Anything else answers visually_improved.
+ *
  * Embeddings (plan v2 F2): embedContent answers a deterministic 768-dimension vector, a hashed
  * bag of words, so reports with similar wording are similar. Markers in the embedded text:
  *   STUB:EMBED-REJECT      400 (PROVIDER_REJECTED)
@@ -104,6 +114,36 @@ function visionAnswer(report: string): unknown {
   return {
     candidates: [{ content: { role: "model", parts: [{ text }] }, finishReason: "STOP" }],
     usageMetadata: { promptTokenCount: 300, candidatesTokenCount: 80, totalTokenCount: 380 },
+  };
+}
+
+/** A before/after comparison, as Gemini returns it with responseJsonSchema. */
+function verificationAnswer(reports: string): unknown {
+  const unresolved = reports.includes("STUB:VERIFY-UNRESOLVED");
+  const answer = {
+    before_observations: ["A visible fault on the fixture"],
+    after_observations: [
+      unresolved ? "The same fault is still visible" : "The fault is no longer visible",
+    ],
+    visible_changes: unresolved ? [] : ["The visible fault appears to be gone"],
+    same_scene: reports.includes("STUB:VERIFY-SCENE") ? "no" : "yes",
+    before_quality: "usable",
+    after_quality: reports.includes("STUB:VERIFY-DARK") ? "dark" : "usable",
+    assessment: unresolved ? "possibly_unresolved" : "visually_improved",
+    not_visible_or_uncertain: ["Whether it works cannot be seen in a photo"],
+    explanation: reports.includes("STUB:VERIFY-OVERCLAIM")
+      ? "It is fully repaired and works perfectly."
+      : "The visible signs of the problem appear reduced; whether it works cannot be seen.",
+    functional_test_not_performed: true,
+  };
+  return {
+    candidates: [
+      {
+        content: { role: "model", parts: [{ text: JSON.stringify(answer) }] },
+        finishReason: "STOP",
+      },
+    ],
+    usageMetadata: { promptTokenCount: 600, candidatesTokenCount: 120, totalTokenCount: 720 },
   };
 }
 
@@ -269,6 +309,31 @@ const server = createServer((req, res) => {
         return;
       }
       send(res, 200, coordinationTurn(message, turn));
+      return;
+    }
+
+    const schema = JSON.stringify(
+      (body as { generationConfig?: { responseJsonSchema?: unknown } }).generationConfig
+        ?.responseJsonSchema ?? {},
+    );
+    if (schema.includes("functional_test_not_performed")) {
+      const reports = /<reports>([\s\S]*)<\/reports>/.exec(message)?.[1] ?? "";
+      const images = (contents[0]?.parts ?? []).flatMap((part) =>
+        part.inlineData === undefined ? [] : [part.inlineData],
+      );
+      if (reports.includes("STUB:429")) {
+        send(res, 429, {
+          error: { code: 429, message: "Exhausted", status: "RESOURCE_EXHAUSTED" },
+        });
+        return;
+      }
+      if (images.length !== 2 || !images.every((entry) => isImage(entry.data))) {
+        send(res, 400, {
+          error: { code: 400, message: "Invalid image", status: "INVALID_ARGUMENT" },
+        });
+        return;
+      }
+      send(res, 200, verificationAnswer(reports));
       return;
     }
 

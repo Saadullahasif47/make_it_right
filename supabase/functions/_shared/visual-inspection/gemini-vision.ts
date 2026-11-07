@@ -1,3 +1,5 @@
+import type { z } from "zod";
+
 import { JobError } from "../jobs/types.ts";
 
 import { MODEL_OUTPUT_JSON_SCHEMA, modelOutputSchema, type ModelOutput } from "./schema.ts";
@@ -15,6 +17,21 @@ export interface VisionRequest {
   readonly message: string;
   readonly image: Uint8Array;
   readonly mimeType: string;
+}
+
+/** One image of a multimodal request; a label, when given, is sent as text just before it. */
+export interface VisionImage {
+  readonly bytes: Uint8Array;
+  readonly mimeType: string;
+  readonly label?: string;
+}
+
+export interface StructuredVisionRequest {
+  readonly systemInstruction: string;
+  readonly message: string;
+  readonly images: readonly VisionImage[];
+  /** The answer's contract for Gemini (responseJsonSchema); Zod re-checks it on our side. */
+  readonly jsonSchema: unknown;
 }
 
 const GOOGLE_BASE_URL = "https://generativelanguage.googleapis.com";
@@ -56,18 +73,25 @@ function readReply(body: unknown): { readonly text: string; readonly blocked: bo
 }
 
 /**
- * One multimodal generateContent call with structured JSON output (plan v2 F1.04). Every
- * outcome is either a validated ModelOutput or a JobError with a stable code:
+ * One multimodal generateContent call with structured JSON output (plan v2 F1.04, F4.03). Every
+ * outcome is either a value that passed the Zod schema or a JobError with a stable code:
  *   RATE_LIMITED, PROVIDER_UNAVAILABLE, TIMEOUT    retryable
  *   PROVIDER_REJECTED, INVALID_OUTPUT              not retryable (a person looks instead)
- * Nothing the model returns is trusted until it passes the Zod schema.
+ * Nothing the model returns is trusted until it passes the schema.
  */
-export async function analyseImage(
+export async function generateStructured<T>(
   options: VisionOptions,
-  request: VisionRequest,
+  request: StructuredVisionRequest,
+  schema: z.ZodType<T>,
   signal: AbortSignal,
-): Promise<ModelOutput> {
+): Promise<T> {
   const url = `${(options.baseUrl ?? GOOGLE_BASE_URL).replace(/\/+$/, "")}/v1beta/models/${encodeURIComponent(options.model)}:generateContent`;
+  const parts: Record<string, unknown>[] = [{ text: request.message }];
+  for (const image of request.images) {
+    if (image.label !== undefined) parts.push({ text: image.label });
+    parts.push({ inlineData: { mimeType: image.mimeType, data: toBase64(image.bytes) } });
+  }
+
   let response: Response;
   try {
     response = await options.fetch(url, {
@@ -75,18 +99,10 @@ export async function analyseImage(
       headers: { "content-type": "application/json", "x-goog-api-key": options.apiKey },
       body: JSON.stringify({
         systemInstruction: { parts: [{ text: request.systemInstruction }] },
-        contents: [
-          {
-            role: "user",
-            parts: [
-              { text: request.message },
-              { inlineData: { mimeType: request.mimeType, data: toBase64(request.image) } },
-            ],
-          },
-        ],
+        contents: [{ role: "user", parts }],
         generationConfig: {
           responseMimeType: "application/json",
-          responseJsonSchema: MODEL_OUTPUT_JSON_SCHEMA,
+          responseJsonSchema: request.jsonSchema,
           maxOutputTokens: OUTPUT_TOKEN_BUDGET,
           thinkingConfig: { thinkingLevel: "MINIMAL" },
         },
@@ -120,9 +136,28 @@ export async function analyseImage(
   } catch (error) {
     throw new JobError("INVALID_OUTPUT", false, { cause: error });
   }
-  const parsed = modelOutputSchema.safeParse(json);
+  const parsed = schema.safeParse(json);
   if (!parsed.success) {
     throw new JobError("INVALID_OUTPUT", false, { cause: parsed.error });
   }
   return parsed.data;
+}
+
+/** The single-photo analysis of F1 (plan v2 F1.04). */
+export function analyseImage(
+  options: VisionOptions,
+  request: VisionRequest,
+  signal: AbortSignal,
+): Promise<ModelOutput> {
+  return generateStructured(
+    options,
+    {
+      systemInstruction: request.systemInstruction,
+      message: request.message,
+      images: [{ bytes: request.image, mimeType: request.mimeType }],
+      jsonSchema: MODEL_OUTPUT_JSON_SCHEMA,
+    },
+    modelOutputSchema,
+    signal,
+  );
 }

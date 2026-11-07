@@ -47,11 +47,28 @@ async function postJson(url: string, body: unknown): Promise<Response> {
   });
 }
 
+interface PhotoUploaderProps {
+  /** The reserve endpoint; its `/finalize` sibling confirms the upload. */
+  readonly endpoint: string;
+  /** Extra fields for the reserve request (a repair photo's kind). */
+  readonly fields?: Readonly<Record<string, string>>;
+  readonly label?: string;
+  readonly hint?: string;
+  readonly doneMessage?: string;
+}
+
 /**
- * Adds a photo to a saved report in three steps: reserve it, upload it straight to the private
- * bucket, then confirm it. The report itself never depends on this succeeding.
+ * Adds a photo in three steps: reserve it, upload it straight to the private bucket, then
+ * confirm it. Used for report photos (F1) and repair photos (F4); the report or case itself never
+ * depends on this succeeding.
  */
-export function PhotoUploader({ complaintId }: { readonly complaintId: string }) {
+export function PhotoUploader({
+  endpoint,
+  fields = {},
+  label = "Add a photo",
+  hint = "JPEG, PNG or WebP, up to 2 MB. Photos are private to you, the assigned department and administrators.",
+  doneMessage = "Photo added. It will be analysed shortly.",
+}: PhotoUploaderProps) {
   const router = useRouter();
   const inputId = useId();
   const input = useRef<HTMLInputElement>(null);
@@ -69,8 +86,11 @@ export function PhotoUploader({ complaintId }: { readonly complaintId: string })
 
     try {
       setState({ kind: "working", step: "Preparing upload…" });
-      const base = `/api/complaints/${complaintId}/photos`;
-      const reserved = await postJson(base, { mimeType: file.type, byteSize: file.size });
+      const reserved = await postJson(endpoint, {
+        ...fields,
+        mimeType: file.type,
+        byteSize: file.size,
+      });
       if (!reserved.ok) {
         setState({ kind: "error", message: await apiMessage(reserved) });
         return;
@@ -89,7 +109,9 @@ export function PhotoUploader({ complaintId }: { readonly complaintId: string })
       }
 
       setState({ kind: "working", step: "Checking photo…" });
-      const finalized = await postJson(`${base}/finalize`, { attachmentId: slot.attachmentId });
+      const finalized = await postJson(`${endpoint}/finalize`, {
+        attachmentId: slot.attachmentId,
+      });
       if (!finalized.ok) {
         setState({ kind: "error", message: await apiMessage(finalized) });
         return;
@@ -131,16 +153,13 @@ export function PhotoUploader({ complaintId }: { readonly complaintId: string })
         aria-describedby={`${inputId}-hint`}
       >
         <ImagePlus aria-hidden="true" className="size-4" />
-        {working ? state.step : "Add a photo"}
+        {working ? state.step : label}
       </Button>
       <p id={`${inputId}-hint`} className="text-sm text-ink-muted">
-        JPEG, PNG or WebP, up to 2 MB. Photos are private to you, the assigned department and
-        administrators.
+        {hint}
       </p>
       <div aria-live="polite">
-        {state.kind === "done" ? (
-          <Notice tone="success">Photo added. It will be analysed shortly.</Notice>
-        ) : null}
+        {state.kind === "done" ? <Notice tone="success">{doneMessage}</Notice> : null}
         {state.kind === "error" ? <Notice tone="error">{state.message}</Notice> : null}
       </div>
     </div>
