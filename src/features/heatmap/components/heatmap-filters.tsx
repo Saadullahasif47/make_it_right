@@ -19,7 +19,7 @@ function Select({
   readonly children: React.ReactNode;
 }) {
   return (
-    <label className="grid gap-1 text-sm font-medium text-ink">
+    <label className="grid min-w-0 gap-1 text-sm font-medium text-ink">
       {label}
       <select name={name} defaultValue={value} className={inputClassName}>
         {children}
@@ -45,7 +45,7 @@ export function HeatmapFiltersForm({
       action="/admin/heatmap"
       method="get"
       aria-label="Heatmap filters"
-      className="grid gap-3 rounded-xl border border-line bg-surface p-4 sm:grid-cols-2 lg:grid-cols-4"
+      className="grid grid-cols-2 gap-3 rounded-xl border border-line bg-surface p-4 lg:grid-cols-4"
     >
       <Select name="days" label="Opened in" value={String(filters.days)}>
         {HEATMAP_WINDOWS.map((days) => (

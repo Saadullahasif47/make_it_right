@@ -120,46 +120,49 @@ function AlertCard({ alert }: { readonly alert: InsightAlert }) {
 /** Weekly distinct cases as SVG columns, with the numbers in a table for assistive technology. */
 function WeeklyTrend({ trend }: { readonly trend: Insights["trend"] }) {
   const max = Math.max(1, ...trend.map((week) => week.cases));
-  const width = 600;
-  const height = 180;
-  const gap = 8;
+  // Drawn close to its displayed size, so the labels stay legible; headroom keeps the tallest
+  // bar's number inside the picture.
+  const width = 300;
+  const height = 130;
+  const top = 18;
+  const gap = 5;
   const bar = (width - gap * (trend.length - 1)) / Math.max(1, trend.length);
   return (
     <figure className="space-y-2">
       <svg
-        viewBox={`0 0 ${String(width)} ${String(height + 28)}`}
+        viewBox={`0 0 ${String(width)} ${String(top + height + 22)}`}
         className="w-full"
         aria-hidden="true"
       >
         {trend.map((week, index) => {
-          const h = week.cases === 0 ? 2 : Math.max(6, (week.cases / max) * height);
+          const h = week.cases === 0 ? 2 : Math.max(4, (week.cases / max) * height);
           const x = index * (bar + gap);
           return (
             <g key={week.week_start}>
               <rect
                 x={x}
-                y={height - h}
+                y={top + height - h}
                 width={bar}
                 height={h}
-                rx={4}
+                rx={3}
                 className={week.cases === 0 ? "fill-line" : "fill-brand"}
               />
               {week.cases > 0 ? (
                 <text
                   x={x + bar / 2}
-                  y={height - h - 6}
+                  y={top + height - h - 5}
                   textAnchor="middle"
-                  className="fill-ink text-[13px] font-semibold"
+                  className="fill-ink text-[12px] font-semibold"
                 >
                   {week.cases}
                 </text>
               ) : null}
-              {index % 2 === 0 || index === trend.length - 1 ? (
+              {(trend.length - 1 - index) % 3 === 0 ? (
                 <text
-                  x={x + bar / 2}
-                  y={height + 20}
-                  textAnchor="middle"
-                  className="fill-ink-subtle text-[12px]"
+                  x={index === trend.length - 1 ? x + bar : x + bar / 2}
+                  y={top + height + 16}
+                  textAnchor={index === trend.length - 1 ? "end" : "middle"}
+                  className="fill-ink-subtle text-[11px]"
                 >
                   {weekFormat.format(new Date(week.week_start))}
                 </text>
