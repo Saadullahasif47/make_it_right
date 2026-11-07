@@ -43,14 +43,16 @@ select is(
   (select array_agg(p.proname::text order by p.proname)
      from pg_proc as p join pg_namespace as n on n.oid = p.pronamespace
     where n.nspname = 'public' and has_function_privilege('authenticated', p.oid, 'execute')),
-  array['acknowledge_ticket', 'add_ticket_note', 'admin_decide_proposal', 'admin_metrics', 'admin_retry_ai_job',
+  array['acknowledge_ticket', 'add_ticket_note', 'admin_acknowledge_alert', 'admin_decide_proposal',
+        'admin_heatmap', 'admin_heatmap_room', 'admin_maintenance_insights', 'admin_metrics',
+        'admin_refresh_alerts', 'admin_retry_ai_job', 'admin_set_category_sla',
         'admin_set_department_active', 'admin_set_routing_rule', 'assign_ticket', 'create_ticket',
         'decide_repair_verification', 'discard_evidence_upload', 'dismiss_match_candidates',
-        'finalize_evidence_upload', 'finalize_repair_evidence_upload',
-        'list_complaints', 'photo_analysis_states', 'repair_verification_view', 'request_case_coordination',
+        'finalize_evidence_upload', 'finalize_repair_evidence_upload', 'list_complaints',
+        'photo_analysis_states', 'repair_verification_view', 'request_case_coordination',
         'request_duplicate_check', 'request_evidence_upload', 'request_repair_evidence_upload',
-        'review_match_candidate', 'review_visual_analysis',
-        'ticket_transition_rules', 'transition_ticket'],
+        'review_match_candidate', 'review_visual_analysis', 'set_case_location', 'ticket_transition_rules',
+        'transition_ticket'],
   'signed-in users can execute exactly the allow-listed public functions'
 );
 

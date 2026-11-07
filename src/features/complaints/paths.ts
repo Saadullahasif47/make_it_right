@@ -40,6 +40,7 @@ export const WORKFLOW_NOTICES: Readonly<Record<string, string>> = {
     "The coordinator is looking at this case. Refresh in a moment to see its proposal.",
   "coordination-approved": "Approved. The department now has the work order.",
   "coordination-rejected": "Proposal rejected. The case is yours to route.",
+  "location-set": "Location saved. The heatmap and insights count the case there.",
   "coordination-stale":
     "The case changed after this proposal, so it was not used. Ask the coordinator again if you need it.",
 };

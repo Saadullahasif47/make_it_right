@@ -73,6 +73,8 @@ export default defineConfig({
               FEATURE_DUPLICATE_DETECTION: "true",
               FEATURE_MAINTENANCE_COORDINATOR: "true",
               FEATURE_REPAIR_VERIFICATION: "true",
+              FEATURE_CAMPUS_HEATMAP: "true",
+              FEATURE_MAINTENANCE_INSIGHTS: "true",
             },
           },
         ]
