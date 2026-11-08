@@ -229,35 +229,58 @@ flowchart TD
   D -->|Admin decision| CA[Leads the whole shared case]
 ```
 
-## 8. Database entity relationships (core)
+## 8. Database entity relationships
+
+Split into four so each stays readable. Part A is the base system and the case foundation; parts
+B–D are what the add-on features attach to complaints and cases.
+
+**Part A: identity, tickets, routing and cases**
 
 ```mermaid
 erDiagram
-  profiles ||--o{ complaints : "created_by"
   departments ||--o{ profiles : "staff of"
+  profiles ||--o{ complaints : "created_by"
   departments ||--o{ complaints : "assigned"
+  departments ||--o{ routing_rules : "default for category"
   complaints ||--o{ ticket_events : "history"
   complaints ||--|| submission_keys : "idempotency"
   complaints ||--o{ agent_runs : "AI routing attempts"
-  departments ||--o{ routing_rules : "default for category"
   complaints ||--|| case_reports : "belongs to"
   maintenance_cases ||--o{ case_reports : "groups"
   maintenance_cases ||--o{ case_events : "history"
   maintenance_locations ||--o{ maintenance_cases : "room"
   maintenance_locations ||--o{ asset_registry : "equipment in room"
   asset_registry ||--o{ maintenance_cases : "equipment"
+```
+
+**Part B: photos, AI analyses and duplicate suggestions (on complaints)**
+
+```mermaid
+erDiagram
   complaints ||--o{ evidence_attachments : "reporter photos"
-  maintenance_cases ||--o{ evidence_attachments : "repair photos"
   evidence_attachments ||--o{ visual_analyses : "AI analysis"
   visual_analyses ||--o{ visual_analysis_reviews : "human responses"
   complaints ||--o| complaint_embeddings : "vector"
   complaints ||--o{ match_candidates : "suggested duplicates"
   maintenance_cases ||--o{ match_candidates : "candidate case"
+```
+
+**Part C: work on a case (work orders, coordinator, repair verification)**
+
+```mermaid
+erDiagram
   maintenance_cases ||--o{ case_work_orders : "work orders"
   maintenance_cases ||--o{ coordination_runs : "coordinator runs"
   coordination_runs ||--o| work_order_proposals : "proposal"
+  maintenance_cases ||--o{ evidence_attachments : "repair photos"
   maintenance_cases ||--o{ repair_evidence : "before/after"
   maintenance_cases ||--o{ verification_reviews : "repair checks"
+```
+
+**Part D: insight alerts**
+
+```mermaid
+erDiagram
   asset_registry ||--o{ maintenance_alerts : "subject (repeat failure)"
   maintenance_locations ||--o{ maintenance_alerts : "subject (location)"
   maintenance_alerts ||--o{ maintenance_alert_events : "history"
@@ -270,7 +293,7 @@ key. Full table descriptions in [document 6](06-database-design.md).
 ## 9. Deployment architecture
 
 ```mermaid
-flowchart LR
+flowchart TB
   DEV[Developer laptop<br/>Docker: local Supabase] -->|git push branch| GH[GitHub]
   GH -->|pull request| CI[GitHub Actions<br/>lint, types, unit, pgTAP,<br/>integration, build, E2E]
   GH -->|every push| VP[Vercel Preview deployment<br/>FEATURE_* on]

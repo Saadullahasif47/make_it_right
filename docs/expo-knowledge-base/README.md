@@ -41,7 +41,7 @@ Read in this order the first time. Documents 13 and 15 are the ones to reread on
 | 2   | [Complete user manual](02-complete-user-manual.md)                           | Every screen and button for students, staff and administrators, and the LAB-204 walkthrough | 45 min |
 | 3   | [Feature-by-feature explanation](03-feature-by-feature-explanation.md)       | Each base feature and F1–F6 in depth: purpose, flow, internals, security, failure, limits   | 60 min |
 | 4   | [Technology stack and decisions](04-technology-stack-and-decisions.md)       | Every technology actually in the repository, why it was chosen, and the alternatives        | 40 min |
-| 5   | [System architecture and data flow](05-system-architecture-and-data-flow.md) | Eight Mermaid diagrams and a code-level trace of "Submit"                                   | 40 min |
+| 5   | [System architecture and data flow](05-system-architecture-and-data-flow.md) | Eleven Mermaid diagrams and a code-level trace of "Submit"                                  | 40 min |
 | 6   | [Database design](06-database-design.md)                                     | All 27 tables, RLS, constraints, idempotency, cases vs reports                              | 45 min |
 | 7   | [AI, ML, NLP and agentic AI concepts](07-ai-ml-nlp-agentic-ai-concepts.md)   | The concepts behind the AI, and the honest answer to "did you train a model?"               | 45 min |
 | 8   | [Datasets and evaluations](08-datasets-and-evaluations.md)                   | The six evaluation sets and the demo campus: contents, method, results, limits              | 40 min |

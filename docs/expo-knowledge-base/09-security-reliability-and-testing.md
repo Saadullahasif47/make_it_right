@@ -91,8 +91,9 @@ Only documentation checks were run; no application code or test changed.
 
 - Prettier `format:check` on the whole repository: passed.
 - Local link check over this folder: 140 relative links and anchors, 0 broken.
-- Mermaid: all 9 diagrams parsed with Mermaid 10.9.1 (one sequence diagram was fixed: a semicolon
-  in a message ends the line in Mermaid's syntax).
+- Mermaid: all 12 diagrams parsed and rendered with Mermaid 10.9.1. One sequence diagram was fixed
+  (a semicolon in a message ends the line in Mermaid's syntax), and the database diagram was split into
+  four so each part is readable on an A4 page.
 - `pnpm smoke` against production earlier the same day: 27/27 on `4879ce9`.
 
 The test counts in the table above come from runs earlier in the same session, not from this

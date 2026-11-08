@@ -12,7 +12,7 @@ LangChain or any agent framework (the agent loops are our own code), and any sel
 ## Architecture at a glance
 
 ```mermaid
-flowchart LR
+flowchart TB
   subgraph Client
     B[Browser: student / staff / admin]
   end
