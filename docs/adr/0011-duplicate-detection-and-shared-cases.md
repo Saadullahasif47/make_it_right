@@ -124,3 +124,22 @@ when embeddings fail.
   claimed job reappears after the visibility timeout (ADR 0009).
 - Deploying adds `GEMINI_EMBEDDING_MODEL` (optional; it defaults to `gemini-embedding-2`) to the
   worker's secrets, in A7.03.
+
+## Amendment (2026-11-11): forgiving place matching
+
+Found in the cloud rehearsal: MIR-1028's duplicate job failed with `HANDLER_FAILED`. Its report
+had a known room (`LAB-103`) and the earlier report did not (`lab 103`), so
+`worker_duplicate_features` returned NULL instead of false for "same room", and the worker refused
+the row. Migration `20261111090000_forgiving_place_matching.sql`:
+
+- compares places on letters and digits only, in lower case, and drops a leading "Room"/"Rm" from
+  rooms, so `lab 103`, `LAB-103` and `Room LAB103` are one room;
+- treats two building names as the same when, normalised, they are equal or one starts with the
+  other (3+ characters), so `science` matches `Science Block`;
+- uses both in `match_location` (ambiguous places still stay unknown) and in
+  `worker_duplicate_features`, whose flags are now never NULL;
+- places existing reports that the stricter matching left as "location unknown".
+
+Same room still only adds to the score: two reports in one room are suggested as duplicates only
+when their meaning is also close (the 0.82 threshold is unchanged). pgTAP
+`015_place_matching` covers the normalisers, the matcher and the non-NULL flags.
